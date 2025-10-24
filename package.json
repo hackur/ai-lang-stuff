@@ -1,13 +1,41 @@
 {
   "name": "ai-lang-stuff",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Local-first AI experimentation toolkit with LangChain, LangGraph, Ollama, and mechanistic interpretability tools",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "langgraph dev",
+    "studio": "npx langgraph@latest dev",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
-  "keywords": [],
+  "keywords": [
+    "langchain",
+    "langgraph",
+    "ollama",
+    "local-llm",
+    "ai",
+    "agents",
+    "mechanistic-interpretability"
+  ],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/core": "^0.3.79",
+    "@langchain/langgraph": "^1.0.1",
+    "@langchain/openai": "^0.3.0",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^9.0.0",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
 }

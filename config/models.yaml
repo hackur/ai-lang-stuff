@@ -1,0 +1,130 @@
+# Model Configuration for Local AI Development
+
+# Default model settings
+default:
+  model_name: "qwen3:8b"
+  temperature: 0.7
+  base_url: "http://localhost:11434"
+  max_tokens: 4096
+  timeout: 120
+
+# Model profiles for different use cases
+profiles:
+  fast:
+    model_name: "qwen3:30b-a3b"
+    temperature: 0.5
+    description: "Fast MoE model for quick iterations"
+
+  quality:
+    model_name: "qwen3:8b"
+    temperature: 0.7
+    description: "Best balance of speed and quality"
+
+  creative:
+    model_name: "gemma3:12b"
+    temperature: 0.9
+    description: "Higher temperature for creative tasks"
+
+  coding:
+    model_name: "qwen3:30b-a3b"
+    temperature: 0.3
+    description: "Low temperature for precise code generation"
+
+  multilingual:
+    model_name: "gemma3:12b"
+    temperature: 0.7
+    description: "Best for non-English languages"
+
+  vision:
+    model_name: "qwen3-vl:8b"
+    temperature: 0.7
+    description: "For image understanding tasks"
+
+# Ollama configuration
+ollama:
+  base_url: "http://localhost:11434"
+  timeout: 120
+  num_ctx: 8192  # Context window size
+  num_gpu: 1     # Number of GPUs to use
+  num_thread: 8  # CPU threads
+
+# LM Studio configuration (alternative to Ollama)
+lmstudio:
+  enabled: false
+  base_url: "http://localhost:1234/v1"
+  timeout: 120
+
+# LangSmith observability
+langsmith:
+  enabled: false  # Set to true to enable tracing
+  project: "local-ai-experiments"
+  endpoint: "https://api.smith.langchain.com"
+  # API key should be in .env file: LANGSMITH_API_KEY
+
+# MCP Server configuration
+mcp_servers:
+  filesystem:
+    enabled: true
+    root_path: "./"
+    allowed_operations: ["read", "list"]
+
+  github:
+    enabled: false
+    # Requires GitHub token in .env: GITHUB_TOKEN
+
+  postgres:
+    enabled: false
+    # Connection string in .env: DATABASE_URL
+
+  puppeteer:
+    enabled: false
+    headless: true
+
+# Vector store configuration
+vector_stores:
+  chroma:
+    persist_directory: "./data/chroma_db"
+    collection_name: "documents"
+
+  faiss:
+    index_path: "./data/faiss_index"
+
+# Embedding models
+embeddings:
+  default: "qwen3-embedding"
+  base_url: "http://localhost:11434"
+  dimensions: 1536
+
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  console: true
+
+# Performance settings
+performance:
+  max_concurrent_requests: 5
+  request_timeout: 120
+  retry_attempts: 3
+  retry_delay: 2  # seconds
+  cache_enabled: true
+  cache_ttl: 3600  # seconds
+
+# Model download settings
+model_management:
+  auto_pull: false  # Automatically pull missing models
+  preferred_quantization: "Q4_0"  # Q4_0, Q5_0, Q8_0
+  verify_on_startup: true
+
+# Agent-specific settings
+agents:
+  max_iterations: 10
+  early_stopping: true
+  verbose: false
+
+# LangGraph settings
+langgraph:
+  checkpoint_db: "./data/checkpoints.db"
+  max_steps: 50
+  recursion_limit: 25

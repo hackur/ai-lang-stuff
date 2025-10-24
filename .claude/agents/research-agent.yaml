@@ -1,0 +1,195 @@
+name: "Research Agent"
+description: "Multi-agent pipeline for conducting deep research using local models"
+
+purpose: |
+  Orchestrate multiple specialized agents to perform comprehensive research on a topic:
+  - Researcher: Identifies key subtopics and sources
+  - Analyzer: Synthesizes information and finds patterns
+  - Writer: Generates structured report
+  - Reviewer: Quality checks output
+
+model: "qwen3:30b-a3b"
+
+architecture:
+  type: "langgraph"
+  nodes:
+    - name: "researcher"
+      model: "qwen3:8b"
+      role: "Find and categorize research topics"
+    - name: "analyzer"
+      model: "qwen3:30b-a3b"
+      role: "Deep analysis and synthesis"
+    - name: "writer"
+      model: "gemma3:12b"
+      role: "Generate comprehensive report"
+    - name: "reviewer"
+      model: "qwen3:8b"
+      role: "Quality assessment"
+
+  flow:
+    - from: "START"
+      to: "researcher"
+    - from: "researcher"
+      to: "analyzer"
+    - from: "analyzer"
+      to: "writer"
+    - from: "writer"
+      to: "reviewer"
+    - from: "reviewer"
+      to: "END"
+      condition: "approved"
+    - from: "reviewer"
+      to: "writer"
+      condition: "not approved"
+
+tools:
+  - name: "web_search"
+    mcp_server: "brave-search"
+  - name: "read_file"
+    mcp_server: "filesystem"
+  - name: "wikipedia"
+    mcp_server: "wikipedia"
+
+state:
+  topic: "string"
+  sources: "list[str]"
+  analysis: "string"
+  report: "string"
+  approved: "bool"
+  iteration: "int"
+
+configuration:
+  max_iterations: 3
+  min_sources: 5
+  report_min_length: 1000
+  temperature: 0.7
+
+system_prompts:
+  researcher: |
+    You are an expert researcher. Given a topic, identify 5-10 key subtopics
+    that must be explored to provide comprehensive coverage. Focus on:
+    - Core concepts and definitions
+    - Historical context
+    - Current state of the art
+    - Open problems and challenges
+    - Practical applications
+
+    Format your output as a numbered list.
+
+  analyzer: |
+    You are an analytical expert. Synthesize the research topics into
+    coherent insights. Identify:
+    - Common themes and patterns
+    - Contradictions or debates
+    - Knowledge gaps
+    - Key relationships between concepts
+
+    Provide structured analysis with clear sections.
+
+  writer: |
+    You are a technical writer. Create a comprehensive, well-structured
+    report based on the analysis. Include:
+    - Executive summary
+    - Detailed sections for each major topic
+    - Clear explanations suitable for technical audience
+    - Conclusions and implications
+
+    Use markdown formatting with proper headers and lists.
+
+  reviewer: |
+    You are a quality reviewer. Assess the report for:
+    - Completeness: Does it cover all key aspects?
+    - Accuracy: Are claims well-supported?
+    - Clarity: Is it easy to understand?
+    - Structure: Is it well-organized?
+
+    Respond with "APPROVED" if report meets standards, or provide
+    specific feedback for improvement.
+
+examples:
+  - input:
+      topic: "transformer attention mechanisms"
+    expected_output: |
+      [Comprehensive report covering:]
+      - Self-attention fundamentals
+      - Multi-head attention
+      - Scaled dot-product attention
+      - Attention patterns in different tasks
+      - Computational complexity
+      - Recent innovations (sparse attention, etc.)
+
+  - input:
+      topic: "mechanistic interpretability techniques"
+    expected_output: |
+      [Comprehensive report covering:]
+      - Activation analysis
+      - Circuit discovery
+      - Attribution methods
+      - Causal interventions
+      - Current limitations
+      - Open research questions
+
+usage:
+  code: |
+    from langgraph.graph import StateGraph
+    from agents.research_agent import build_research_agent
+
+    # Build agent from config
+    agent = build_research_agent()
+
+    # Run research
+    result = agent.invoke({
+        "topic": "mechanistic interpretability in transformers"
+    })
+
+    print("Final Report:")
+    print(result["report"])
+
+  cli: |
+    uv run python -m agents.research_agent \
+      --topic "mechanistic interpretability" \
+      --output report.md
+
+monitoring:
+  langsmith:
+    enabled: true
+    project: "research-agent"
+    tags: ["research", "multi-agent"]
+
+  metrics:
+    - "execution_time"
+    - "iterations_to_approval"
+    - "report_length"
+    - "sources_found"
+
+testing:
+  test_cases:
+    - name: "Basic research flow"
+      input: {"topic": "test topic"}
+      assertions:
+        - "report is not empty"
+        - "sources list has items"
+        - "approved is true"
+
+    - name: "Iteration on poor quality"
+      input: {"topic": "complex topic"}
+      mock_reviewer_response: "NOT APPROVED - needs more detail"
+      assertions:
+        - "iteration > 1"
+        - "final approved is true"
+
+maintenance:
+  update_frequency: "monthly"
+  dependencies:
+    - langchain>=1.0.0
+    - langgraph>=1.0.0
+    - langchain-ollama
+
+  known_issues:
+    - "Very long topics may exceed context window"
+    - "Quality varies with model choice"
+
+  optimization_opportunities:
+    - "Cache repeated research topics"
+    - "Parallelize researcher subtask generation"
+    - "Add specialized models for technical vs creative topics"

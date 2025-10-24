@@ -1,7 +1,89 @@
 [project]
 name = "ai-lang-stuff"
 version = "0.1.0"
-description = "Add your description here"
+description = "Local-first AI experimentation toolkit with LangChain, LangGraph, Ollama, and mechanistic interpretability tools"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.10"
+dependencies = [
+    # Core LangChain
+    "langchain>=1.0.2",
+    "langchain-core>=0.3.79",
+    "langchain-community>=0.4.0",
+
+    # LangGraph
+    "langgraph>=1.0.1",
+    "langgraph-cli>=0.1.0",
+
+    # Local model integration
+    "langchain-ollama>=0.3.0",
+    "openai>=1.0.0",
+
+    # Vector stores
+    "chromadb>=0.5.0",
+    "faiss-cpu>=1.9.0",
+
+    # Mechanistic interpretability
+    "transformer-lens>=3.0.0",
+    "torch>=2.0.0",
+
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "httpx>=0.25.0",
+    "sqlalchemy>=2.0.0",
+    "tenacity>=8.0.0",
+    "pyyaml>=6.0.0",
+
+    # Data processing
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+
+    # Visualization
+    "matplotlib>=3.7.0",
+    "plotly>=5.14.0",
+
+    # Development tools
+    "jupyter>=1.0.0",
+    "jupyterlab>=4.0.0",
+    "ipython>=8.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "mypy>=1.5.0",
+]
+
+gpu = [
+    "faiss-gpu>=1.9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src --cov-report=html --cov-report=term"
