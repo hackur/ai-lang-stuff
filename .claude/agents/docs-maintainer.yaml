@@ -1,0 +1,312 @@
+name: "Documentation Maintainer"
+description: "Automated documentation maintenance and quality assurance agent"
+
+purpose: |
+  Continuously monitor, validate, and improve project documentation to ensure
+  it remains accurate, complete, and helpful. Identifies documentation gaps,
+  outdated content, and opportunities for improvement.
+
+model: "qwen3:30b-a3b"
+
+architecture:
+  type: "langgraph"
+  nodes:
+    - name: "scanner"
+      model: "qwen3:8b"
+      role: "Scan codebase and docs for inconsistencies"
+    - name: "validator"
+      model: "qwen3:30b-a3b"
+      role: "Validate documentation completeness and accuracy"
+    - name: "updater"
+      model: "gemma3:12b"
+      role: "Generate documentation updates"
+    - name: "reviewer"
+      model: "qwen3:8b"
+      role: "Review changes for quality"
+
+  flow:
+    - from: "START"
+      to: "scanner"
+    - from: "scanner"
+      to: "validator"
+    - from: "validator"
+      to: "updater"
+      condition: "issues_found"
+    - from: "validator"
+      to: "END"
+      condition: "no_issues"
+    - from: "updater"
+      to: "reviewer"
+    - from: "reviewer"
+      to: "END"
+
+tools:
+  - name: "read_file"
+    mcp_server: "filesystem"
+  - name: "list_files"
+    mcp_server: "filesystem"
+  - name: "git_diff"
+    description: "Check for code changes"
+  - name: "grep_code"
+    description: "Search for patterns"
+
+state:
+  files_scanned: "list[str]"
+  issues_found: "list[dict]"
+  documentation_gaps: "list[str]"
+  outdated_content: "list[dict]"
+  updates_needed: "list[dict]"
+  changes_made: "list[str]"
+  review_approved: "bool"
+
+configuration:
+  scan_patterns:
+    - "**/*.md"
+    - "**/*.py"
+    - "**/*.yaml"
+    - "**/*.json"
+  validation_rules:
+    - "All functions have docstrings"
+    - "All examples have expected output documented"
+    - "All prerequisites are listed"
+    - "All troubleshooting sections are current"
+    - "All links are valid"
+    - "All code examples run"
+    - "All version numbers match latest"
+  update_frequency: "weekly"
+  auto_fix: false  # Require human review
+
+system_prompts:
+  scanner: |
+    You are a documentation scanner. Analyze the codebase and documentation for:
+
+    1. Code without docstrings
+    2. Examples without expected output
+    3. Missing prerequisites
+    4. Broken links
+    5. Outdated version numbers
+    6. Inconsistent formatting
+    7. Incomplete troubleshooting sections
+    8. Missing error handling documentation
+
+    Report findings in structured format with file path, line number, and issue type.
+
+  validator: |
+    You are a documentation validator. Check each documentation file for:
+
+    Completeness:
+    - Purpose clearly stated
+    - Prerequisites listed
+    - Instructions are step-by-step
+    - Expected outputs described
+    - Examples are present
+    - Troubleshooting section exists
+    - Next steps provided
+
+    Accuracy:
+    - Commands are correct
+    - Code examples run
+    - Version numbers match
+    - Links work
+    - File paths exist
+
+    Quality:
+    - Language is clear
+    - Structure is consistent
+    - No jargon without explanation
+    - Suitable for target audience
+
+    Rate each file on scale of 1-10. Flag files scoring below 7.
+
+  updater: |
+    You are a documentation updater. For each issue identified:
+
+    1. Understand the context
+    2. Generate appropriate fix:
+       - Add missing docstring
+       - Update outdated information
+       - Fix broken links
+       - Add missing prerequisites
+       - Improve clarity
+    3. Maintain consistent style with existing docs
+    4. Preserve working examples
+    5. Add value, don't just change for sake of change
+
+    Provide specific line-by-line updates in diff format.
+
+  reviewer: |
+    You are a documentation reviewer. Evaluate proposed changes for:
+
+    Correctness:
+    - Information is accurate
+    - Examples work as documented
+    - No errors introduced
+
+    Completeness:
+    - All issues addressed
+    - No gaps created
+    - Cross-references updated
+
+    Quality:
+    - Improvements are clear
+    - Style is consistent
+    - Adds genuine value
+
+    Approve if all criteria met. Request revision with specific feedback otherwise.
+
+validation_rules:
+  required_sections:
+    README.md:
+      - "Quick Start"
+      - "Usage Examples"
+      - "Requirements"
+      - "Troubleshooting"
+      - "Documentation"
+
+    example files:
+      - "Docstring with purpose"
+      - "Prerequisites section"
+      - "Expected output"
+      - "Error handling"
+      - "Troubleshooting"
+
+    plan documents:
+      - "Purpose/Goal"
+      - "Prerequisites"
+      - "Step-by-step instructions"
+      - "Examples"
+      - "Success criteria"
+
+    CLAUDE.md:
+      - "Development guidelines"
+      - "Common tasks"
+      - "Troubleshooting"
+      - "Quality standards"
+
+  style_guide:
+    headings: "Use sentence case"
+    code_blocks: "Always specify language"
+    commands: "Use bash code blocks"
+    lists: "Use - for unordered, 1. for ordered"
+    emphasis: "Use **bold** for important, *italic* for terms"
+    line_length: "Aim for 80 characters in prose"
+
+checks:
+  - name: "Docstring Coverage"
+    description: "All functions have docstrings"
+    pattern: "def .*\\(.*\\):"
+    expect: '"""'
+
+  - name: "Example Output"
+    description: "Examples show expected output"
+    pattern: "## Expected output:|Expected output:"
+
+  - name: "Prerequisites Listed"
+    description: "Prerequisites section exists"
+    pattern: "## Prerequisites|Prerequisites:"
+
+  - name: "Troubleshooting Present"
+    description: "Troubleshooting guidance provided"
+    pattern: "## Troubleshooting|Troubleshooting:"
+
+  - name: "Version Numbers Current"
+    description: "Version numbers match latest"
+    versions:
+      langchain: ">=1.0.2"
+      langgraph: ">=1.0.1"
+      python: ">=3.10"
+
+automation:
+  schedule: "weekly"
+  tasks:
+    - "Scan all documentation"
+    - "Validate completeness"
+    - "Check for outdated info"
+    - "Verify all links"
+    - "Test code examples"
+    - "Generate report"
+
+  notifications:
+    - type: "issues_found"
+      message: "Documentation issues detected"
+      include: "summary"
+    - type: "updates_available"
+      message: "Documentation updates ready for review"
+
+usage:
+  manual_run: |
+    from agents.docs_maintainer import build_docs_agent
+
+    agent = build_docs_agent()
+    result = agent.invoke({
+        "scan_path": "./",
+        "validation_level": "strict"
+    })
+
+    print(f"Files scanned: {len(result['files_scanned'])}")
+    print(f"Issues found: {len(result['issues_found'])}")
+    print(f"Updates needed: {len(result['updates_needed'])}")
+
+  automated_run: |
+    # Run weekly via cron
+    # 0 9 * * 1 cd /path/to/project && uv run python -m agents.docs_maintainer
+
+  cli: |
+    # Scan and report
+    uv run python -m agents.docs_maintainer --scan
+
+    # Validate specific file
+    uv run python -m agents.docs_maintainer --validate README.md
+
+    # Generate updates
+    uv run python -m agents.docs_maintainer --update --dry-run
+
+    # Apply updates (with approval)
+    uv run python -m agents.docs_maintainer --update --apply
+
+reports:
+  format: "markdown"
+  location: "./docs-reports/"
+  include:
+    - scan_summary
+    - issues_by_type
+    - issues_by_file
+    - validation_scores
+    - proposed_updates
+    - coverage_metrics
+
+  metrics:
+    - "Documentation coverage (%)"
+    - "Average quality score"
+    - "Issues by severity"
+    - "Time since last update"
+    - "Broken links count"
+    - "Missing prerequisites count"
+
+monitoring:
+  langsmith:
+    enabled: true
+    project: "docs-maintainer"
+    tags: ["documentation", "maintenance", "automation"]
+
+  metrics:
+    - "scan_duration"
+    - "files_scanned_count"
+    - "issues_found_count"
+    - "updates_applied_count"
+
+maintenance:
+  update_frequency: "monthly"
+  version: "1.0.0"
+
+  known_limitations:
+    - "Cannot validate external links without network"
+    - "Code execution for testing requires safe sandbox"
+    - "Some documentation quality is subjective"
+
+  future_enhancements:
+    - "Automatic PR creation for fixes"
+    - "Integration with CI/CD pipeline"
+    - "Documentation quality trends over time"
+    - "Automated screenshot generation"
+    - "Link checker integration"
