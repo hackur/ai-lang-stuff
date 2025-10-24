@@ -1,0 +1,126 @@
+# Qwen3 30B - Dense Transformer Model
+# Documentation: https://huggingface.co/Qwen/Qwen3-30B
+# Release: April 2025
+
+model_name: "qwen3:30b"
+model_family: "Qwen3"
+architecture: "Dense Transformer"
+
+# Model Specifications
+parameters:
+  total: 30.5B
+  active: 30.5B  # All parameters active (not MoE)
+
+# Context Configuration
+context:
+  native_window: 32768  # 32K tokens native
+  extended_window: 131072  # 128K with YaRN extension
+  rope_base: 1000000  # RoPE base frequency
+
+# Optimal Inference Settings
+inference:
+  # General-purpose settings
+  default:
+    temperature: 0.7
+    top_p: 0.8
+    top_k: 20
+    repeat_penalty: 1.05
+
+  # Coding tasks - precise, deterministic
+  coding:
+    temperature: 0.3
+    top_p: 0.8
+    top_k: 20
+    repeat_penalty: 1.05
+
+  # Creative writing - higher variance
+  creative:
+    temperature: 0.9
+    top_p: 0.95
+    top_k: 40
+    repeat_penalty: 1.0
+
+  # Reasoning/thinking mode
+  reasoning:
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    min_p: 0.0
+    # IMPORTANT: Never use greedy decoding (do_sample=False) for thinking mode
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 25-35  # Approximate on M-series Mac
+  time_to_first_token: 1.5-3s
+  memory_required_gb: 18  # For Q4 quantization
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"  # Efficient balance of quality/speed
+  recommended: "Q5_K_M"  # Best quality at reasonable size
+  options:
+    - Q4_0: "4.1GB - Fast, good quality"
+    - Q4_K_M: "4.8GB - Better quality, still fast"
+    - Q5_K_M: "5.4GB - Excellent quality"
+    - Q8_0: "8.5GB - Near-original quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Complex reasoning tasks"
+    - "Code generation and review"
+    - "Long-form content creation"
+    - "Multi-turn conversations"
+  secondary:
+    - "Technical documentation"
+    - "Data analysis assistance"
+    - "Research and summarization"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 29  # Including English, Chinese, and 27 others
+  vision: false
+  function_calling: true
+  json_mode: true
+
+# Prompt Format
+prompt_format:
+  type: "ChatML"
+  system_token: "<|im_start|>system"
+  user_token: "<|im_start|>user"
+  assistant_token: "<|im_start|>assistant"
+  end_token: "<|im_end|>"
+
+# Special Tokens & Stop Sequences
+tokens:
+  eos_token: "<|endoftext|>"
+  stop_sequences:
+    - "<|im_end|>"
+    - "<|endoftext|>"
+
+# Resource Links
+resources:
+  official_page: "https://huggingface.co/Qwen/Qwen3-30B"
+  model_card: "https://huggingface.co/Qwen/Qwen3-30B"
+  documentation: "https://docs.unsloth.ai/models/qwen3-how-to-run-and-fine-tune"
+  ollama_page: "https://ollama.com/library/qwen3:30b"
+
+# Best Practices
+best_practices:
+  - "Use native 32K context; only extend with YaRN if needed"
+  - "For thinking/reasoning tasks: temperature 0.6, top_p 0.95, never greedy decoding"
+  - "For coding: temperature 0.3 for precise, consistent outputs"
+  - "Provide sufficient max_tokens for reasoning chains (2000+ recommended)"
+  - "Use Q5_K_M quantization for best quality/performance balance"
+
+# Known Issues & Limitations
+limitations:
+  - "No native vision capabilities (use Qwen3-VL for vision tasks)"
+  - "Extended context (>32K) requires YaRN and more memory"
+  - "Thinking mode requires sampling; greedy decoding causes repetition"
+
+# Version History
+version:
+  release_date: "2025-04"
+  latest_update: "2025-07"  # Instruct-2507 variant available

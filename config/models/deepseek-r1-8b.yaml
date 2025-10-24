@@ -1,0 +1,197 @@
+# DeepSeek-R1 8B - Reasoning-Optimized Model
+# Documentation: https://github.com/deepseek-ai/DeepSeek-R1
+# Model Card: https://huggingface.co/deepseek-ai/DeepSeek-R1
+# Paper: https://arxiv.org/pdf/2501.12948
+# Release: January 2025
+
+model_name: "deepseek-r1:8b"
+model_family: "DeepSeek-R1"
+architecture: "Dense Transformer with Reinforcement Learning"
+specialization: "Chain-of-Thought Reasoning"
+
+# Model Specifications
+parameters:
+  total: 8B
+  active: 8B
+  distilled_from: "DeepSeek-R1 671B"
+
+# Training Methodology
+training:
+  approach: "Reinforcement Learning (RL)"
+  technique: "Model Distillation from DeepSeek-R1"
+  base_models: "Qwen and Llama architectures"
+  special_capability: "Self-discovered chain-of-thought reasoning"
+
+# Context Configuration
+context:
+  native_window: 32768  # 32K tokens
+  reasoning_buffer: "Reserve tokens for CoT chains"
+
+# Optimal Inference Settings
+inference:
+  # Reasoning tasks (CRITICAL SETTINGS)
+  reasoning:
+    temperature: 0.6  # Recommended by DeepSeek
+    top_p: 0.95
+    top_k: 50
+    min_p: 0.0
+    repeat_penalty: 1.0
+    # NEVER use temperature below 0.5 or above 0.7
+    # Avoid greedy decoding to prevent repetition
+
+  # Mathematical problems
+  math:
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 50
+    response_format: "Step-by-step with \\boxed{} for final answer"
+
+  # Code reasoning
+  code_reasoning:
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 50
+    start_with: "<think>"
+
+  # General tasks (NOT recommended - use different model)
+  general:
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    note: "R1 optimized for reasoning, not general chat"
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 45-60  # Slower due to CoT
+  time_to_first_token: 1.0-2.0s
+  reasoning_overhead: "2-3x more tokens due to thinking process"
+  memory_required_gb: 4.9  # Q4 quantization
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q5_K_M"
+  options:
+    - Q4_0: "2.5GB - Good for reasoning"
+    - Q4_K_M: "3.0GB - Better quality"
+    - Q5_K_M: "3.6GB - Best quality"
+    - Q8_0: "4.9GB - Maximum quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Complex mathematical problem solving"
+    - "Multi-step reasoning tasks"
+    - "Code logic analysis and debugging"
+    - "Scientific reasoning"
+  secondary:
+    - "Educational tutoring with explanations"
+    - "Logical puzzle solving"
+    - "Strategic planning"
+  not_recommended_for:
+    - "Simple Q&A"
+    - "Fast code completion"
+    - "General conversation"
+    - "Speed-critical applications"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 29
+  vision: false
+  function_calling: true
+  json_mode: true
+  chain_of_thought: true  # Core capability
+  self_verification: true
+  reasoning_traces: true
+
+# Prompt Format
+prompt_format:
+  type: "Reasoning-Optimized"
+
+  # For reasoning tasks - enforce thinking
+  reasoning_format: |
+    <think>
+    {Let the model reason here}
+    </think>
+    {Final answer}
+
+  # For math problems
+  math_format: |
+    Please reason step by step, and put your final answer within \boxed{}
+
+  # IMPORTANT: No system prompts
+  system_prompt_policy: "Avoid system prompts - put all instructions in user prompt"
+
+# Special Tokens
+tokens:
+  thinking_start: "<think>"
+  thinking_end: "</think>"
+  eos_token: "<|endoftext|>"
+
+# Resource Links
+resources:
+  github: "https://github.com/deepseek-ai/DeepSeek-R1"
+  model_card: "https://huggingface.co/deepseek-ai/DeepSeek-R1"
+  paper: "https://arxiv.org/pdf/2501.12948"
+  blog: "https://www.vellum.ai/blog/the-training-of-deepseek-r1-and-ways-to-use-it"
+  analysis: "https://www.seangoedecke.com/deepseek-r1/"
+  technical: "https://fireworks.ai/blog/deepseek-r1-deepdive"
+  medium_guide: "https://medium.com/@tahirbalarabe2/deepseek-r1-explained-chain-of-thought-reinforcement-learning-and-model-distillation-0eb165d928c9"
+  ollama_page: "https://ollama.com/library/deepseek-r1:8b"
+
+# Best Practices
+best_practices:
+  - "CRITICAL: Use temperature 0.5-0.7 (recommended 0.6)"
+  - "Never use greedy decoding - causes endless repetitions"
+  - "Always enforce <think> token at start for reasoning tasks"
+  - "Avoid system prompts - use user prompts for all instructions"
+  - "For math: Add directive to use \\boxed{} for final answer"
+  - "Reserve sufficient max_tokens (2000+) for reasoning chains"
+  - "Let model self-verify and correct its reasoning"
+  - "Don't interrupt mid-reasoning - wait for </think>"
+
+# Chain-of-Thought Behavior
+cot_behavior:
+  how_it_works: "Model explores reasoning paths through RL training"
+  benefits:
+    - "Self-identifies flawed reasoning"
+    - "Corrects hallucinations mid-stream"
+    - "Shows work for transparency"
+  considerations:
+    - "Uses 2-3x more tokens than direct answers"
+    - "Slower inference due to reasoning process"
+    - "May over-explain simple problems"
+
+# Known Issues & Limitations
+limitations:
+  - "Optimized for reasoning, not general conversation"
+  - "Slower and more verbose than non-reasoning models"
+  - "Temperature range is critical (0.5-0.7 only)"
+  - "Requires prompting discipline (no system prompts)"
+  - "May hallucinate with insufficient context"
+
+# Comparison to Other Models
+comparisons:
+  vs_deepseek_coder:
+    reasoning: "R1 much better"
+    code_completion: "Coder faster"
+    use_r1_for: "Complex logic, debugging"
+    use_coder_for: "Quick code generation"
+  vs_qwen3_8b:
+    reasoning: "R1 superior"
+    general_use: "Qwen3 more versatile"
+    speed: "Qwen3 faster"
+  vs_openai_o1:
+    performance: "R1 comparable on math/code/reasoning"
+    availability: "R1 open-source, local"
+    cost: "R1 free to run locally"
+
+# Version History
+version:
+  release_date: "2025-01-20"
+  architecture: "Distilled from DeepSeek-R1 671B"
+  variants:
+    - "DeepSeek-R1-Zero (pure RL, no supervised fine-tuning)"
+    - "DeepSeek-R1 (RL + supervised)"
+    - "Distilled models on Qwen and Llama"

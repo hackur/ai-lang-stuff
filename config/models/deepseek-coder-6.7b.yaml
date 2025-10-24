@@ -1,0 +1,186 @@
+# DeepSeek Coder 6.7B - Lightweight Coding Model
+# Documentation: https://github.com/deepseek-ai/DeepSeek-Coder
+# Model Card: https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct
+# Release: 2024
+
+model_name: "deepseek-coder:6.7b"
+model_family: "DeepSeek-Coder"
+architecture: "Dense Transformer"
+specialization: "Code Generation"
+
+# Model Specifications
+parameters:
+  total: 6.7B
+  active: 6.7B
+
+# Training Data
+training:
+  code_tokens: "2T tokens"  # 87% code, 13% natural language
+  languages_supported: 80+
+  programming_languages:
+    - Python
+    - Java
+    - JavaScript
+    - TypeScript
+    - C++
+    - C#
+    - Go
+    - Rust
+    - PHP
+    - Ruby
+    - and 70+ more
+
+# Context Configuration
+context:
+  native_window: 16384  # 16K tokens
+  fill_in_middle: true  # Supports FIM for code completion
+
+# Optimal Inference Settings
+inference:
+  # Code generation (recommended by DeepSeek)
+  code_generation:
+    temperature: 0  # Deterministic for consistency
+    top_p: 0.95
+    top_k: 50
+    repeat_penalty: 1.0
+
+  # Code completion/autocomplete
+  code_completion:
+    temperature: 0.2  # Low for consistent completions
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.05
+
+  # Code review/analysis
+  code_review:
+    temperature: 0.3
+    top_p: 0.9
+    top_k: 50
+    repeat_penalty: 1.0
+
+  # Exploratory/creative coding
+  exploratory:
+    temperature: 0.7
+    top_p: 0.95
+    top_k: 50
+    repeat_penalty: 1.0
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 60-80  # Fast on M-series Mac
+  time_to_first_token: 0.7-1.2s
+  memory_required_gb: 3.8  # Q4 quantization
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q5_K_M"
+  options:
+    - Q4_0: "1.9GB - Fast, good for coding"
+    - Q4_K_M: "2.3GB - Better quality"
+    - Q5_K_M: "2.8GB - Best quality/speed balance"
+    - Q8_0: "3.8GB - Maximum quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Code generation and completion"
+    - "Bug fixing and refactoring"
+    - "Code explanation and documentation"
+    - "Algorithm implementation"
+  secondary:
+    - "Unit test generation"
+    - "Code translation between languages"
+    - "API wrapper creation"
+    - "Boilerplate code generation"
+  optimal_for:
+    - "Lightweight coding assistant"
+    - "Real-time code completion"
+    - "Educational coding help"
+
+# Model Capabilities
+capabilities:
+  multilingual: false  # Focused on code
+  code_languages: 80+
+  vision: false
+  function_calling: true
+  json_mode: true
+  fill_in_middle: true
+  code_completion: true
+  repository_level: false  # Consider 33B for repo-level
+
+# Prompt Format
+prompt_format:
+  type: "DeepSeek Instruct"
+  format: |
+    ### Instruction:
+    {instruction}
+
+    ### Response:
+
+  # Alternative format for chat
+  chat_format:
+    user: "User: {message}\n"
+    assistant: "Assistant: {message}\n"
+
+# Special Tokens
+tokens:
+  bos_token: "<|begin▁of▁sentence|>"
+  eos_token: "<|end▁of▁sentence|>"
+  fim_prefix: "<|fim▁begin|>"
+  fim_middle: "<|fim▁hole|>"
+  fim_suffix: "<|fim▁end|>"
+
+# Resource Links
+resources:
+  github: "https://github.com/deepseek-ai/DeepSeek-Coder"
+  model_card: "https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-instruct"
+  base_model: "https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-base"
+  paper: "https://arxiv.org/abs/2401.14196"
+  api_docs: "https://api-docs.deepseek.com/quick_start/parameter_settings"
+  ollama_page: "https://ollama.com/library/deepseek-coder:6.7b"
+
+# Best Practices
+best_practices:
+  - "Use temperature 0 for deterministic code generation"
+  - "Use temperature 0.2-0.3 for slight variation in solutions"
+  - "Supports Fill-in-the-Middle for IDE-style completion"
+  - "Trained on 87% code, 13% natural language - optimized for coding"
+  - "Best for single-file or function-level code tasks"
+  - "For repository-level understanding, consider deepseek-coder:33b"
+  - "Minimum 16GB RAM recommended for fine-tuning"
+
+# Fine-Tuning
+fine_tuning:
+  method: "QLoRA"
+  minimum_ram: "16GB"
+  recommended_ram: "32GB"
+  guide: "https://kennycason.com/posts/2025-03-10-finetuning-deepseek-coder-6.7b.html"
+
+# Known Issues & Limitations
+limitations:
+  - "16K context may be limiting for large codebases"
+  - "Not optimized for natural language conversations"
+  - "May hallucinate with very domain-specific libraries"
+  - "Better at common languages (Python, JS) than obscure ones"
+
+# Comparison to Other Models
+comparisons:
+  vs_codestral:
+    speed: "Similar"
+    quality: "Codestral slightly better"
+    size: "DeepSeek more compact"
+  vs_stable_code:
+    context: "DeepSeek larger (16K vs 4K)"
+    quality: "DeepSeek more capable"
+  vs_deepseek_33b:
+    speed: "6.7B much faster"
+    quality: "33B more accurate"
+    use_6.7b_for: "Quick iterations, learning"
+    use_33b_for: "Production code, complex logic"
+
+# Version History
+version:
+  release_date: "2024-01"
+  model_version: "v1.5"
+  architecture: "Based on DeepSeek LLM architecture"

@@ -1,0 +1,190 @@
+# DeepSeek Coder 33B - Large Coding Model
+# Documentation: https://github.com/deepseek-ai/DeepSeek-Coder
+# Model Card: https://huggingface.co/deepseek-ai/deepseek-coder-33b-instruct
+# Release: 2024
+
+model_name: "deepseek-coder:33b"
+model_family: "DeepSeek-Coder"
+architecture: "Dense Transformer"
+specialization: "Advanced Code Generation"
+
+# Model Specifications
+parameters:
+  total: 33B
+  active: 33B
+
+# Training Data
+training:
+  code_tokens: "2T tokens"  # 87% code, 13% natural language
+  languages_supported: 80+
+  repository_level: true  # Can understand repo context
+
+# Context Configuration
+context:
+  native_window: 16384  # 16K tokens
+  fill_in_middle: true
+
+# Optimal Inference Settings
+inference:
+  # Production code generation
+  code_generation:
+    temperature: 0
+    top_p: 0.95
+    top_k: 50
+    repeat_penalty: 1.0
+    description: "Deterministic, high-quality code"
+
+  # Code review and refactoring
+  code_review:
+    temperature: 0.2
+    top_p: 0.9
+    top_k: 50
+    repeat_penalty: 1.0
+
+  # Architecture design
+  architecture:
+    temperature: 0.4
+    top_p: 0.92
+    top_k: 50
+    repeat_penalty: 1.0
+
+  # Exploratory solutions
+  exploratory:
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 50
+    repeat_penalty: 1.0
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 20-30  # Slower due to size
+  time_to_first_token: 2-3s
+  memory_required_gb: 18  # Q4 quantization
+  compute_intensive: true
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q5_K_M"
+  options:
+    - Q4_0: "9.5GB - Fast enough, good quality"
+    - Q4_K_M: "11GB - Better quality"
+    - Q5_K_M: "13GB - Excellent quality"
+    - Q8_0: "18GB - Maximum quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Production-grade code generation"
+    - "Complex algorithm implementation"
+    - "Repository-level code understanding"
+    - "Large-scale refactoring"
+  secondary:
+    - "Architecture design and planning"
+    - "Complex debugging scenarios"
+    - "Multi-file code generation"
+    - "Advanced code optimization"
+  optimal_for:
+    - "Professional development"
+    - "Complex software projects"
+    - "Enterprise code assistance"
+
+# Model Capabilities
+capabilities:
+  multilingual: false  # Code-focused
+  code_languages: 80+
+  vision: false
+  function_calling: true
+  json_mode: true
+  fill_in_middle: true
+  repository_level: true
+  complex_reasoning: true
+
+# Prompt Format
+prompt_format:
+  type: "DeepSeek Instruct"
+  format: |
+    ### Instruction:
+    {instruction}
+
+    ### Response:
+
+  chat_format:
+    user: "User: {message}\n"
+    assistant: "Assistant: {message}\n"
+
+# Special Tokens
+tokens:
+  bos_token: "<|begin▁of▁sentence|>"
+  eos_token: "<|end▁of▁sentence|>"
+  fim_prefix: "<|fim▁begin|>"
+  fim_middle: "<|fim▁hole|>"
+  fim_suffix: "<|fim▁end|>"
+
+# Resource Links
+resources:
+  github: "https://github.com/deepseek-ai/DeepSeek-Coder"
+  model_card: "https://huggingface.co/deepseek-ai/deepseek-coder-33b-instruct"
+  base_model: "https://huggingface.co/deepseek-ai/deepseek-coder-33b-base"
+  paper: "https://arxiv.org/abs/2401.14196"
+  api_docs: "https://api-docs.deepseek.com/quick_start/parameter_settings"
+  ollama_page: "https://ollama.com/library/deepseek-coder:33b"
+
+# Best Practices
+best_practices:
+  - "Use temperature 0 for production code generation"
+  - "Capable of understanding repository-level context"
+  - "Best for complex multi-file code generation"
+  - "Excellent at architectural reasoning and design patterns"
+  - "Use for code that will go into production"
+  - "Consider 6.7B for quick iterations, 33B for final implementation"
+  - "Requires substantial RAM (24GB+ recommended)"
+
+# Hardware Requirements
+hardware_requirements:
+  minimum_ram: "24GB"
+  recommended_ram: "32GB+"
+  disk_space: "10-20GB depending on quantization"
+  suitable_for:
+    - "M2 Pro/Max MacBook Pro"
+    - "M3 Pro/Max/Ultra"
+    - "High-end desktop workstations"
+    - "Cloud instances with GPU"
+
+# Known Issues & Limitations
+limitations:
+  - "High memory requirements"
+  - "Slower inference than smaller models"
+  - "16K context may still be limiting for very large repos"
+  - "Overkill for simple coding tasks"
+
+# When to Use vs 6.7B
+model_selection:
+  use_6.7b_when:
+    - "Quick iterations and prototyping"
+    - "Learning and experimentation"
+    - "Simple to moderate complexity"
+    - "Limited hardware resources"
+  use_33b_when:
+    - "Production code generation"
+    - "Complex architecture design"
+    - "Repository-level understanding needed"
+    - "Maximum code quality required"
+
+# Comparison to Other Large Coders
+comparisons:
+  vs_codestral_22b:
+    size: "DeepSeek larger (33B vs 22B)"
+    context: "Codestral larger (256K vs 16K)"
+    quality: "Similar for most tasks"
+    speed: "Codestral faster due to efficient architecture"
+  vs_qwen3_30b:
+    specialization: "DeepSeek code-focused, Qwen3 general"
+    code_quality: "DeepSeek better for pure coding"
+    versatility: "Qwen3 better for mixed tasks"
+
+# Version History
+version:
+  release_date: "2024-01"
+  model_version: "v1.5"
+  architecture: "Based on DeepSeek LLM architecture"

@@ -1,0 +1,127 @@
+# Qwen3 8B - Dense Balanced Model
+# Documentation: https://huggingface.co/Qwen/Qwen3-8B
+# Release: April 2025
+
+model_name: "qwen3:8b"
+model_family: "Qwen3"
+architecture: "Dense Transformer"
+
+# Model Specifications
+parameters:
+  total: 8B
+  active: 8B
+
+# Context Configuration
+context:
+  native_window: 32768  # 32K tokens
+  extended_window: 131072  # 128K with YaRN
+  rope_base: 1000000
+
+# Optimal Inference Settings
+inference:
+  # Recommended default (from official docs)
+  default:
+    temperature: 0.7
+    top_p: 0.8
+    top_k: 20
+    repeat_penalty: 1.05
+
+  # Precise coding
+  coding:
+    temperature: 0.3
+    top_p: 0.75
+    top_k: 15
+    repeat_penalty: 1.05
+
+  # Creative tasks
+  creative:
+    temperature: 0.85
+    top_p: 0.92
+    top_k: 35
+    repeat_penalty: 1.0
+
+  # Reasoning tasks
+  reasoning:
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    min_p: 0.0
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 55-75  # Fast on M-series Mac
+  time_to_first_token: 0.8-1.5s
+  memory_required_gb: 5.2  # Q4 quantization
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q5_K_M"
+  options:
+    - Q4_0: "2.2GB - Very fast, good quality"
+    - Q4_K_M: "2.6GB - Better quality"
+    - Q5_K_M: "3.2GB - Excellent quality"
+    - Q8_0: "5.2GB - Near-original quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "General-purpose coding assistance"
+    - "Quick reasoning and problem-solving"
+    - "Multi-turn conversations"
+    - "Content generation"
+  secondary:
+    - "Code review and suggestions"
+    - "Documentation writing"
+    - "Data analysis help"
+    - "Learning and tutoring"
+  sweet_spot: "Best balance of speed, quality, and resource usage"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 29
+  vision: false
+  function_calling: true
+  json_mode: true
+
+# Prompt Format
+prompt_format:
+  type: "ChatML"
+  system_token: "<|im_start|>system"
+  user_token: "<|im_start|>user"
+  assistant_token: "<|im_start|>assistant"
+  end_token: "<|im_end|>"
+
+# Special Tokens
+tokens:
+  eos_token: "<|endoftext|>"
+  stop_sequences:
+    - "<|im_end|>"
+    - "<|endoftext|>"
+
+# Resource Links
+resources:
+  official_page: "https://huggingface.co/Qwen/Qwen3-8B"
+  documentation: "https://docs.unsloth.ai/models/qwen3-how-to-run-and-fine-tune"
+  ollama_page: "https://ollama.com/library/qwen3:8b"
+
+# Best Practices
+best_practices:
+  - "Best all-around model in the Qwen3 series for local development"
+  - "Fast enough for real-time interaction, smart enough for complex tasks"
+  - "Use temperature 0.7 for balanced outputs"
+  - "32K context is sufficient for most tasks"
+  - "Q4_0 or Q5_K_M quantization recommended for best speed/quality"
+  - "Excellent for learning LangChain/LangGraph patterns"
+
+# Known Issues & Limitations
+limitations:
+  - "No vision capabilities"
+  - "Slower than 30B-A3B MoE but more accurate for complex reasoning"
+  - "May struggle with very long contexts (>100K tokens)"
+
+# Version History
+version:
+  release_date: "2025-04"
+  latest_update: "2025-07"

@@ -1,0 +1,154 @@
+# Qwen3 4B - Lightweight Edge Model
+# Documentation: https://huggingface.co/Qwen/Qwen3-4B
+# Release: April 2025
+
+model_name: "qwen3:4b"
+model_family: "Qwen3"
+architecture: "Dense Transformer"
+
+# Model Specifications
+parameters:
+  total: 4B
+  active: 4B
+
+# Context Configuration
+context:
+  native_window: 32768  # 32K tokens
+  extended_window: 131072  # 128K with YaRN
+  rope_base: 1000000
+
+# Optimal Inference Settings
+inference:
+  # Default for edge/lightweight use
+  default:
+    temperature: 0.7
+    top_p: 0.8
+    top_k: 20
+    repeat_penalty: 1.05
+
+  # Coding on edge devices
+  coding:
+    temperature: 0.3
+    top_p: 0.75
+    top_k: 15
+    repeat_penalty: 1.05
+
+  # Creative tasks
+  creative:
+    temperature: 0.85
+    top_p: 0.9
+    top_k: 30
+    repeat_penalty: 1.0
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 85-110  # Very fast on M-series Mac
+  time_to_first_token: 0.5-1.0s
+  memory_required_gb: 2.6  # Q4 quantization
+  suitable_for:
+    - "MacBook Air / M1 Mac mini"
+    - "Raspberry Pi 5"
+    - "Edge devices"
+    - "Mobile deployment"
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q4_K_M"
+  options:
+    - Q4_0: "1.1GB - Ultra fast, minimal resources"
+    - Q4_K_M: "1.4GB - Better quality, still fast"
+    - Q5_K_M: "1.8GB - Best for edge devices"
+    - Q8_0: "2.6GB - Maximum quality for 4B"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Edge deployment and mobile devices"
+    - "Quick coding assistance with minimal resources"
+    - "Real-time conversational AI"
+    - "Embedded systems"
+  secondary:
+    - "Prototyping and experimentation"
+    - "Learning AI development"
+    - "Low-power computing environments"
+  ideal_for: "Resource-constrained environments requiring fast inference"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 29
+  vision: false
+  function_calling: true
+  json_mode: true
+  edge_optimized: true
+
+# Prompt Format
+prompt_format:
+  type: "ChatML"
+  system_token: "<|im_start|>system"
+  user_token: "<|im_start|>user"
+  assistant_token: "<|im_start|>assistant"
+  end_token: "<|im_end|>"
+
+# Special Tokens
+tokens:
+  eos_token: "<|endoftext|>"
+  stop_sequences:
+    - "<|im_end|>"
+    - "<|endoftext|>"
+
+# Resource Links
+resources:
+  official_page: "https://huggingface.co/Qwen/Qwen3-4B"
+  documentation: "https://docs.unsloth.ai/models/qwen3-how-to-run-and-fine-tune"
+  ollama_page: "https://ollama.com/library/qwen3:4b"
+
+# Best Practices
+best_practices:
+  - "Perfect for testing and development on resource-limited hardware"
+  - "Use Q4_0 quantization for maximum speed"
+  - "Ideal for learning LangChain patterns before scaling up"
+  - "Fast enough for real-time interactive applications"
+  - "Good for simple coding tasks and conversational AI"
+  - "Consider using for initial prototypes, then scale to 8B/30B"
+
+# Resource Requirements
+resource_requirements:
+  minimum_ram: "4GB"
+  recommended_ram: "8GB"
+  disk_space: "1-3GB depending on quantization"
+  cpu_threads: 4
+  suitable_hardware:
+    - "M1/M2/M3 MacBook Air"
+    - "Mac Mini base models"
+    - "Raspberry Pi 5 (8GB)"
+    - "Intel/AMD laptops with 8GB+ RAM"
+
+# Known Issues & Limitations
+limitations:
+  - "Not suitable for very complex reasoning tasks"
+  - "May struggle with highly technical or domain-specific queries"
+  - "No vision capabilities"
+  - "Smaller parameter count means less knowledge retention"
+
+# When to Use vs Larger Models
+model_selection:
+  use_4b_when:
+    - "Speed and resource efficiency are critical"
+    - "Running on edge/mobile devices"
+    - "Simple to moderate complexity tasks"
+    - "Learning and experimentation"
+  upgrade_to_8b_when:
+    - "Need better reasoning capabilities"
+    - "More complex coding tasks"
+    - "Professional development work"
+  upgrade_to_30b_when:
+    - "Maximum quality required"
+    - "Complex multi-step reasoning"
+    - "Production deployments"
+
+# Version History
+version:
+  release_date: "2025-04"
+  latest_update: "2025-07"

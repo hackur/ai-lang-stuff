@@ -1,0 +1,179 @@
+# Qwen3 30B-A3B - Mixture of Experts (MoE) Model
+# Documentation: https://huggingface.co/Qwen/Qwen3-30B-A3B
+# Architecture Comparison: https://www.marktechpost.com/2025/08/06/moe-architecture-comparison-qwen3-30b-a3b-vs-gpt-oss-20b/
+# Release: April 2025
+
+model_name: "qwen3:30b-a3b"
+model_family: "Qwen3-MoE"
+architecture: "Mixture of Experts (MoE)"
+
+# Model Specifications
+parameters:
+  total: 30.5B
+  active_per_token: 3.3B  # ~11% of parameters active per token
+  layers: 48
+  experts_per_layer: 128
+  experts_active: 8  # Top-8 expert routing
+
+# MoE Architecture Details
+moe_config:
+  architecture_type: "Grouped Query Attention (GQA)"
+  query_heads: 32
+  kv_heads: 4
+  expert_sharing: false  # No shared experts (unlike Qwen2.5-MoE)
+  load_balancing: "global-batch"  # Encourages expert specialization
+  layer_normalization: "qk"  # QK layer norm for training stability
+
+# Context Configuration
+context:
+  native_window: 32768  # 32K tokens native
+  extended_window: 131072  # 128K with YaRN extension
+  rope_base: 1000000  # RoPE base frequency
+
+# Optimal Inference Settings
+inference:
+  # Fast coding/iteration (primary use case)
+  coding_fast:
+    temperature: 0.3
+    top_p: 0.8
+    top_k: 20
+    repeat_penalty: 1.05
+    description: "Optimized for speed with good quality"
+
+  # General-purpose balanced
+  default:
+    temperature: 0.5
+    top_p: 0.9
+    top_k: 20
+    repeat_penalty: 1.05
+
+  # Creative writing
+  creative:
+    temperature: 0.9
+    top_p: 0.95
+    top_k: 40
+    repeat_penalty: 1.0
+
+  # Thinking/reasoning mode
+  thinking:
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    min_p: 0.0
+    # CRITICAL: Never use greedy decoding for thinking variant
+    # Always use sampling (do_sample=True)
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 45-65  # ~2x faster than dense 30B due to MoE
+  time_to_first_token: 1.0-2.0s
+  memory_required_gb: 18  # Similar to dense despite being MoE
+  memory_bandwidth: "Lower than dense models"
+
+  # MoE Efficiency Benefits
+  efficiency:
+    compute: "~3x more efficient than dense 30B"
+    inference_speedup: "2x faster generation"
+    expert_specialization: "Each expert specializes in specific domains"
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q5_K_M"
+  options:
+    - Q4_0: "4.1GB - Fast, excellent for MoE architecture"
+    - Q4_K_M: "4.8GB - Better quality"
+    - Q5_K_M: "5.4GB - Best quality/speed balance"
+    - Q8_0: "8.5GB - Near-original quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Fast code generation and iteration"
+    - "Quick prototyping and experimentation"
+    - "Real-time coding assistance"
+    - "Interactive development workflows"
+  secondary:
+    - "Multi-turn conversations with low latency"
+    - "Rapid content generation"
+    - "Quick reasoning tasks"
+  optimized_for:
+    - "Speed-critical applications"
+    - "High-frequency requests"
+    - "Resource-constrained environments"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 29
+  vision: false
+  function_calling: true
+  json_mode: true
+  expert_routing: true  # Dynamic expert selection per token
+
+# Prompt Format
+prompt_format:
+  type: "ChatML"
+  system_token: "<|im_start|>system"
+  user_token: "<|im_start|>user"
+  assistant_token: "<|im_start|>assistant"
+  end_token: "<|im_end|>"
+
+# Special Tokens & Stop Sequences
+tokens:
+  eos_token: "<|endoftext|>"
+  stop_sequences:
+    - "<|im_end|>"
+    - "<|endoftext|>"
+
+# Resource Links
+resources:
+  official_page: "https://huggingface.co/Qwen/Qwen3-30B-A3B"
+  instruct_variant: "https://huggingface.co/Qwen/Qwen3-30B-A3B-Instruct-2507"
+  coder_variant: "https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct"
+  architecture_analysis: "https://www.marktechpost.com/2025/08/06/moe-architecture-comparison-qwen3-30b-a3b-vs-gpt-oss-20b/"
+  deployment_guide: "https://ghost.codersera.com/blog/qwen3-vl-30b-a3b-thinking-complete-2025-deployment-guide/"
+  jan_settings: "https://www.jan.ai/post/qwen3-settings"
+  ollama_page: "https://ollama.com/library/qwen3:30b-a3b"
+
+# Best Practices
+best_practices:
+  - "Use for speed-critical applications where generation speed matters"
+  - "MoE architecture provides 2x faster inference than dense 30B"
+  - "Expert routing happens automatically - no manual configuration needed"
+  - "Global-batch load balancing encourages expert specialization"
+  - "For thinking mode: temperature 0.6, top_p 0.95, always enable sampling"
+  - "For fast coding: temperature 0.3, prioritize speed over creativity"
+  - "Q4_0 quantization works particularly well with MoE architecture"
+
+# MoE-Specific Advantages
+moe_advantages:
+  - "Only 3.3B parameters active per token vs 30.5B total"
+  - "Reduced memory bandwidth requirements"
+  - "Expert specialization improves task-specific performance"
+  - "No shared experts = less redundancy, better efficiency"
+  - "Global-batch load balancing = better expert utilization"
+
+# Known Issues & Limitations
+limitations:
+  - "No native vision capabilities"
+  - "Expert routing adds slight computational overhead"
+  - "May require fine-tuning for domain-specific expert optimization"
+  - "Thinking mode requires sampling (never use greedy decoding)"
+
+# Comparison to Dense Qwen3 30B
+vs_dense:
+  speed: "~2x faster"
+  quality: "Comparable for most tasks"
+  memory: "Similar footprint"
+  compute_efficiency: "~3x more efficient"
+  use_when: "Speed is priority over absolute quality"
+
+# Version History
+version:
+  release_date: "2025-04"
+  latest_update: "2025-07"  # Instruct-2507 and Coder variants
+  architecture_improvements:
+    - "Removed expert sharing from Qwen2.5-MoE"
+    - "Added global-batch load balancing loss"
+    - "Improved QK layer normalization"
