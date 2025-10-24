@@ -1,0 +1,197 @@
+# Gemma 3 12B FP16 - Multimodal Vision-Language Model
+# Documentation: https://huggingface.co/google/gemma-3-12b-it
+# Official Page: https://deepmind.google/models/gemma/gemma-3/
+# Release: March 2025
+
+model_name: "gemma3:12b-it-fp16"
+model_family: "Gemma3"
+architecture: "Dense Transformer with Local-Global Attention + Vision"
+vendor: "Google DeepMind"
+quantization_note: "FP16 - Full precision for maximum quality"
+
+# Model Specifications
+parameters:
+  total: 12B
+  active: 12B
+
+# Training Data
+training:
+  tokens: "12T tokens"
+  languages: 140+
+  tokenizer: "Gemini tokenizer"
+  vision_capable: true
+
+# Context Configuration
+context:
+  pretrain_window: 32768  # 32K pretraining
+  max_context: 128000  # 128K with scaling
+  attention_architecture: "Local-Global Interleaved"
+  local_layers: 5
+  global_layers: 1
+  local_window_size: 1024
+
+# Optimal Inference Settings
+inference:
+  # General purpose
+  default:
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.05
+
+  # Vision-language tasks
+  vision:
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.0
+    description: "Image understanding and analysis"
+
+  # Multilingual processing
+  multilingual:
+    temperature: 0.7
+    top_p: 0.92
+    top_k: 40
+    repeat_penalty: 1.0
+
+  # Creative writing
+  creative:
+    temperature: 0.9
+    top_p: 0.95
+    top_k: 50
+    repeat_penalty: 1.0
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 40-55  # FP16 slower but highest quality
+  time_to_first_token: 1.2-2.0s
+  memory_required_gb: 24  # FP16 full precision
+  kv_cache_overhead: "< 15%"
+  suitable_for: "High-end Mac Studio, MacBook Pro Max/Ultra"
+
+# Quantization Info
+quantization:
+  current: "FP16"  # Full precision
+  note: "This is the full precision version"
+  alternatives:
+    - "gemma3:12b (Q4_0) - 7GB, much faster"
+    - "gemma3:12b-q5 - Better quality, still faster than FP16"
+  use_fp16_when: "Maximum quality required, have sufficient RAM/VRAM"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Vision-language tasks (image understanding)"
+    - "Multilingual content creation (140+ languages)"
+    - "High-quality text generation"
+    - "Multimodal applications"
+  secondary:
+    - "Document analysis with images"
+    - "Educational content with visual aids"
+    - "Creative multimodal projects"
+  ideal_for: "Professional multimodal AI applications"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 140+
+  vision: true  # Can process images + text
+  function_calling: true
+  json_mode: true
+  local_global_attention: true
+  multimodal: true
+
+# Prompt Format
+prompt_format:
+  type: "Gemma Chat"
+  text_format: |
+    <start_of_turn>user
+    {user_message}<end_of_turn>
+    <start_of_turn>model
+    {assistant_message}<end_of_turn>
+
+  vision_format: |
+    <start_of_turn>user
+    <image>
+    {user_message}<end_of_turn>
+    <start_of_turn>model
+
+# Special Tokens
+tokens:
+  bos_token: "<bos>"
+  eos_token: "<eos>"
+  user_token: "<start_of_turn>user"
+  model_token: "<start_of_turn>model"
+  end_turn: "<end_of_turn>"
+  image_token: "<image>"
+
+# Resource Links
+resources:
+  official_page: "https://deepmind.google/models/gemma/gemma-3/"
+  model_card: "https://huggingface.co/google/gemma-3-12b-it"
+  fp16_variant: "https://huggingface.co/google/gemma-3-12b-it-fp16"
+  blog: "https://blog.google/technology/developers/gemma-3/"
+  huggingface_blog: "https://huggingface.co/blog/gemma3"
+  infoq_vision: "https://www.infoq.com/news/2025/05/gemma3-new-features/"
+  ollama_page: "https://ollama.com/library/gemma3:12b-it-fp16"
+
+# Best Practices
+best_practices:
+  - "Use FP16 for maximum quality when RAM/VRAM permits"
+  - "Excellent for vision-language tasks"
+  - "Best-in-class multilingual support (140+ languages)"
+  - "Consider quantized version (Q4/Q5) for faster inference"
+  - "Requires 24GB+ RAM for comfortable use"
+  - "Local-global attention reduces memory overhead"
+  - "Great for document analysis with images"
+
+# Vision Capabilities
+vision_features:
+  image_understanding: true
+  multimodal_reasoning: true
+  document_analysis: true
+  note: "Can process images interleaved with text"
+
+# Architecture Innovation
+architecture_details:
+  attention_pattern: "5:1 ratio local to global layers"
+  local_window: "1024 tokens"
+  rope_base: "1M (global), 10K (local)"
+  kv_cache_reduction: "From ~60% to <15%"
+  vision_integration: "Native image encoder support"
+
+# Hardware Requirements
+hardware_requirements:
+  minimum_ram: "24GB"
+  recommended_ram: "32GB+"
+  disk_space: "24GB"
+  suitable_hardware:
+    - "M2/M3 Max MacBook Pro (32GB+)"
+    - "Mac Studio M1/M2 Max/Ultra"
+    - "High-end workstations with 32GB+ RAM"
+
+# Known Issues & Limitations
+limitations:
+  - "High memory requirements due to FP16 precision"
+  - "Slower inference than quantized versions"
+  - "Overkill for text-only tasks (use quantized variant)"
+  - "May be too large for standard laptops"
+
+# When to Use FP16 vs Quantized
+precision_selection:
+  use_fp16_when:
+    - "Maximum quality absolutely required"
+    - "Have 24GB+ RAM available"
+    - "Working on professional/production projects"
+    - "Need best possible vision-language performance"
+  use_quantized_when:
+    - "Speed is important"
+    - "Limited RAM (< 24GB)"
+    - "Interactive applications"
+    - "Text-only tasks"
+
+# Version History
+version:
+  release_date: "2025-03"
+  gemini_generation: "Based on Gemini 2.0"
+  vision_capability: "First Gemma with vision support"

@@ -1,0 +1,154 @@
+# Gemma 3 3.3B - Lightweight Multimodal Model
+# Documentation: https://huggingface.co/google/gemma-3-3b-it
+# Official Page: https://deepmind.google/models/gemma/gemma-3/
+# Release: March 2025
+
+model_name: "gemma3:latest"
+model_family: "Gemma3"
+architecture: "Dense Transformer with Local-Global Attention"
+vendor: "Google DeepMind"
+
+# Model Specifications
+parameters:
+  total: 3.3B
+  active: 3.3B
+
+# Training Data
+training:
+  tokens: "12T tokens"
+  languages: 140+
+  tokenizer: "Gemini tokenizer (balanced for non-English)"
+
+# Context Configuration
+context:
+  pretrain_window: 32768  # 32K pretraining
+  inference_window: 32768  # 32K inference
+  attention_architecture: "Local-Global Interleaved"
+  local_layers: 5
+  global_layers: 1
+  local_window_size: 1024  # tokens
+
+# Optimal Inference Settings
+inference:
+  # General purpose
+  default:
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 40
+    repeat_penalty: 1.05
+
+  # Coding tasks
+  coding:
+    temperature: 0.4
+    top_p: 0.85
+    top_k: 30
+    repeat_penalty: 1.05
+
+  # Multilingual tasks
+  multilingual:
+    temperature: 0.7
+    top_p: 0.92
+    top_k: 40
+    repeat_penalty: 1.0
+
+  # Creative writing
+  creative:
+    temperature: 0.9
+    top_p: 0.95
+    top_k: 50
+    repeat_penalty: 1.0
+
+# Performance Characteristics
+performance:
+  tokens_per_second: 90-120  # Very fast on M-series Mac
+  time_to_first_token: 0.4-0.8s
+  memory_required_gb: 3.3  # Q4 quantization
+  kv_cache_overhead: "< 15%"  # Due to local-global attention
+
+# Quantization Settings
+quantization:
+  current: "Q4_0"
+  recommended: "Q4_K_M"
+  options:
+    - Q4_0: "1.2GB - Ultra fast"
+    - Q4_K_M: "1.5GB - Better quality"
+    - Q5_K_M: "1.9GB - Excellent quality"
+    - Q8_0: "3.3GB - Maximum quality"
+
+# Use Cases
+use_cases:
+  primary:
+    - "Multilingual applications (140+ languages)"
+    - "Fast general-purpose AI assistant"
+    - "Edge deployment"
+    - "Low-resource environments"
+  secondary:
+    - "Quick prototyping"
+    - "Educational tools"
+    - "Mobile deployment"
+  ideal_for: "Multilingual tasks on resource-limited hardware"
+
+# Model Capabilities
+capabilities:
+  multilingual: true
+  languages: 140+
+  vision: false  # 3B text-only, vision in 12B/27B
+  function_calling: true
+  json_mode: true
+  local_global_attention: true
+
+# Prompt Format
+prompt_format:
+  type: "Gemma Chat"
+  format: |
+    <start_of_turn>user
+    {user_message}<end_of_turn>
+    <start_of_turn>model
+    {assistant_message}<end_of_turn>
+
+# Special Tokens
+tokens:
+  bos_token: "<bos>"
+  eos_token: "<eos>"
+  user_token: "<start_of_turn>user"
+  model_token: "<start_of_turn>model"
+  end_turn: "<end_of_turn>"
+
+# Resource Links
+resources:
+  official_page: "https://deepmind.google/models/gemma/gemma-3/"
+  model_card: "https://huggingface.co/google/gemma-3-3b-it"
+  blog: "https://blog.google/technology/developers/gemma-3/"
+  huggingface_blog: "https://huggingface.co/blog/gemma3"
+  developers_blog: "https://developers.googleblog.com/en/introducing-gemma3/"
+  ollama_page: "https://ollama.com/library/gemma3:latest"
+
+# Best Practices
+best_practices:
+  - "Excellent for multilingual tasks with 140+ language support"
+  - "Gemini tokenizer more balanced for non-English languages"
+  - "Local-global attention reduces KV cache to <15% overhead"
+  - "5:1 ratio of local to global attention layers optimizes speed"
+  - "Perfect for edge deployment and mobile devices"
+  - "Use for quick iterations before scaling to 12B/27B"
+  - "Temperature 0.7 recommended for balanced outputs"
+
+# Architecture Innovation
+architecture_details:
+  attention_pattern: "Interleaves 5 local layers with 1 global layer"
+  local_window: "1024 tokens per local attention layer"
+  rope_base: "1M on global layers, 10K on local layers"
+  memory_efficiency: "Dramatically reduced KV cache from ~60% to <15%"
+  benefit: "Faster inference, lower memory usage"
+
+# Known Issues & Limitations
+limitations:
+  - "No vision capabilities (text-only)"
+  - "Smaller size means less knowledge retention than 12B/27B"
+  - "Not specialized for coding (consider DeepSeek Coder)"
+
+# Version History
+version:
+  release_date: "2025-03"
+  gemini_generation: "Based on Gemini 2.0"
+  leaderboard_ranking: "Not individually ranked (27B in top 10)"
