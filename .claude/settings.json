@@ -1,0 +1,6 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "/Volumes/JS-DEV/pcrcard/.claude/statusline.sh"
+  }
+}
