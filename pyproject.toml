@@ -9,23 +9,19 @@ dependencies = [
     "langchain>=1.0.2",
     "langchain-core>=0.3.79",
     "langchain-community>=0.4.0",
-
     # LangGraph
     "langgraph>=1.0.1",
     "langgraph-cli>=0.1.0",
-
     # Local model integration
     "langchain-ollama>=0.3.0",
     "openai>=1.0.0",
-
     # Vector stores
+    "langchain-chroma>=0.1.0",
     "chromadb>=0.5.0",
     "faiss-cpu>=1.9.0",
-
     # Mechanistic interpretability
     "transformer-lens>=3.0.0",
     "torch>=2.0.0",
-
     # Utilities
     "python-dotenv>=1.0.0",
     "pydantic>=2.0.0",
@@ -34,15 +30,16 @@ dependencies = [
     "sqlalchemy>=2.0.0",
     "tenacity>=8.0.0",
     "pyyaml>=6.0.0",
-
     # Data processing
     "numpy>=1.24.0",
     "pandas>=2.0.0",
-
+    # Document loaders
+    "pypdf>=3.17.0",
     # Visualization
     "matplotlib>=3.7.0",
     "plotly>=5.14.0",
-
+    # Performance monitoring
+    "psutil>=5.9.0",
     # Development tools
     "jupyter>=1.0.0",
     "jupyterlab>=4.0.0",
@@ -54,9 +51,15 @@ dev = [
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.1.0",
+    "pytest-benchmark>=4.0.0",
     "ruff>=0.1.0",
     "black>=23.0.0",
     "mypy>=1.5.0",
+    "bandit[toml]>=1.7.0",
+    "pre-commit>=3.5.0",
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.4.0",
+    "mkdocstrings[python]>=0.24.0",
 ]
 
 gpu = [
@@ -87,3 +90,21 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=src --cov-report=html --cov-report=term"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "examples"]
+skips = ["B101", "B601"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/__pycache__/*", "*/.venv/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

@@ -1,0 +1,48 @@
+{
+  "name": "ai-lang-stuff",
+  "description": "Local-first AI experimentation toolkit with LangChain, LangGraph, and Ollama",
+  "version": "0.1.0",
+  "python_version": "3.10",
+  "graphs": {
+    "research_agent": {
+      "path": "./workflows/research_agent.py",
+      "graph": "research_agent",
+      "description": "Sequential research pipeline with researcher, analyzer, and summarizer agents"
+    },
+    "code_reviewer": {
+      "path": "./workflows/code_reviewer.py",
+      "graph": "code_reviewer",
+      "description": "Code review pipeline with conditional routing based on code quality"
+    },
+    "rag_pipeline": {
+      "path": "./workflows/rag_pipeline.py",
+      "graph": "rag_pipeline",
+      "description": "RAG system with document ingestion, retrieval, and response generation"
+    }
+  },
+  "dependencies": [
+    "langchain>=1.0.2",
+    "langchain-core>=0.3.79",
+    "langchain-community>=0.4.0",
+    "langgraph>=1.0.1",
+    "langchain-ollama>=0.3.0",
+    "langchain-chroma>=0.1.0",
+    "chromadb>=0.5.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0"
+  ],
+  "env": {
+    "OLLAMA_BASE_URL": "http://localhost:11434",
+    "DEFAULT_MODEL": "qwen3:8b",
+    "LANGCHAIN_TRACING_V2": "false",
+    "LOG_LEVEL": "INFO"
+  },
+  "checkpointer": {
+    "type": "sqlite",
+    "path": "./checkpoints"
+  },
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8123
+  }
+}
