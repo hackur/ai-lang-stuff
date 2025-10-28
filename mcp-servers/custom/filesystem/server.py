@@ -8,7 +8,7 @@ Operations are restricted to allowed directories for security.
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from src.utils.logging import get_logger
 
@@ -50,7 +50,7 @@ class FilesystemMCPServer:
 
         return False
 
-    def read_file(self, path: str, encoding: str = "utf-8") -> Dict[str, any]:
+    def read_file(self, path: str, encoding: str = "utf-8") -> Dict[str, Any]:
         """
         Read file contents.
 
@@ -98,7 +98,7 @@ class FilesystemMCPServer:
             logger.error(f"Error reading file {path}: {e}")
             return {"status": "error", "error": str(e)}
 
-    def write_file(self, path: str, content: str, encoding: str = "utf-8") -> Dict[str, any]:
+    def write_file(self, path: str, content: str, encoding: str = "utf-8") -> Dict[str, Any]:
         """
         Write content to file.
 
@@ -143,7 +143,7 @@ class FilesystemMCPServer:
             logger.error(f"Error writing file {path}: {e}")
             return {"status": "error", "error": str(e)}
 
-    def list_directory(self, path: str, pattern: Optional[str] = None) -> Dict[str, any]:
+    def list_directory(self, path: str, pattern: Optional[str] = None) -> Dict[str, Any]:
         """
         List directory contents.
 
@@ -211,7 +211,7 @@ class FilesystemMCPServer:
             logger.error(f"Error listing directory {path}: {e}")
             return {"status": "error", "error": str(e)}
 
-    def search_files(self, path: str, query: str, file_pattern: str = "**/*") -> Dict[str, any]:
+    def search_files(self, path: str, query: str, file_pattern: str = "**/*") -> Dict[str, Any]:
         """
         Search for files containing text.
 

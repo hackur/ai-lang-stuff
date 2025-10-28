@@ -6,7 +6,7 @@ This is a stub implementation - actual search integration to be added.
 """
 
 import json
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from src.utils.logging import get_logger
 
@@ -35,7 +35,7 @@ class WebSearchMCPServer:
         self.provider = provider
         logger.info(f"Web search MCP server initialized (provider: {provider}, stub mode)")
 
-    def search(self, query: str, max_results: int = 5) -> Dict[str, any]:
+    def search(self, query: str, max_results: int = 5) -> Dict[str, Any]:
         """
         Search the web.
 
@@ -87,7 +87,7 @@ class WebSearchMCPServer:
         query: str,
         context: str,
         max_results: int = 5
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """
         Search with additional context for better results.
 
