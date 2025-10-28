@@ -24,14 +24,14 @@ Usage:
     python document_understanding.py /path/to/document.pdf --question "What is the main topic?"
 """
 
-import sys
-from pathlib import Path
-from typing import List, Dict, Optional
 import logging
+import sys
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional
 
-from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
 
 # Add project root to path for utils imports
 project_root = Path(__file__).parent.parent.parent

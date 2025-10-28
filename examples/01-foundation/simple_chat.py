@@ -11,8 +11,8 @@ Expected output:
 Clear explanation of list comprehensions with examples.
 """
 
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_ollama import ChatOllama
 
 
 def main():

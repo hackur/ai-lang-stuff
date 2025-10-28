@@ -16,20 +16,20 @@ Workflows tested:
 - Conditional routing
 """
 
-import time
-import statistics
-from typing import Dict, List, Any, Optional, Annotated
-from dataclasses import dataclass, asdict
-import json
 import csv
-from pathlib import Path
+import json
 import operator
+import statistics
+import time
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Annotated, Any, Dict, List, Optional
 
 import pytest
-from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.tools import tool
-from langgraph.graph import StateGraph, END
+from langchain_ollama import ChatOllama
+from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import ToolExecutor
 
 

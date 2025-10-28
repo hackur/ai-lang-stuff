@@ -24,14 +24,14 @@ Usage:
 """
 
 import base64
-import sys
-from pathlib import Path
-from typing import List, Dict, Optional
 import logging
+import sys
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional
 
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
+from langchain_ollama import ChatOllama
 
 # Add project root to path for utils imports
 project_root = Path(__file__).parent.parent.parent

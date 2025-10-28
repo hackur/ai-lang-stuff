@@ -20,10 +20,10 @@ specific images from the collection.
 """
 
 import base64
+import logging
 import sys
 from pathlib import Path
 from typing import Optional
-import logging
 
 from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage

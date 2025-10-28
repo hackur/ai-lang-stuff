@@ -24,18 +24,18 @@ Usage:
 """
 
 import base64
-import sys
-from pathlib import Path
-from typing import List, Dict, Optional
 import logging
+import sys
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+from typing import Dict, List, Optional
 
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # Add project root to path for utils imports
 project_root = Path(__file__).parent.parent.parent

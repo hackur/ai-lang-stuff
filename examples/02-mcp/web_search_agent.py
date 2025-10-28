@@ -25,10 +25,11 @@ from pathlib import Path
 # Add project root to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from langchain_ollama import ChatOllama
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
-from utils import OllamaManager, WebSearchMCP, MCPConfig
+from langchain_ollama import ChatOllama
+
+from utils import MCPConfig, OllamaManager, WebSearchMCP
 
 
 def main():

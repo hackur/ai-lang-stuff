@@ -14,9 +14,10 @@ Expected output:
 Response from each model with timing information.
 """
 
-from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage
 import time
+
+from langchain_core.messages import HumanMessage
+from langchain_ollama import ChatOllama
 
 
 def test_model(model_name: str, prompt: str) -> tuple[str, float]:

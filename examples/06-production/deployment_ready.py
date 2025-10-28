@@ -50,7 +50,6 @@ from aiohttp import web
 from langchain_core.messages import HumanMessage
 from langchain_ollama import ChatOllama
 
-
 # ============================================================================
 # Logging Setup
 # ============================================================================

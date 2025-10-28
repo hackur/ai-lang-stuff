@@ -15,18 +15,18 @@ Models tested:
 - deepseek-r1:8b (reasoning)
 """
 
-import time
-import psutil
-import statistics
-from typing import Dict, List, Any, Optional
-from dataclasses import dataclass, asdict
-import json
 import csv
+import json
+import statistics
+import time
+from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
+import psutil
 import pytest
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
+from langchain_ollama import ChatOllama
 
 
 @dataclass

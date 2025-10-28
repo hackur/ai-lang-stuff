@@ -5,8 +5,8 @@ Run with: uv run pytest tests/test_basic.py
 """
 
 import pytest
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
+from langchain_ollama import ChatOllama
 
 
 def test_ollama_import():
@@ -48,8 +48,9 @@ def test_streaming_response():
 
 def test_config_loading():
     """Test that configuration can be loaded."""
-    import yaml
     from pathlib import Path
+
+    import yaml
 
     config_path = Path(__file__).parent.parent / "config" / "models.yaml"
 

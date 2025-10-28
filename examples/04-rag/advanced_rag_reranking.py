@@ -19,14 +19,14 @@ Highly relevant answers with improved retrieval precision through multi-stage
 ranking, quality scoring, and context compression.
 """
 
+import logging
 import sys
 from pathlib import Path
 from typing import List, Tuple
-import logging
 
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import TextLoader, DirectoryLoader
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama

@@ -28,13 +28,14 @@ References:
     - TransformerLens documentation
 """
 
-import torch
-from typing import List, Dict, Tuple
 from dataclasses import dataclass
-from transformer_lens import HookedTransformer
-from transformer_lens.utils import get_act_name
+from typing import Dict, List, Tuple
+
 import matplotlib.pyplot as plt
 import networkx as nx
+import torch
+from transformer_lens import HookedTransformer
+from transformer_lens.utils import get_act_name
 
 
 @dataclass

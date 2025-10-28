@@ -49,7 +49,6 @@ from langchain_core.messages import HumanMessage
 from langchain_core.outputs import LLMResult
 from langchain_ollama import ChatOllama
 
-
 # ============================================================================
 # Structured Logging
 # ============================================================================

@@ -17,14 +17,14 @@ Usage:
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
-from typing import Dict, Any
-import sys
+from typing import Any, Dict
 
 try:
-    import matplotlib.pyplot as plt
     import matplotlib
+    import matplotlib.pyplot as plt
 
     matplotlib.use("Agg")  # Non-interactive backend
     PLOTTING_AVAILABLE = True
@@ -32,9 +32,9 @@ except ImportError:
     PLOTTING_AVAILABLE = False
     print("Warning: matplotlib not available. Plotting disabled.")
 
+from agent_workflow_performance import AgentWorkflowBenchmark
 from model_performance import ModelBenchmark
 from vector_store_performance import VectorStoreBenchmark
-from agent_workflow_performance import AgentWorkflowBenchmark
 
 
 class BenchmarkRunner:

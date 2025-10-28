@@ -16,8 +16,9 @@ import random
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
 from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
+
 import psutil
 import requests
 from requests.exceptions import ConnectionError, Timeout

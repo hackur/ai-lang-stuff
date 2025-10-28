@@ -20,14 +20,14 @@ Answers that stream in real-time, showing progressive generation with
 source citations appearing as they become relevant.
 """
 
-import sys
-from pathlib import Path
-from typing import List, Iterator
 import logging
 import re
+import sys
+from pathlib import Path
+from typing import Iterator, List
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import TextLoader, DirectoryLoader
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama

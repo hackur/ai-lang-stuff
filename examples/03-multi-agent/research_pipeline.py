@@ -19,23 +19,22 @@ Complete research pipeline execution showing each agent's contribution.
 """
 
 import operator
+
+# Import utilities - using absolute import path
+import sys
+from pathlib import Path
 from typing import Annotated, List, TypedDict
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
 from langgraph.graph import END, StateGraph
 
-# Import utilities - using absolute import path
-import sys
-from pathlib import Path
-
 # Add project root to path for imports
 project_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_root))
 
+from utils.logging import get_logger, setup_logging
 from utils.state_manager import StateManager, create_thread_id
-from utils.logging import setup_logging, get_logger
-
 
 # ============================================================================
 # State Definition

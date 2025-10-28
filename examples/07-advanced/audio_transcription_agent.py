@@ -26,16 +26,16 @@ Usage:
     python audio_transcription_agent.py --text-file transcript.txt  # Process existing transcript
 """
 
+import json
+import logging
 import sys
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
-import logging
-from dataclasses import dataclass
-import json
-from datetime import datetime
 
-from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import ChatOllama
 
 # Add project root to path for utils imports
 project_root = Path(__file__).parent.parent.parent

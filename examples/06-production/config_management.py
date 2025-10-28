@@ -43,7 +43,6 @@ import yaml
 from pydantic import BaseModel, Field, SecretStr, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 # ============================================================================
 # Environment Enum
 # ============================================================================

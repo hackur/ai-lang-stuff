@@ -12,8 +12,8 @@ Expected output:
 Tokens appearing one at a time in real-time.
 """
 
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage
+from langchain_ollama import ChatOllama
 
 
 def main():

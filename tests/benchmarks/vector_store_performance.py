@@ -12,21 +12,21 @@ Metrics:
 - Scaling characteristics (100, 1K, 10K documents)
 """
 
-import time
-import psutil
-import statistics
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass, asdict
-import json
 import csv
-from pathlib import Path
-import tempfile
+import json
 import shutil
+import statistics
+import tempfile
+import time
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
+import psutil
 import pytest
 from langchain_chroma import Chroma
-from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
 

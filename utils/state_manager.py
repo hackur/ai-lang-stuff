@@ -9,11 +9,10 @@ import operator
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Annotated, Dict, List, Optional, Type, TypedDict
+from typing import Annotated, Any, Dict, List, Optional, Type, TypedDict
 
 from langchain_core.messages import BaseMessage
 from langgraph.checkpoint.sqlite import SqliteSaver
-
 
 logger = logging.getLogger(__name__)
 

@@ -10,20 +10,19 @@ Tests complete workflow execution including:
 
 import operator
 import sqlite3
+
+# Import utilities
+import sys
 from pathlib import Path
 from typing import Annotated, List, TypedDict
 
 import pytest
 from langchain_core.messages import AIMessage
 
-# Import utilities
-import sys
-
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from utils.state_manager import StateManager, create_thread_id
-
 
 # ============================================================================
 # Test State Definitions
@@ -71,7 +70,7 @@ class TestWorkflowExecution:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def node_a(state: SimpleAgentState) -> SimpleAgentState:
             """First node."""
@@ -126,7 +125,7 @@ class TestWorkflowExecution:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def router_node(state: SimpleAgentState) -> SimpleAgentState:
             """Router that decides next path."""
@@ -213,7 +212,7 @@ class TestStatePersistence:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def test_node(state: SimpleAgentState) -> SimpleAgentState:
             """Test node."""
@@ -252,7 +251,7 @@ class TestStatePersistence:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def increment_node(state: SimpleAgentState) -> SimpleAgentState:
             """Increment counter."""
@@ -304,7 +303,7 @@ class TestParallelExecution:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def agent_a(state: ParallelAgentState) -> ParallelAgentState:
             """Agent A processing."""
@@ -381,7 +380,7 @@ class TestErrorRecovery:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def error_prone_node(state: ErrorRecoveryState) -> ErrorRecoveryState:
             """Node that may error on first try."""
@@ -429,7 +428,7 @@ class TestErrorRecovery:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def safe_node(state: ErrorRecoveryState) -> ErrorRecoveryState:
             """Safe node that always succeeds."""
@@ -481,7 +480,7 @@ class TestMultiAgentCoordination:
             checkpoint_dir: Checkpoint directory fixture
             mock_ollama_llm: Mock Ollama LLM fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         class ResearchState(TypedDict):
             """Research pipeline state."""
@@ -578,7 +577,7 @@ class TestCheckpointValidation:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def test_node(state: SimpleAgentState) -> SimpleAgentState:
             """Test node."""
@@ -623,7 +622,7 @@ class TestCheckpointValidation:
         Args:
             checkpoint_dir: Checkpoint directory fixture
         """
-        from langgraph.graph import StateGraph, END
+        from langgraph.graph import END, StateGraph
 
         def simple_node(state: SimpleAgentState) -> SimpleAgentState:
             """Simple node."""

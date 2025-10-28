@@ -24,12 +24,13 @@ References:
     - Anthropic's "Interpretability in the Wild" paper
 """
 
-import torch
-import numpy as np
 from typing import Dict
+
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
 from transformer_lens import HookedTransformer
 from transformer_lens.utils import get_act_name
-import matplotlib.pyplot as plt
 
 
 def setup_model(model_name: str = "gpt2-small") -> HookedTransformer:

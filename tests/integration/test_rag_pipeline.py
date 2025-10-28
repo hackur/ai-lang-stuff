@@ -8,20 +8,18 @@ Tests complete RAG workflows including:
 - Result validation and source tracking
 """
 
+# Import utilities
+import sys
 from pathlib import Path
 from typing import List
 
 import pytest
 from langchain_core.documents import Document
 
-# Import utilities
-import sys
-
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from utils import VectorStoreManager
-
 
 # ============================================================================
 # Document Ingestion Tests

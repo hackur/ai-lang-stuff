@@ -4,16 +4,17 @@ This module tests all OllamaManager methods including HTTP interactions,
 error handling, and convenience functions using mocked requests.
 """
 
-import pytest
-from unittest.mock import Mock, patch
-from requests.exceptions import ConnectionError, Timeout, RequestException
 import json
+from unittest.mock import Mock, patch
+
+import pytest
+from requests.exceptions import ConnectionError, RequestException, Timeout
 
 from utils.ollama_manager import (
     OllamaManager,
     check_ollama,
-    get_available_models,
     ensure_model,
+    get_available_models,
 )
 
 

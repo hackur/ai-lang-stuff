@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
-from pydantic import BaseModel, Field, ValidationError
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field, ValidationError
 
 
 class ModelConfig(BaseModel):

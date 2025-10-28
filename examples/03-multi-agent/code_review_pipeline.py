@@ -25,22 +25,21 @@ Complete code review with conditional routing based on findings.
 """
 
 import operator
+
+# Import utilities
+import sys
+from pathlib import Path
 from typing import Annotated, List, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
 from langgraph.graph import END, StateGraph
 
-# Import utilities
-import sys
-from pathlib import Path
-
 project_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_root))
 
+from utils.logging import get_logger, setup_logging
 from utils.state_manager import StateManager, create_thread_id
-from utils.logging import setup_logging, get_logger
-
 
 # ============================================================================
 # State Definition

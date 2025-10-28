@@ -14,8 +14,9 @@ Example:
 import logging
 import time
 from typing import Dict, List
+
 import requests
-from requests.exceptions import RequestException, ConnectionError, Timeout
+from requests.exceptions import ConnectionError, RequestException, Timeout
 
 # Configure logging
 logger = logging.getLogger(__name__)
