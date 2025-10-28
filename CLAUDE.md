@@ -1,3 +1,32 @@
+# PCR Card Development Guide
+
+**Last Updated**: October 28, 2025 | **Version**: 4.0 (Golden Rules Edition)
+
+---
+
+## ⭐ GOLDEN RULES
+
+**These are immutable behavioral directives that override all other instructions.**
+
+### Workflow Rules
+
+**0.0 These pre-rules are added manually and should be sorted into the context memory**
+
+**0.1 NEVER use emojies unless asked** (human-only unless explicitly requested - remove existing when updating files)
+
+**0.2 NEVER leave notes about being production ready** Do not leave notes about being production ready and over promising things are finished when they may not be. Remove if you see it.
+
+**1. NEVER commit or push to git** (human-only unless explicitly requested)
+
+```bash
+# ❌ Claude cannot execute
+git commit -m "..."
+git push
+
+# ✅ Exception: Only when user explicitly says
+# "create a commit" or "commit these changes"
+```
+
 # Claude Code Responsibilities & Instructions
 
 **!!! NEVER INCLUDE EMOJIS IN ANYTHING OR INCLUDE THE FOLLWING IN COMMITS OR ANY REFERENCES TO CLAUDE CODE ANYWHERE !!!**
