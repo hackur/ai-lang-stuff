@@ -19,13 +19,14 @@ import argparse
 import json
 import time
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any
 import sys
 
 try:
     import matplotlib.pyplot as plt
     import matplotlib
-    matplotlib.use('Agg')  # Non-interactive backend
+
+    matplotlib.use("Agg")  # Non-interactive backend
     PLOTTING_AVAILABLE = True
 except ImportError:
     PLOTTING_AVAILABLE = False
@@ -270,20 +271,20 @@ class BenchmarkRunner:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
         # Latency chart
-        ax1.bar(models, latencies, color='steelblue')
-        ax1.set_ylabel('Latency (ms)')
-        ax1.set_title('Model Latency Comparison')
-        ax1.tick_params(axis='x', rotation=45)
+        ax1.bar(models, latencies, color="steelblue")
+        ax1.set_ylabel("Latency (ms)")
+        ax1.set_title("Model Latency Comparison")
+        ax1.tick_params(axis="x", rotation=45)
 
         # Throughput chart
-        ax2.bar(models, throughputs, color='coral')
-        ax2.set_ylabel('Tokens/Second')
-        ax2.set_title('Model Throughput Comparison')
-        ax2.tick_params(axis='x', rotation=45)
+        ax2.bar(models, throughputs, color="coral")
+        ax2.set_ylabel("Tokens/Second")
+        ax2.set_title("Model Throughput Comparison")
+        ax2.tick_params(axis="x", rotation=45)
 
         plt.tight_layout()
         output_file = self.output_dir / f"model_performance_{timestamp}.png"
-        plt.savefig(output_file, dpi=150, bbox_inches='tight')
+        plt.savefig(output_file, dpi=150, bbox_inches="tight")
         plt.close()
         print(f"  - Model performance chart: {output_file}")
 
@@ -301,13 +302,13 @@ class BenchmarkRunner:
             throughputs.append(metrics.get("avg_throughput", 0))
 
         plt.figure(figsize=(8, 5))
-        plt.bar(stores, throughputs, color=['steelblue', 'coral'])
-        plt.ylabel('Operations/Second')
-        plt.title('Vector Store Throughput Comparison')
+        plt.bar(stores, throughputs, color=["steelblue", "coral"])
+        plt.ylabel("Operations/Second")
+        plt.title("Vector Store Throughput Comparison")
         plt.tight_layout()
 
         output_file = self.output_dir / f"vector_store_performance_{timestamp}.png"
-        plt.savefig(output_file, dpi=150, bbox_inches='tight')
+        plt.savefig(output_file, dpi=150, bbox_inches="tight")
         plt.close()
         print(f"  - Vector store chart: {output_file}")
 
@@ -325,14 +326,14 @@ class BenchmarkRunner:
             latencies.append(metrics.get("avg_total_latency_ms", 0))
 
         plt.figure(figsize=(8, 5))
-        plt.bar(workflows, latencies, color='mediumseagreen')
-        plt.ylabel('Latency (ms)')
-        plt.title('Agent Workflow Performance')
-        plt.xticks(rotation=45, ha='right')
+        plt.bar(workflows, latencies, color="mediumseagreen")
+        plt.ylabel("Latency (ms)")
+        plt.title("Agent Workflow Performance")
+        plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
 
         output_file = self.output_dir / f"workflow_performance_{timestamp}.png"
-        plt.savefig(output_file, dpi=150, bbox_inches='tight')
+        plt.savefig(output_file, dpi=150, bbox_inches="tight")
         plt.close()
         print(f"  - Workflow chart: {output_file}")
 
@@ -361,16 +362,14 @@ class BenchmarkRunner:
         if "model_performance" in results1 and "model_performance" in results2:
             print("\nModel Performance Changes:")
             BenchmarkRunner._compare_model_performance(
-                results1["model_performance"],
-                results2["model_performance"]
+                results1["model_performance"], results2["model_performance"]
             )
 
         # Compare vector stores
         if "vector_store_performance" in results1 and "vector_store_performance" in results2:
             print("\nVector Store Performance Changes:")
             BenchmarkRunner._compare_vector_stores(
-                results1["vector_store_performance"],
-                results2["vector_store_performance"]
+                results1["vector_store_performance"], results2["vector_store_performance"]
             )
 
     @staticmethod
@@ -386,7 +385,6 @@ class BenchmarkRunner:
                 diff = ((lat2 - lat1) / lat1 * 100) if lat1 > 0 else 0
                 direction = "slower" if diff > 0 else "faster"
                 print(f"  {model:20s}: {abs(diff):6.1f}% {direction}")
-
 
     @staticmethod
     def _compare_vector_stores(data1: Dict, data2: Dict):
@@ -408,41 +406,18 @@ def main():
     parser = argparse.ArgumentParser(
         description="Unified benchmark runner for ai-lang-stuff performance tests"
     )
+    parser.add_argument("--all", action="store_true", help="Run all benchmarks")
+    parser.add_argument("--models", action="store_true", help="Run model performance benchmarks")
+    parser.add_argument("--vector-stores", action="store_true", help="Run vector store benchmarks")
+    parser.add_argument("--workflows", action="store_true", help="Run agent workflow benchmarks")
+    parser.add_argument("--quick", action="store_true", help="Run quick benchmarks (fewer tests)")
     parser.add_argument(
-        "--all",
-        action="store_true",
-        help="Run all benchmarks"
-    )
-    parser.add_argument(
-        "--models",
-        action="store_true",
-        help="Run model performance benchmarks"
-    )
-    parser.add_argument(
-        "--vector-stores",
-        action="store_true",
-        help="Run vector store benchmarks"
-    )
-    parser.add_argument(
-        "--workflows",
-        action="store_true",
-        help="Run agent workflow benchmarks"
-    )
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Run quick benchmarks (fewer tests)"
-    )
-    parser.add_argument(
-        "--compare",
-        nargs=2,
-        metavar=("FILE1", "FILE2"),
-        help="Compare two benchmark result files"
+        "--compare", nargs=2, metavar=("FILE1", "FILE2"), help="Compare two benchmark result files"
     )
     parser.add_argument(
         "--output-dir",
         default="benchmark_results",
-        help="Output directory for results (default: benchmark_results)"
+        help="Output directory for results (default: benchmark_results)",
     )
 
     args = parser.parse_args()

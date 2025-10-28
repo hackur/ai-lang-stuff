@@ -10,13 +10,13 @@ Tests complete RAG workflows including:
 
 from pathlib import Path
 from typing import List
-from unittest.mock import Mock, patch
 
 import pytest
 from langchain_core.documents import Document
 
 # Import utilities
 import sys
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -41,10 +41,7 @@ class TestDocumentIngestion:
         content = text_file.read_text()
 
         # Create Document object
-        doc = Document(
-            page_content=content,
-            metadata={"source": str(text_file), "type": "text"}
-        )
+        doc = Document(page_content=content, metadata={"source": str(text_file), "type": "text"})
 
         assert len(doc.page_content) > 0
         assert doc.metadata["source"] == str(text_file)
@@ -58,10 +55,7 @@ class TestDocumentIngestion:
         from langchain.text_splitter import RecursiveCharacterTextSplitter
 
         # Create document
-        doc = Document(
-            page_content=sample_pdf_content,
-            metadata={"source": "test.pdf", "page": 1}
-        )
+        doc = Document(page_content=sample_pdf_content, metadata={"source": "test.pdf", "page": 1})
 
         # Split into chunks
         splitter = RecursiveCharacterTextSplitter(
@@ -117,10 +111,7 @@ class TestVectorStoreOperations:
 
     @pytest.mark.integration
     def test_vector_store_creation_with_mock_embeddings(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test creating vector store with mock embeddings.
 
@@ -133,10 +124,7 @@ class TestVectorStoreOperations:
 
         # Convert to Document objects
         docs = [
-            Document(
-                page_content=doc["page_content"],
-                metadata=doc["metadata"]
-            )
+            Document(page_content=doc["page_content"], metadata=doc["metadata"])
             for doc in sample_documents
         ]
 
@@ -145,7 +133,7 @@ class TestVectorStoreOperations:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_collection",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         assert vectorstore is not None
@@ -153,10 +141,7 @@ class TestVectorStoreOperations:
 
     @pytest.mark.integration
     def test_vector_store_retrieval(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test retrieving documents from vector store.
 
@@ -177,7 +162,7 @@ class TestVectorStoreOperations:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_retrieval",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Test similarity search
@@ -187,10 +172,7 @@ class TestVectorStoreOperations:
         assert all(isinstance(doc, Document) for doc in results)
 
     def test_vector_store_persistence(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test vector store persistence and loading.
 
@@ -213,7 +195,7 @@ class TestVectorStoreOperations:
             documents=docs,
             embedding=mock_embeddings,
             collection_name=collection_name,
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         original_count = vectorstore._collection.count()
@@ -222,7 +204,7 @@ class TestVectorStoreOperations:
         loaded_vectorstore = Chroma(
             collection_name=collection_name,
             embedding_function=mock_embeddings,
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         assert loaded_vectorstore._collection.count() == original_count
@@ -238,11 +220,7 @@ class TestQueryProcessing:
 
     @pytest.mark.integration
     def test_retrieval_qa_chain_creation(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        mock_ollama_llm,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, mock_ollama_llm, vector_store_dir: Path
     ):
         """Test creating RetrievalQA chain.
 
@@ -265,7 +243,7 @@ class TestQueryProcessing:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_qa",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Create QA chain
@@ -281,11 +259,7 @@ class TestQueryProcessing:
     @pytest.mark.integration
     @pytest.mark.slow
     def test_qa_chain_query(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        mock_ollama_llm,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, mock_ollama_llm, vector_store_dir: Path
     ):
         """Test querying the QA chain.
 
@@ -308,7 +282,7 @@ class TestQueryProcessing:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_query",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Create QA chain
@@ -327,10 +301,7 @@ class TestQueryProcessing:
         assert len(result["source_documents"]) > 0
 
     def test_retriever_configuration(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test retriever with different configurations.
 
@@ -350,7 +321,7 @@ class TestQueryProcessing:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_retriever",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Test different k values
@@ -375,11 +346,7 @@ class TestSourceTracking:
 
         original_doc = Document(
             page_content="This is a long document that will be split into chunks. " * 10,
-            metadata={
-                "source": "test.pdf",
-                "page": 5,
-                "author": "Test Author"
-            }
+            metadata={"source": "test.pdf", "page": 5, "author": "Test Author"},
         )
 
         splitter = RecursiveCharacterTextSplitter(
@@ -397,10 +364,7 @@ class TestSourceTracking:
 
     @pytest.mark.integration
     def test_source_document_tracking(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test tracking source documents in retrieval.
 
@@ -420,7 +384,7 @@ class TestSourceTracking:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_sources",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Retrieve with metadata
@@ -442,11 +406,7 @@ class TestEndToEndRAGPipeline:
     @pytest.mark.integration
     @pytest.mark.slow
     def test_complete_rag_pipeline(
-        self,
-        sample_pdf_content: str,
-        mock_embeddings,
-        mock_ollama_llm,
-        vector_store_dir: Path
+        self, sample_pdf_content: str, mock_embeddings, mock_ollama_llm, vector_store_dir: Path
     ):
         """Test complete RAG pipeline from documents to answers.
 
@@ -461,10 +421,7 @@ class TestEndToEndRAGPipeline:
         from langchain_chroma import Chroma
 
         # Step 1: Load and chunk documents
-        doc = Document(
-            page_content=sample_pdf_content,
-            metadata={"source": "intro.pdf", "page": 1}
-        )
+        doc = Document(page_content=sample_pdf_content, metadata={"source": "intro.pdf", "page": 1})
 
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=200,
@@ -479,7 +436,7 @@ class TestEndToEndRAGPipeline:
             documents=chunks,
             embedding=mock_embeddings,
             collection_name="test_e2e",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Step 3: Create QA chain
@@ -491,9 +448,7 @@ class TestEndToEndRAGPipeline:
         )
 
         # Step 4: Query the system
-        result = qa_chain.invoke({
-            "query": "What are the prerequisites for local AI development?"
-        })
+        result = qa_chain.invoke({"query": "What are the prerequisites for local AI development?"})
 
         # Validate results
         assert "result" in result
@@ -501,10 +456,7 @@ class TestEndToEndRAGPipeline:
         assert len(result["source_documents"]) > 0
 
     def test_multiple_document_sources(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test RAG with documents from multiple sources.
 
@@ -528,7 +480,7 @@ class TestEndToEndRAGPipeline:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_multi_source",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Query should retrieve from multiple sources
@@ -574,10 +526,7 @@ class TestRAGPerformance:
 
     @pytest.mark.integration
     def test_retrieval_accuracy(
-        self,
-        sample_documents: List[dict],
-        mock_embeddings,
-        vector_store_dir: Path
+        self, sample_documents: List[dict], mock_embeddings, vector_store_dir: Path
     ):
         """Test retrieval accuracy with known queries.
 
@@ -597,7 +546,7 @@ class TestRAGPerformance:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_accuracy",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Query for specific topic
@@ -634,7 +583,7 @@ class TestRAGErrorHandling:
                 documents=docs,
                 embedding=mock_embeddings,
                 collection_name="test_empty",
-                persist_directory=str(vector_store_dir)
+                persist_directory=str(vector_store_dir),
             )
         except (ValueError, Exception) as e:
             # Expected for empty documents
@@ -656,7 +605,7 @@ class TestRAGErrorHandling:
             documents=docs,
             embedding=mock_embeddings,
             collection_name="test_no_docs",
-            persist_directory=str(vector_store_dir)
+            persist_directory=str(vector_store_dir),
         )
 
         # Query should return empty or single result

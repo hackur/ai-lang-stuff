@@ -14,7 +14,7 @@ import shutil
 import tempfile
 from pathlib import Path
 from typing import Generator, Dict, Any, List
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock
 
 import pytest
 from langchain_core.messages import AIMessage
@@ -58,9 +58,8 @@ def test_data_dir(temp_dir: Path) -> Path:
 
     # Create sample JSON file
     import json
-    (data_dir / "sample.json").write_text(
-        json.dumps({"key": "value", "test": "data"})
-    )
+
+    (data_dir / "sample.json").write_text(json.dumps({"key": "value", "test": "data"}))
 
     # Create nested directory structure
     nested = data_dir / "nested" / "deep"
@@ -114,7 +113,7 @@ def mock_ollama_response() -> AIMessage:
     """
     return AIMessage(
         content="This is a mock response from the model.",
-        response_metadata={"model": "qwen3:8b", "done": True}
+        response_metadata={"model": "qwen3:8b", "done": True},
     )
 
 
@@ -308,6 +307,7 @@ def capture_logs(caplog):
         caplog: Configured log capture
     """
     import logging
+
     caplog.set_level(logging.INFO)
     return caplog
 
@@ -389,8 +389,7 @@ def create_mock_retriever(documents: List[Dict[str, Any]]):
 
     mock_retriever = Mock()
     mock_retriever.get_relevant_documents.return_value = [
-        Document(page_content=doc["page_content"], metadata=doc["metadata"])
-        for doc in documents
+        Document(page_content=doc["page_content"], metadata=doc["metadata"]) for doc in documents
     ]
     return mock_retriever
 

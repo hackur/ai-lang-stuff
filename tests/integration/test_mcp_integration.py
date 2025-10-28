@@ -9,16 +9,15 @@ Tests full MCP server integration including:
 """
 
 import json
-import tempfile
 from pathlib import Path
-from typing import List
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 from langchain_core.tools import Tool
 
 # Import utilities
 import sys
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -35,11 +34,7 @@ class TestFilesystemMCPIntegration:
 
     def test_mcp_config_creation(self):
         """Test creating MCP configuration."""
-        config = MCPConfig(
-            host="localhost",
-            port=8001,
-            timeout=30.0
-        )
+        config = MCPConfig(host="localhost", port=8001, timeout=30.0)
 
         assert config.host == "localhost"
         assert config.port == 8001
@@ -71,11 +66,9 @@ class TestFilesystemMCPIntegration:
         fs_client = FilesystemMCP(config=config, base_path=test_data_dir)
 
         # Mock the actual MCP calls
-        with patch.object(fs_client, '_call_mcp') as mock_call:
+        with patch.object(fs_client, "_call_mcp") as mock_call:
             # Test list directory
-            mock_call.return_value = {
-                "files": ["sample.txt", "sample.json", "nested/"]
-            }
+            mock_call.return_value = {"files": ["sample.txt", "sample.json", "nested/"]}
 
             result = fs_client.list_directory(str(test_data_dir))
             assert "sample.txt" in result or mock_call.called
@@ -129,6 +122,7 @@ class TestMCPToolIntegration:
         Args:
             test_data_dir: Test data directory fixture
         """
+
         # Create mock MCP tools
         def mock_list_dir(path: str) -> str:
             """Mock directory listing."""
@@ -142,13 +136,9 @@ class TestMCPToolIntegration:
             Tool(
                 name="list_directory",
                 description="List contents of a directory",
-                func=mock_list_dir
+                func=mock_list_dir,
             ),
-            Tool(
-                name="read_file",
-                description="Read contents of a file",
-                func=mock_read_file
-            ),
+            Tool(name="read_file", description="Read contents of a file", func=mock_read_file),
         ]
 
         assert len(tools) == 2
@@ -160,11 +150,7 @@ class TestMCPToolIntegration:
         assert "file1.txt" in result
 
     @pytest.mark.integration
-    def test_agent_with_filesystem_tools(
-        self,
-        test_data_dir: Path,
-        mock_ollama_llm
-    ):
+    def test_agent_with_filesystem_tools(self, test_data_dir: Path, mock_ollama_llm):
         """Test agent using filesystem tools.
 
         Args:
@@ -187,16 +173,18 @@ class TestMCPToolIntegration:
             Tool(
                 name="list_directory",
                 description="List contents of a directory. Input: directory path",
-                func=mock_list_dir
+                func=mock_list_dir,
             ),
         ]
 
         # Create simple prompt
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are a helpful assistant with filesystem access."),
-            ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You are a helpful assistant with filesystem access."),
+                ("human", "{input}"),
+                ("placeholder", "{agent_scratchpad}"),
+            ]
+        )
 
         # Create agent
         agent = create_tool_calling_agent(mock_ollama_llm, tools, prompt)
@@ -208,9 +196,7 @@ class TestMCPToolIntegration:
         )
 
         # Test agent invocation
-        result = executor.invoke({
-            "input": f"List the contents of {test_data_dir}"
-        })
+        result = executor.invoke({"input": f"List the contents of {test_data_dir}"})
 
         assert result is not None
         assert "output" in result
@@ -231,13 +217,9 @@ class TestCombinedMCPTools:
             Tool(
                 name="list_directory",
                 description="List directory contents",
-                func=lambda x: "file1.txt\nfile2.txt"
+                func=lambda x: "file1.txt\nfile2.txt",
             ),
-            Tool(
-                name="read_file",
-                description="Read file contents",
-                func=lambda x: "File content"
-            ),
+            Tool(name="read_file", description="Read file contents", func=lambda x: "File content"),
         ]
 
         # Web search tools
@@ -245,11 +227,9 @@ class TestCombinedMCPTools:
             Tool(
                 name="web_search",
                 description="Search the web",
-                func=lambda x: json.dumps({
-                    "results": [
-                        {"title": "Result 1", "url": "https://example.com"}
-                    ]
-                })
+                func=lambda x: json.dumps(
+                    {"results": [{"title": "Result 1", "url": "https://example.com"}]}
+                ),
             ),
         ]
 
@@ -276,30 +256,30 @@ class TestCombinedMCPTools:
             Tool(
                 name="filesystem_list",
                 description="List directory contents",
-                func=lambda x: "documents/\ncode/\ndata/"
+                func=lambda x: "documents/\ncode/\ndata/",
             ),
             Tool(
                 name="web_search",
                 description="Search the web for information",
-                func=lambda x: json.dumps({
-                    "results": [{"title": "Test", "snippet": "Test result"}]
-                })
+                func=lambda x: json.dumps(
+                    {"results": [{"title": "Test", "snippet": "Test result"}]}
+                ),
             ),
         ]
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You have both filesystem and web search capabilities."),
-            ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You have both filesystem and web search capabilities."),
+                ("human", "{input}"),
+                ("placeholder", "{agent_scratchpad}"),
+            ]
+        )
 
         agent = create_tool_calling_agent(mock_ollama_llm, tools, prompt)
         executor = AgentExecutor(agent=agent, tools=tools, max_iterations=3)
 
         # Test with query that could use either tool
-        result = executor.invoke({
-            "input": "Search for Python tutorials"
-        })
+        result = executor.invoke({"input": "Search for Python tutorials"})
 
         assert result is not None
 
@@ -467,24 +447,25 @@ class TestWebSearchIntegration:
 
     def test_web_search_tool_creation(self):
         """Test creating web search tool."""
+
         def mock_search(query: str) -> str:
             """Mock web search."""
-            return json.dumps({
-                "query": query,
-                "results": [
-                    {
-                        "title": "Test Result",
-                        "url": "https://example.com",
-                        "snippet": "This is a test result"
-                    }
-                ],
-                "total": 1
-            })
+            return json.dumps(
+                {
+                    "query": query,
+                    "results": [
+                        {
+                            "title": "Test Result",
+                            "url": "https://example.com",
+                            "snippet": "This is a test result",
+                        }
+                    ],
+                    "total": 1,
+                }
+            )
 
         tool = Tool(
-            name="web_search",
-            description="Search the web for information",
-            func=mock_search
+            name="web_search", description="Search the web for information", func=mock_search
         )
 
         assert tool.name == "web_search"
@@ -509,25 +490,21 @@ class TestWebSearchIntegration:
 
         def mock_search(query: str) -> str:
             """Mock web search."""
-            return json.dumps({
-                "results": [
-                    {"title": f"Result for: {query}", "url": "https://example.com"}
-                ]
-            })
+            return json.dumps(
+                {"results": [{"title": f"Result for: {query}", "url": "https://example.com"}]}
+            )
 
         tools = [
-            Tool(
-                name="web_search",
-                description="Search the web",
-                func=mock_search
-            ),
+            Tool(name="web_search", description="Search the web", func=mock_search),
         ]
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You can search the web for information."),
-            ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You can search the web for information."),
+                ("human", "{input}"),
+                ("placeholder", "{agent_scratchpad}"),
+            ]
+        )
 
         agent = create_tool_calling_agent(mock_ollama_llm, tools, prompt)
         executor = AgentExecutor(agent=agent, tools=tools, max_iterations=2)

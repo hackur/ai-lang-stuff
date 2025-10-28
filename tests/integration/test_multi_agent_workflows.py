@@ -12,13 +12,13 @@ import operator
 import sqlite3
 from pathlib import Path
 from typing import Annotated, List, TypedDict
-from unittest.mock import Mock, patch
 
 import pytest
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage
 
 # Import utilities
 import sys
+
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -32,6 +32,7 @@ from utils.state_manager import StateManager, create_thread_id
 
 class SimpleAgentState(TypedDict):
     """Simple state for testing."""
+
     messages: Annotated[List, operator.add]
     counter: int
     result: str
@@ -39,6 +40,7 @@ class SimpleAgentState(TypedDict):
 
 class ParallelAgentState(TypedDict):
     """State for parallel execution testing."""
+
     task: str
     agent_a_result: str
     agent_b_result: str
@@ -48,6 +50,7 @@ class ParallelAgentState(TypedDict):
 
 class ErrorRecoveryState(TypedDict):
     """State for error recovery testing."""
+
     step: int
     errors: Annotated[List[str], operator.add]
     results: Annotated[List[str], operator.add]
@@ -103,11 +106,7 @@ class TestWorkflowExecution:
         thread_id = create_thread_id("test-workflow")
         config = {"configurable": {"thread_id": thread_id}}
 
-        initial_state = {
-            "messages": [],
-            "counter": 0,
-            "result": ""
-        }
+        initial_state = {"messages": [], "counter": 0, "result": ""}
 
         # Run workflow
         final_state = None
@@ -164,9 +163,7 @@ class TestWorkflowExecution:
 
         workflow.set_entry_point("router")
         workflow.add_conditional_edges(
-            "router",
-            route_decision,
-            {"path_a": "path_a", "path_b": "path_b"}
+            "router", route_decision, {"path_a": "path_a", "path_b": "path_b"}
         )
         workflow.add_edge("path_a", END)
         workflow.add_edge("path_b", END)
@@ -206,7 +203,7 @@ class TestStatePersistence:
         checkpoint_path = checkpoint_dir / "test_checkpoints.db"
 
         # Create checkpointer
-        checkpointer = StateManager.get_checkpointer(str(checkpoint_path))
+        StateManager.get_checkpointer(str(checkpoint_path))
 
         assert checkpoint_path.exists()
 
@@ -356,7 +353,7 @@ class TestParallelExecution:
             "agent_a_result": "",
             "agent_b_result": "",
             "combined_result": "",
-            "messages": []
+            "messages": [],
         }
 
         final_state = None
@@ -414,12 +411,7 @@ class TestErrorRecovery:
         config = {"configurable": {"thread_id": thread_id}}
 
         # First attempt - should error
-        initial_state = {
-            "step": 0,
-            "errors": [],
-            "results": [],
-            "retry_count": 0
-        }
+        initial_state = {"step": 0, "errors": [], "results": [], "retry_count": 0}
 
         final_state = None
         for output in app.stream(initial_state, config):
@@ -459,12 +451,7 @@ class TestErrorRecovery:
         config = {"configurable": {"thread_id": thread_id}}
 
         # Execute with some initial error state
-        initial_state = {
-            "step": 0,
-            "errors": ["Previous error"],
-            "results": [],
-            "retry_count": 1
-        }
+        initial_state = {"step": 0, "errors": ["Previous error"], "results": [], "retry_count": 1}
 
         final_state = None
         for output in app.stream(initial_state, config):
@@ -498,6 +485,7 @@ class TestMultiAgentCoordination:
 
         class ResearchState(TypedDict):
             """Research pipeline state."""
+
             question: str
             research: str
             analysis: str
@@ -549,7 +537,7 @@ class TestMultiAgentCoordination:
             "research": "",
             "analysis": "",
             "summary": "",
-            "messages": []
+            "messages": [],
         }
 
         final_state = None
@@ -579,7 +567,7 @@ class TestCheckpointValidation:
             checkpoint_dir: Checkpoint directory fixture
         """
         checkpoint_path = checkpoint_dir / "validation_test.db"
-        checkpointer = StateManager.get_checkpointer(str(checkpoint_path))
+        StateManager.get_checkpointer(str(checkpoint_path))
 
         assert checkpoint_path.exists()
         assert checkpoint_path.stat().st_size > 0

@@ -5,9 +5,7 @@ Tests MCP client connection management, retry logic, error handling,
 and specific implementations for filesystem and web search operations.
 """
 
-import asyncio
 from pathlib import Path
-from typing import Any, Dict
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
@@ -191,9 +189,7 @@ class TestMCPClient:
     @pytest.mark.asyncio
     async def test_connect_network_error(self, mcp_config: MCPConfig):
         """Test connection failure due to network error."""
-        with patch.object(
-            ConcreteMCPClient, "_health_check"
-        ) as mock_health:
+        with patch.object(ConcreteMCPClient, "_health_check") as mock_health:
             mock_health.side_effect = httpx.RequestError("Connection refused")
 
             client = ConcreteMCPClient(config=mcp_config)
@@ -232,9 +228,10 @@ class TestMCPClient:
     @pytest.mark.asyncio
     async def test_call_tool_success(self, mcp_config: MCPConfig):
         """Test successful tool call."""
-        with patch.object(ConcreteMCPClient, "connect") as mock_connect, \
-             patch.object(ConcreteMCPClient, "client") as mock_client:
-
+        with (
+            patch.object(ConcreteMCPClient, "connect"),
+            patch.object(ConcreteMCPClient, "client") as mock_client,
+        ):
             mock_response = MagicMock()
             mock_response.json.return_value = {"result": {"data": "test_data"}}
             mock_response.raise_for_status = MagicMock()
@@ -257,9 +254,10 @@ class TestMCPClient:
     @pytest.mark.asyncio
     async def test_call_tool_auto_connect(self, mcp_config: MCPConfig):
         """Test tool call automatically connects if not connected."""
-        with patch.object(ConcreteMCPClient, "connect") as mock_connect, \
-             patch.object(ConcreteMCPClient, "client") as mock_client:
-
+        with (
+            patch.object(ConcreteMCPClient, "connect") as mock_connect,
+            patch.object(ConcreteMCPClient, "client") as mock_client,
+        ):
             mock_response = MagicMock()
             mock_response.json.return_value = {"result": {}}
             mock_response.raise_for_status = MagicMock()
@@ -279,7 +277,6 @@ class TestMCPClient:
     async def test_call_tool_error_response(self, mcp_config: MCPConfig):
         """Test tool call with error in response."""
         with patch.object(ConcreteMCPClient, "client") as mock_client:
-
             mock_response = MagicMock()
             mock_response.json.return_value = {"error": "Tool execution failed"}
             mock_response.raise_for_status = MagicMock()
@@ -298,7 +295,6 @@ class TestMCPClient:
     async def test_call_tool_http_error(self, mcp_config: MCPConfig):
         """Test tool call with HTTP status error."""
         with patch.object(ConcreteMCPClient, "client") as mock_client:
-
             mock_response = MagicMock()
             mock_response.status_code = 500
             mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
@@ -319,11 +315,8 @@ class TestMCPClient:
     async def test_call_tool_request_error(self, mcp_config: MCPConfig):
         """Test tool call with request error."""
         with patch.object(ConcreteMCPClient, "client") as mock_client:
-
             mock_http_client = AsyncMock()
-            mock_http_client.post = AsyncMock(
-                side_effect=httpx.RequestError("Connection error")
-            )
+            mock_http_client.post = AsyncMock(side_effect=httpx.RequestError("Connection error"))
             mock_client.__get__ = MagicMock(return_value=mock_http_client)
 
             client = ConcreteMCPClient(config=mcp_config)
@@ -335,9 +328,10 @@ class TestMCPClient:
     @pytest.mark.asyncio
     async def test_async_context_manager(self, mcp_config: MCPConfig):
         """Test async context manager protocol."""
-        with patch.object(ConcreteMCPClient, "connect") as mock_connect, \
-             patch.object(ConcreteMCPClient, "disconnect") as mock_disconnect:
-
+        with (
+            patch.object(ConcreteMCPClient, "connect") as mock_connect,
+            patch.object(ConcreteMCPClient, "disconnect") as mock_disconnect,
+        ):
             async with ConcreteMCPClient(config=mcp_config) as client:
                 assert isinstance(client, ConcreteMCPClient)
 
@@ -368,9 +362,7 @@ class TestFilesystemMCP:
         assert client.base_path == temp_base_path
 
     @pytest.mark.asyncio
-    async def test_filesystem_initialization_no_base_path(
-        self, filesystem_config: MCPConfig
-    ):
+    async def test_filesystem_initialization_no_base_path(self, filesystem_config: MCPConfig):
         """Test filesystem client initialization without base path."""
         client = FilesystemMCP(config=filesystem_config)
         assert client.base_path is None
@@ -382,9 +374,7 @@ class TestFilesystemMCP:
         assert isinstance(path, Path)
         assert path.is_absolute()
 
-    def test_validate_path_with_base_path(
-        self, filesystem_config: MCPConfig, temp_base_path: Path
-    ):
+    def test_validate_path_with_base_path(self, filesystem_config: MCPConfig, temp_base_path: Path):
         """Test path validation with base path constraint."""
         client = FilesystemMCP(config=filesystem_config, base_path=temp_base_path)
         test_file = temp_base_path / "test.txt"
@@ -488,9 +478,7 @@ class TestFilesystemMCP:
     async def test_search_files_with_pattern(self, filesystem_config: MCPConfig):
         """Test file search with glob pattern."""
         with patch.object(FilesystemMCP, "call_tool") as mock_call_tool:
-            mock_call_tool.return_value = {
-                "files": ["/tmp/file1.py", "/tmp/dir/file2.py"]
-            }
+            mock_call_tool.return_value = {"files": ["/tmp/file1.py", "/tmp/dir/file2.py"]}
 
             client = FilesystemMCP(config=filesystem_config)
             files = await client.search_files("*.py", "/tmp")
@@ -628,17 +616,13 @@ class TestWebSearchMCP:
     async def test_fetch_url_success(self, websearch_config: MCPConfig):
         """Test successful URL fetch."""
         with patch.object(WebSearchMCP, "call_tool") as mock_call_tool:
-            mock_call_tool.return_value = {
-                "content": "<html><body>Page content</body></html>"
-            }
+            mock_call_tool.return_value = {"content": "<html><body>Page content</body></html>"}
 
             client = WebSearchMCP(config=websearch_config)
             content = await client.fetch_url("https://example.com")
 
             assert content == "<html><body>Page content</body></html>"
-            mock_call_tool.assert_called_once_with(
-                "fetch_url", {"url": "https://example.com"}
-            )
+            mock_call_tool.assert_called_once_with("fetch_url", {"url": "https://example.com"})
 
     @pytest.mark.asyncio
     async def test_fetch_url_empty_content(self, websearch_config: MCPConfig):
@@ -827,9 +811,7 @@ class TestErrorHandling:
             assert mock_http_client.post.call_count == 3
 
     @pytest.mark.asyncio
-    async def test_filesystem_tool_error_propagation(
-        self, filesystem_config: MCPConfig
-    ):
+    async def test_filesystem_tool_error_propagation(self, filesystem_config: MCPConfig):
         """Test filesystem operations propagate MCPToolError."""
         with patch.object(FilesystemMCP, "call_tool") as mock_call_tool:
             mock_call_tool.side_effect = MCPToolError("File not found")
@@ -860,9 +842,10 @@ class TestIntegrationScenarios:
         self, filesystem_config: MCPConfig, temp_base_path: Path
     ):
         """Test complete filesystem workflow: connect, write, read, list, disconnect."""
-        with patch.object(FilesystemMCP, "_health_check") as mock_health, \
-             patch.object(FilesystemMCP, "client") as mock_client:
-
+        with (
+            patch.object(FilesystemMCP, "_health_check") as mock_health,
+            patch.object(FilesystemMCP, "client") as mock_client,
+        ):
             # Mock health check
             mock_response_health = MagicMock()
             mock_response_health.status_code = 200
@@ -878,17 +861,17 @@ class TestIntegrationScenarios:
                 response.raise_for_status = MagicMock()
                 return response
 
-            mock_http_client.post = AsyncMock(side_effect=[
-                create_response({"success": True}),  # write
-                create_response({"content": "test content"}),  # read
-                create_response({"entries": [{"name": "test.txt"}]}),  # list
-            ])
+            mock_http_client.post = AsyncMock(
+                side_effect=[
+                    create_response({"success": True}),  # write
+                    create_response({"content": "test content"}),  # read
+                    create_response({"entries": [{"name": "test.txt"}]}),  # list
+                ]
+            )
 
             mock_client.__get__ = MagicMock(return_value=mock_http_client)
 
-            async with FilesystemMCP(
-                config=filesystem_config, base_path=temp_base_path
-            ) as fs:
+            async with FilesystemMCP(config=filesystem_config, base_path=temp_base_path) as fs:
                 # Write file
                 test_file = temp_base_path / "test.txt"
                 success = await fs.write_file(test_file, "test content")
@@ -906,9 +889,10 @@ class TestIntegrationScenarios:
     @pytest.mark.asyncio
     async def test_websearch_complete_workflow(self, websearch_config: MCPConfig):
         """Test complete web search workflow: connect, search, fetch, disconnect."""
-        with patch.object(WebSearchMCP, "_health_check") as mock_health, \
-             patch.object(WebSearchMCP, "client") as mock_client:
-
+        with (
+            patch.object(WebSearchMCP, "_health_check") as mock_health,
+            patch.object(WebSearchMCP, "client") as mock_client,
+        ):
             # Mock health check
             mock_response_health = MagicMock()
             mock_response_health.status_code = 200
@@ -923,18 +907,22 @@ class TestIntegrationScenarios:
                 response.raise_for_status = MagicMock()
                 return response
 
-            mock_http_client.post = AsyncMock(side_effect=[
-                create_response({
-                    "results": [
+            mock_http_client.post = AsyncMock(
+                side_effect=[
+                    create_response(
                         {
-                            "title": "Result",
-                            "url": "https://example.com",
-                            "snippet": "Snippet",
+                            "results": [
+                                {
+                                    "title": "Result",
+                                    "url": "https://example.com",
+                                    "snippet": "Snippet",
+                                }
+                            ]
                         }
-                    ]
-                }),  # search
-                create_response({"content": "Page content"}),  # fetch
-            ])
+                    ),  # search
+                    create_response({"content": "Page content"}),  # fetch
+                ]
+            )
 
             mock_client.__get__ = MagicMock(return_value=mock_http_client)
 

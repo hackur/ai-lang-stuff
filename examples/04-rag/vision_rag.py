@@ -22,10 +22,9 @@ specific images from the collection.
 import base64
 import sys
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Optional
 import logging
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -45,11 +44,7 @@ logger = logging.getLogger(__name__)
 class VisionRAG:
     """Multi-modal RAG system for images and text."""
 
-    def __init__(
-        self,
-        vision_model: str = "qwen3-vl:8b",
-        base_url: str = "http://localhost:11434"
-    ):
+    def __init__(self, vision_model: str = "qwen3-vl:8b", base_url: str = "http://localhost:11434"):
         """
         Initialize vision RAG system.
 
@@ -59,11 +54,7 @@ class VisionRAG:
         """
         self.vision_model = vision_model
         self.base_url = base_url
-        self.llm = ChatOllama(
-            model=vision_model,
-            base_url=base_url,
-            temperature=0.3
-        )
+        self.llm = ChatOllama(model=vision_model, base_url=base_url, temperature=0.3)
         logger.info(f"Initialized VisionRAG with model: {vision_model}")
 
     def encode_image(self, image_path: Path) -> str:
@@ -109,10 +100,7 @@ Be specific and thorough."""
             message = HumanMessage(
                 content=[
                     {"type": "text", "text": prompt_text},
-                    {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}"
-                    }
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_b64}"},
                 ]
             )
 
@@ -143,11 +131,11 @@ Be specific and thorough."""
 
             message = HumanMessage(
                 content=[
-                    {"type": "text", "text": f"Question: {question}\n\nAnswer the question based on this image."},
                     {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}"
-                    }
+                        "type": "text",
+                        "text": f"Question: {question}\n\nAnswer the question based on this image.",
+                    },
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_b64}"},
                 ]
             )
 
@@ -166,7 +154,7 @@ def index_images(
     vector_mgr: VectorStoreManager,
     collection_name: str,
     persist_dir: str,
-    rebuild: bool = False
+    rebuild: bool = False,
 ) -> tuple:
     """
     Index images with generated descriptions.
@@ -189,8 +177,7 @@ def index_images(
     if collection_exists and not rebuild:
         logger.info(f"Loading existing collection: {collection_name}")
         vectorstore = vector_mgr.load_existing(
-            collection_name=collection_name,
-            persist_dir=persist_dir
+            collection_name=collection_name, persist_dir=persist_dir
         )
         # Load metadata from collection
         # Note: In production, you'd want to persist the image paths separately
@@ -200,10 +187,9 @@ def index_images(
     logger.info("Creating new image index...")
 
     # Find all images
-    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
+    image_extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
     image_files = [
-        f for f in image_dir.iterdir()
-        if f.is_file() and f.suffix.lower() in image_extensions
+        f for f in image_dir.iterdir() if f.is_file() and f.suffix.lower() in image_extensions
     ]
 
     logger.info(f"Found {len(image_files)} images")
@@ -223,11 +209,11 @@ def index_images(
             doc = Document(
                 page_content=description,
                 metadata={
-                    'source': str(image_path),
-                    'filename': image_path.name,
-                    'type': 'image',
-                    'format': image_path.suffix[1:].lower()
-                }
+                    "source": str(image_path),
+                    "filename": image_path.name,
+                    "type": "image",
+                    "format": image_path.suffix[1:].lower(),
+                },
             )
             documents.append(doc)
 
@@ -243,19 +229,13 @@ def index_images(
     # Create vector store
     logger.info("Creating vector store...")
     vectorstore = vector_mgr.create_from_documents(
-        documents=documents,
-        collection_name=collection_name,
-        persist_dir=persist_dir
+        documents=documents, collection_name=collection_name, persist_dir=persist_dir
     )
 
     return vectorstore, documents
 
 
-def create_multimodal_qa(
-    vectorstore,
-    vision_rag: VisionRAG,
-    text_model: str = "qwen3:8b"
-):
+def create_multimodal_qa(vectorstore, vision_rag: VisionRAG, text_model: str = "qwen3:8b"):
     """
     Create multi-modal QA system.
 
@@ -267,20 +247,21 @@ def create_multimodal_qa(
     Returns:
         QA function.
     """
-    text_llm = ChatOllama(
-        model=text_model,
-        temperature=0.2,
-        base_url="http://localhost:11434"
-    )
+    text_llm = ChatOllama(model=text_model, temperature=0.2, base_url="http://localhost:11434")
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are a helpful assistant that answers questions about a collection of images.
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """You are a helpful assistant that answers questions about a collection of images.
 You have access to descriptions of images. Use these descriptions to answer questions.
 
 Image Descriptions:
-{context}"""),
-        ("human", "{question}")
-    ])
+{context}""",
+            ),
+            ("human", "{question}"),
+        ]
+    )
 
     def qa_function(query: str, k: int = 3) -> dict:
         """
@@ -298,44 +279,38 @@ Image Descriptions:
         docs = vectorstore.similarity_search(query, k=k)
 
         if not docs:
-            return {
-                'answer': "No relevant images found.",
-                'images': [],
-                'mode': 'none'
-            }
+            return {"answer": "No relevant images found.", "images": [], "mode": "none"}
 
         # Check if query asks for visual analysis
-        visual_keywords = ['show', 'see', 'look', 'picture', 'visual', 'color', 'shape']
+        visual_keywords = ["show", "see", "look", "picture", "visual", "color", "shape"]
         needs_visual = any(keyword in query.lower() for keyword in visual_keywords)
 
         if needs_visual and docs:
             # Use vision model to answer with the most relevant image
-            top_image_path = Path(docs[0].metadata['source'])
+            top_image_path = Path(docs[0].metadata["source"])
             logger.info(f"Using vision model for image: {top_image_path.name}")
 
             answer = vision_rag.answer_visual_question(top_image_path, query)
 
             return {
-                'answer': answer,
-                'images': docs,
-                'mode': 'vision',
-                'primary_image': str(top_image_path)
+                "answer": answer,
+                "images": docs,
+                "mode": "vision",
+                "primary_image": str(top_image_path),
             }
         else:
             # Use text model with descriptions
-            context = "\n\n".join([
-                f"Image: {doc.metadata.get('filename', 'unknown')}\n{doc.page_content}"
-                for doc in docs
-            ])
+            context = "\n\n".join(
+                [
+                    f"Image: {doc.metadata.get('filename', 'unknown')}\n{doc.page_content}"
+                    for doc in docs
+                ]
+            )
 
             chain = prompt | text_llm
             response = chain.invoke({"context": context, "question": query})
 
-            return {
-                'answer': response.content,
-                'images': docs,
-                'mode': 'text'
-            }
+            return {"answer": response.content, "images": docs, "mode": "text"}
 
     return qa_function
 
@@ -372,17 +347,17 @@ def interactive_visual_qa_loop(qa_function):
             # Display answer
             print("\nAnswer:")
             print("-" * 60)
-            print(result['answer'])
+            print(result["answer"])
             print("-" * 60)
 
             # Show source images
-            if result['images']:
+            if result["images"]:
                 print(f"\nRelevant images ({len(result['images'])}):")
-                for i, doc in enumerate(result['images'], 1):
-                    filename = doc.metadata.get('filename', 'unknown')
+                for i, doc in enumerate(result["images"], 1):
+                    filename = doc.metadata.get("filename", "unknown")
                     print(f"  {i}. {filename}")
 
-                if 'primary_image' in result:
+                if "primary_image" in result:
                     print(f"\nPrimary image analyzed: {Path(result['primary_image']).name}")
 
             print(f"\n[Mode: {result['mode']}]")
@@ -400,40 +375,25 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Multi-modal Vision RAG system")
+    parser.add_argument("image_dir", help="Directory containing images")
     parser.add_argument(
-        "image_dir",
-        help="Directory containing images"
-    )
-    parser.add_argument(
-        "--collection",
-        default="vision_rag",
-        help="Collection name (default: vision_rag)"
+        "--collection", default="vision_rag", help="Collection name (default: vision_rag)"
     )
     parser.add_argument(
         "--persist-dir",
         default="./data/vector_stores",
-        help="Vector store directory (default: ./data/vector_stores)"
+        help="Vector store directory (default: ./data/vector_stores)",
     )
     parser.add_argument(
-        "--vision-model",
-        default="qwen3-vl:8b",
-        help="Vision model (default: qwen3-vl:8b)"
+        "--vision-model", default="qwen3-vl:8b", help="Vision model (default: qwen3-vl:8b)"
     )
-    parser.add_argument(
-        "--text-model",
-        default="qwen3:8b",
-        help="Text model (default: qwen3:8b)"
-    )
+    parser.add_argument("--text-model", default="qwen3:8b", help="Text model (default: qwen3:8b)")
     parser.add_argument(
         "--embedding-model",
         default="qwen3-embedding",
-        help="Embedding model (default: qwen3-embedding)"
+        help="Embedding model (default: qwen3-embedding)",
     )
-    parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Rebuild image index"
-    )
+    parser.add_argument("--rebuild", action="store_true", help="Rebuild image index")
 
     args = parser.parse_args()
 
@@ -480,7 +440,7 @@ def main():
             vector_mgr=vector_mgr,
             collection_name=args.collection,
             persist_dir=args.persist_dir,
-            rebuild=args.rebuild
+            rebuild=args.rebuild,
         )
     except Exception as e:
         print(f"Error indexing images: {e}")
@@ -489,9 +449,7 @@ def main():
     # Step 5: Create QA system
     print("\n5. Creating QA system...")
     qa_function = create_multimodal_qa(
-        vectorstore=vectorstore,
-        vision_rag=vision_rag,
-        text_model=args.text_model
+        vectorstore=vectorstore, vision_rag=vision_rag, text_model=args.text_model
     )
 
     # Step 6: Start interactive session

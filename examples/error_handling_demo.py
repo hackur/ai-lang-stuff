@@ -24,7 +24,6 @@ Expected Output:
 import logging
 import random
 import time
-from typing import Any
 
 # Configure logging
 logging.basicConfig(
@@ -199,9 +198,7 @@ def example_5_graceful_degradation():
     print("Example 5: Graceful Degradation")
     print("=" * 70)
 
-    degradation = GracefulDegradation(
-        fallback_models=["qwen3:30b", "qwen3:8b", "gemma3:4b"]
-    )
+    degradation = GracefulDegradation(fallback_models=["qwen3:30b", "qwen3:8b", "gemma3:4b"])
 
     # Simulate model failures
     failed_models = ["qwen3:30b", "qwen3:8b"]
@@ -418,7 +415,7 @@ def example_10_model_timeout_pattern():
     print("Example 10: Model Timeout with Fallback")
     print("=" * 70)
 
-    manager = RecoveryManager(fallback_models=["qwen3:8b", "gemma3:4b"])
+    RecoveryManager(fallback_models=["qwen3:8b", "gemma3:4b"])
     degradation = GracefulDegradation()
 
     def generate_text(prompt, model="qwen3:8b", timeout=10):
@@ -454,7 +451,7 @@ def example_10_model_timeout_pattern():
             result = generate_text(prompt, model=model)
             print(f"Success with {model}: {result}")
             break
-        except TimeoutError as e:
+        except TimeoutError:
             print(f"Timeout with {model}, trying fallback...")
             fallback = degradation.get_fallback_model(model)
             if not fallback:

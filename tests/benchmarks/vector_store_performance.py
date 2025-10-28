@@ -24,7 +24,6 @@ import tempfile
 import shutil
 
 import pytest
-import numpy as np
 from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OllamaEmbeddings
@@ -95,7 +94,7 @@ class VectorStoreBenchmark:
                         "topic": i % 10,
                         "category": i % 5,
                         "priority": i % 3,
-                    }
+                    },
                 )
             )
         return documents
@@ -107,10 +106,7 @@ class VectorStoreBenchmark:
         return temp_dir
 
     def benchmark_indexing(
-        self,
-        store_type: str,
-        num_documents: int,
-        num_runs: int = 3
+        self, store_type: str, num_documents: int, num_runs: int = 3
     ) -> List[VectorStoreBenchmarkResult]:
         """
         Benchmark document indexing performance.
@@ -136,12 +132,11 @@ class VectorStoreBenchmark:
                     vectorstore = Chroma.from_documents(
                         documents=documents,
                         embedding=self.embeddings,
-                        persist_directory=str(persist_dir)
+                        persist_directory=str(persist_dir),
                     )
                 elif store_type == "faiss":
                     vectorstore = FAISS.from_documents(
-                        documents=documents,
-                        embedding=self.embeddings
+                        documents=documents, embedding=self.embeddings
                     )
                 else:
                     raise ValueError(f"Unknown store type: {store_type}")
@@ -187,10 +182,7 @@ class VectorStoreBenchmark:
         return results
 
     def benchmark_querying(
-        self,
-        store_type: str,
-        num_documents: int,
-        num_queries: int = 10
+        self, store_type: str, num_documents: int, num_queries: int = 10
     ) -> List[VectorStoreBenchmarkResult]:
         """
         Benchmark query performance.
@@ -213,13 +205,10 @@ class VectorStoreBenchmark:
                 vectorstore = Chroma.from_documents(
                     documents=documents,
                     embedding=self.embeddings,
-                    persist_directory=str(persist_dir)
+                    persist_directory=str(persist_dir),
                 )
             elif store_type == "faiss":
-                vectorstore = FAISS.from_documents(
-                    documents=documents,
-                    embedding=self.embeddings
-                )
+                vectorstore = FAISS.from_documents(documents=documents, embedding=self.embeddings)
             else:
                 raise ValueError(f"Unknown store type: {store_type}")
 

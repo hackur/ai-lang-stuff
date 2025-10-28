@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import List, Optional
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -73,9 +73,7 @@ def can_import_example(example_path: Path) -> bool:
 
 
 def run_example_script(
-    example_path: Path,
-    timeout: int = TIMEOUT_SECONDS,
-    mock_ollama: bool = True
+    example_path: Path, timeout: int = TIMEOUT_SECONDS, mock_ollama: bool = True
 ) -> subprocess.CompletedProcess:
     """Run an example script as a subprocess.
 
@@ -101,7 +99,7 @@ def run_example_script(
         text=True,
         timeout=timeout,
         cwd=str(PROJECT_ROOT),
-        env={**subprocess.os.environ, **env}
+        env={**subprocess.os.environ, **env},
     )
 
     return result
@@ -351,8 +349,9 @@ class TestOutputPatterns:
             docstring_end = content.find('"""', docstring_start + 3)
             docstring = content[docstring_start:docstring_end]
 
-            assert "Prerequisites" in docstring or "Expected" in docstring, \
-                f"Missing Prerequisites/Expected in {example.name}"
+            assert (
+                "Prerequisites" in docstring or "Expected" in docstring
+            ), f"Missing Prerequisites/Expected in {example.name}"
 
     def test_examples_have_main_function(self):
         """Test that all examples have a main() function."""
@@ -364,8 +363,7 @@ class TestOutputPatterns:
 
             content = example.read_text()
             assert "def main" in content, f"No main() in {example.name}"
-            assert 'if __name__ == "__main__"' in content, \
-                f"No main block in {example.name}"
+            assert 'if __name__ == "__main__"' in content, f"No main block in {example.name}"
 
     def test_examples_have_error_handling(self):
         """Test that examples include error handling."""
@@ -381,8 +379,7 @@ class TestOutputPatterns:
             has_try_except = "try:" in content and "except" in content
             has_error_check = "Error" in content or "error" in content
 
-            assert has_try_except or has_error_check, \
-                f"No error handling in {example.name}"
+            assert has_try_except or has_error_check, f"No error handling in {example.name}"
 
 
 # ============================================================================

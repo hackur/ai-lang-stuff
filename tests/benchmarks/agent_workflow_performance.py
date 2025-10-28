@@ -120,23 +120,22 @@ class AgentWorkflowBenchmark:
 
         def make_agent_node(name: str, prompt: str):
             """Create an agent node."""
+
             def agent_node(state: AgentState) -> AgentState:
-                messages = state.get("messages", [])
+                state.get("messages", [])
                 response = self.llm.invoke([HumanMessage(content=prompt)])
                 return {
                     "messages": [response],
                     "step_count": state.get("step_count", 0) + 1,
                     "tool_calls": state.get("tool_calls", 0),
                 }
+
             return agent_node
 
         # Create nodes
         for i in range(num_agents):
             node_name = f"agent_{i}"
-            workflow.add_node(
-                node_name,
-                make_agent_node(node_name, f"Process step {i}")
-            )
+            workflow.add_node(node_name, make_agent_node(node_name, f"Process step {i}"))
 
         # Link sequentially
         workflow.set_entry_point("agent_0")
@@ -152,13 +151,13 @@ class AgentWorkflowBenchmark:
 
         def tool_calling_agent(state: AgentState) -> AgentState:
             """Agent that calls tools."""
-            messages = state.get("messages", [])
+            state.get("messages", [])
             tool_calls = state.get("tool_calls", 0)
 
             # Simulate tool call
-            start = time.perf_counter()
+            time.perf_counter()
             result = calculator("2 + 2")
-            end = time.perf_counter()
+            time.perf_counter()
 
             return {
                 "messages": [AIMessage(content=result)],
@@ -173,9 +172,7 @@ class AgentWorkflowBenchmark:
         return workflow
 
     def benchmark_sequential_workflow(
-        self,
-        num_agents: int,
-        num_runs: int = 3
+        self, num_agents: int, num_runs: int = 3
     ) -> List[AgentWorkflowBenchmarkResult]:
         """
         Benchmark sequential agent workflow.
@@ -242,9 +239,7 @@ class AgentWorkflowBenchmark:
         return results
 
     def benchmark_tool_calling(
-        self,
-        num_calls: int = 5,
-        num_runs: int = 3
+        self, num_calls: int = 5, num_runs: int = 3
     ) -> List[AgentWorkflowBenchmarkResult]:
         """
         Benchmark tool-calling workflow.
@@ -363,7 +358,7 @@ class AgentWorkflowBenchmark:
 
         # Tool calling
         print("\nTool Calling:")
-        print(f"  - 5 tool calls...", end=" ")
+        print("  - 5 tool calls...", end=" ")
         tool_results = self.benchmark_tool_calling(num_calls=5, num_runs=2)
         valid_tool_results = [r for r in tool_results if r.error is None]
         if valid_tool_results:
@@ -374,7 +369,7 @@ class AgentWorkflowBenchmark:
 
         # State management
         print("\nState Management:")
-        print(f"  - 100 state updates...", end=" ")
+        print("  - 100 state updates...", end=" ")
         state_metrics = self.benchmark_state_management(100)
         print(f"{state_metrics['per_update_ms']:.3f}ms per update")
 
@@ -390,8 +385,7 @@ class AgentWorkflowBenchmark:
         # Group by workflow type
         for workflow_type in ["sequential", "tool_calling"]:
             workflow_results = [
-                r for r in self.results
-                if r.workflow_type == workflow_type and r.error is None
+                r for r in self.results if r.workflow_type == workflow_type and r.error is None
             ]
             if workflow_results:
                 summary["by_workflow"][workflow_type] = {

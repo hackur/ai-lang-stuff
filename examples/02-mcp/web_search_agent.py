@@ -68,13 +68,13 @@ def main():
             host="localhost",
             port=8002,  # Web search MCP server port
             timeout=60.0,  # Longer timeout for web operations
-            max_retries=3
+            max_retries=3,
         )
 
         # Create web search client
         search_client = WebSearchMCP(config=config)
 
-        print(f"✓ MCP web search client initialized")
+        print("✓ MCP web search client initialized")
         print(f"  Server: {config.base_url}")
         print(f"  Timeout: {config.timeout}s")
     except Exception as e:
@@ -121,16 +121,17 @@ def main():
             Tool(
                 name="web_search",
                 description="Search the web for information. Input: search query string.",
-                func=mock_search
+                func=mock_search,
             )
         ]
         print(f"✓ Created {len(tools)} mock web search tools (for demo)")
 
     # Create agent prompt with research focus
-    prompt = ChatPromptTemplate.from_messages([
-        (
-            "system",
-            """You are a helpful AI research assistant with web search capabilities.
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """You are a helpful AI research assistant with web search capabilities.
 
 You can:
 - Search the web using web_search
@@ -150,11 +151,12 @@ Guidelines:
 - Be clear about the recency of information
 - Acknowledge if information might be outdated
 
-Be thorough but concise in your responses."""
-        ),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}"),
-    ])
+Be thorough but concise in your responses.""",
+            ),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
 
     # Create the agent
     agent = create_tool_calling_agent(llm, tools, prompt)
@@ -164,7 +166,7 @@ Be thorough but concise in your responses."""
         verbose=True,  # Show reasoning and search process
         max_iterations=5,
         handle_parsing_errors=True,
-        return_intermediate_steps=True  # Return search results
+        return_intermediate_steps=True,  # Return search results
     )
 
     print("✓ Agent created and ready")
@@ -201,7 +203,11 @@ Be thorough but concise in your responses."""
             for i, (action, observation) in enumerate(result["intermediate_steps"], 1):
                 print(f"\nStep {i}: {action.tool}")
                 print(f"Input: {action.tool_input}")
-                print(f"Result: {observation[:200]}..." if len(observation) > 200 else f"Result: {observation}")
+                print(
+                    f"Result: {observation[:200]}..."
+                    if len(observation) > 200
+                    else f"Result: {observation}"
+                )
             print("-" * 70)
 
     except Exception as e:

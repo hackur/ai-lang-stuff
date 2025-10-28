@@ -26,15 +26,12 @@ Usage:
 import base64
 import sys
 from pathlib import Path
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional
 import logging
 from dataclasses import dataclass
 
 from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain_core.tools import Tool
+from langchain_core.messages import HumanMessage
 
 # Add project root to path for utils imports
 project_root = Path(__file__).parent.parent.parent
@@ -43,13 +40,14 @@ sys.path.insert(0, str(project_root))
 from utils import OllamaManager
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class VisionResult:
     """Result from vision model analysis."""
+
     content: str
     image_path: Optional[Path] = None
     metadata: Optional[Dict] = None
@@ -71,7 +69,7 @@ class VisionAgent:
         self,
         vision_model: str = "qwen3-vl:8b",
         text_model: str = "qwen3:8b",
-        base_url: str = "http://localhost:11434"
+        base_url: str = "http://localhost:11434",
     ):
         """
         Initialize vision agent.
@@ -86,18 +84,10 @@ class VisionAgent:
         self.base_url = base_url
 
         # Initialize vision model
-        self.vision_llm = ChatOllama(
-            model=vision_model,
-            base_url=base_url,
-            temperature=0.3
-        )
+        self.vision_llm = ChatOllama(model=vision_model, base_url=base_url, temperature=0.3)
 
         # Initialize text model for planning and reasoning
-        self.text_llm = ChatOllama(
-            model=text_model,
-            base_url=base_url,
-            temperature=0.7
-        )
+        self.text_llm = ChatOllama(model=text_model, base_url=base_url, temperature=0.7)
 
         logger.info(f"Initialized VisionAgent with models: {vision_model}, {text_model}")
 
@@ -119,7 +109,7 @@ class VisionAgent:
             raise FileNotFoundError(f"Image not found: {image_path}")
 
         # Validate image extension
-        valid_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
+        valid_extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
         if image_path.suffix.lower() not in valid_extensions:
             raise ValueError(f"Invalid image format: {image_path.suffix}")
 
@@ -132,10 +122,7 @@ class VisionAgent:
             raise ValueError(f"Failed to encode image: {e}")
 
     def analyze_image(
-        self,
-        image_path: Path,
-        prompt: Optional[str] = None,
-        detailed: bool = True
+        self, image_path: Path, prompt: Optional[str] = None, detailed: bool = True
     ) -> VisionResult:
         """
         Analyze an image with optional custom prompt.
@@ -175,10 +162,7 @@ Be specific, thorough, and objective."""
             message = HumanMessage(
                 content=[
                     {"type": "text", "text": prompt_text},
-                    {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}"
-                    }
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_b64}"},
                 ]
             )
 
@@ -190,9 +174,9 @@ Be specific, thorough, and objective."""
                 content=response.content,
                 image_path=image_path,
                 metadata={
-                    'model': self.vision_model,
-                    'prompt_type': 'detailed' if detailed else 'concise'
-                }
+                    "model": self.vision_model,
+                    "prompt_type": "detailed" if detailed else "concise",
+                },
             )
 
         except Exception as e:
@@ -200,10 +184,7 @@ Be specific, thorough, and objective."""
             raise
 
     def answer_question(
-        self,
-        image_path: Path,
-        question: str,
-        context: Optional[str] = None
+        self, image_path: Path, question: str, context: Optional[str] = None
     ) -> VisionResult:
         """
         Answer a specific question about an image.
@@ -231,10 +212,7 @@ Be specific, thorough, and objective."""
             message = HumanMessage(
                 content=[
                     {"type": "text", "text": full_prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}"
-                    }
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_b64}"},
                 ]
             )
 
@@ -245,10 +223,10 @@ Be specific, thorough, and objective."""
                 content=response.content,
                 image_path=image_path,
                 metadata={
-                    'model': self.vision_model,
-                    'question': question,
-                    'has_context': context is not None
-                }
+                    "model": self.vision_model,
+                    "question": question,
+                    "has_context": context is not None,
+                },
             )
 
         except Exception as e:
@@ -256,9 +234,7 @@ Be specific, thorough, and objective."""
             raise
 
     def compare_images(
-        self,
-        image_paths: List[Path],
-        comparison_aspects: Optional[List[str]] = None
+        self, image_paths: List[Path], comparison_aspects: Optional[List[str]] = None
     ) -> VisionResult:
         """
         Compare multiple images and generate analysis.
@@ -284,10 +260,9 @@ Be specific, thorough, and objective."""
             for i, img_path in enumerate(image_paths, 1):
                 logger.info(f"  Analyzing image {i}/{len(image_paths)}: {img_path.name}")
                 result = self.analyze_image(img_path, detailed=False)
-                individual_analyses.append({
-                    'filename': img_path.name,
-                    'description': result.content
-                })
+                individual_analyses.append(
+                    {"filename": img_path.name, "description": result.content}
+                )
 
             # Build comparison prompt
             aspects_text = ""
@@ -298,7 +273,9 @@ Be specific, thorough, and objective."""
 
 """
             for i, analysis in enumerate(individual_analyses, 1):
-                comparison_prompt += f"Image {i} ({analysis['filename']}):\n{analysis['description']}\n\n"
+                comparison_prompt += (
+                    f"Image {i} ({analysis['filename']}):\n{analysis['description']}\n\n"
+                )
 
             comparison_prompt += f"""Now provide a comprehensive comparison:{aspects_text}
 
@@ -317,22 +294,18 @@ Format as a structured comparison."""
             return VisionResult(
                 content=response.content,
                 metadata={
-                    'model': self.text_model,
-                    'images': [str(p) for p in image_paths],
-                    'num_images': len(image_paths),
-                    'aspects': comparison_aspects
-                }
+                    "model": self.text_model,
+                    "images": [str(p) for p in image_paths],
+                    "num_images": len(image_paths),
+                    "aspects": comparison_aspects,
+                },
             )
 
         except Exception as e:
             logger.error(f"Error comparing images: {e}")
             raise
 
-    def visual_reasoning(
-        self,
-        image_path: Path,
-        reasoning_task: str
-    ) -> VisionResult:
+    def visual_reasoning(self, image_path: Path, reasoning_task: str) -> VisionResult:
         """
         Perform complex visual reasoning tasks.
 
@@ -364,10 +337,7 @@ Be thorough and explain your reasoning process."""
             message = HumanMessage(
                 content=[
                     {"type": "text", "text": reasoning_prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}"
-                    }
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_b64}"},
                 ]
             )
 
@@ -378,10 +348,10 @@ Be thorough and explain your reasoning process."""
                 content=response.content,
                 image_path=image_path,
                 metadata={
-                    'model': self.vision_model,
-                    'task': reasoning_task,
-                    'task_type': 'visual_reasoning'
-                }
+                    "model": self.vision_model,
+                    "task": reasoning_task,
+                    "task_type": "visual_reasoning",
+                },
             )
 
         except Exception as e:
@@ -396,7 +366,7 @@ Be thorough and explain your reasoning process."""
             image_path: Path to image to analyze.
         """
         print("\n" + "=" * 80)
-        print(f"Vision Agent - Interactive Session")
+        print("Vision Agent - Interactive Session")
         print(f"Image: {image_path.name}")
         print("=" * 80)
 
@@ -460,9 +430,7 @@ Be thorough and explain your reasoning process."""
                 # Answer question
                 print("\nThinking...")
                 result = self.answer_question(
-                    image_path=image_path,
-                    question=user_input,
-                    context=context
+                    image_path=image_path, question=user_input, context=context
                 )
 
                 print("\nAgent:")
@@ -485,40 +453,19 @@ def main():
     """Main execution function."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Vision Agent for multi-modal image understanding"
-    )
+    parser = argparse.ArgumentParser(description="Vision Agent for multi-modal image understanding")
+    parser.add_argument("image_path", help="Path to image file or directory")
+    parser.add_argument("--question", "-q", help="Ask a specific question about the image")
     parser.add_argument(
-        "image_path",
-        help="Path to image file or directory"
+        "--compare", action="store_true", help="Compare multiple images (requires directory path)"
     )
+    parser.add_argument("--reasoning", "-r", help="Perform visual reasoning task")
     parser.add_argument(
-        "--question", "-q",
-        help="Ask a specific question about the image"
+        "--vision-model", default="qwen3-vl:8b", help="Vision model (default: qwen3-vl:8b)"
     )
+    parser.add_argument("--text-model", default="qwen3:8b", help="Text model (default: qwen3:8b)")
     parser.add_argument(
-        "--compare",
-        action="store_true",
-        help="Compare multiple images (requires directory path)"
-    )
-    parser.add_argument(
-        "--reasoning", "-r",
-        help="Perform visual reasoning task"
-    )
-    parser.add_argument(
-        "--vision-model",
-        default="qwen3-vl:8b",
-        help="Vision model (default: qwen3-vl:8b)"
-    )
-    parser.add_argument(
-        "--text-model",
-        default="qwen3:8b",
-        help="Text model (default: qwen3:8b)"
-    )
-    parser.add_argument(
-        "--interactive", "-i",
-        action="store_true",
-        help="Start interactive Q&A session"
+        "--interactive", "-i", action="store_true", help="Start interactive Q&A session"
     )
 
     args = parser.parse_args()
@@ -547,10 +494,7 @@ def main():
 
     # Initialize agent
     print("\n3. Initializing vision agent...")
-    agent = VisionAgent(
-        vision_model=args.vision_model,
-        text_model=args.text_model
-    )
+    agent = VisionAgent(vision_model=args.vision_model, text_model=args.text_model)
 
     # Determine mode
     input_path = Path(args.image_path)
@@ -567,9 +511,10 @@ def main():
                 return
 
             # Find all images in directory
-            image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
+            image_extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
             images = [
-                f for f in input_path.iterdir()
+                f
+                for f in input_path.iterdir()
                 if f.is_file() and f.suffix.lower() in image_extensions
             ]
 
@@ -595,7 +540,7 @@ def main():
 
             # Visual reasoning
             elif args.reasoning:
-                print(f"\n4. Performing visual reasoning...")
+                print("\n4. Performing visual reasoning...")
                 result = agent.visual_reasoning(image_path, args.reasoning)
 
                 print("\nVisual Reasoning Analysis:")
@@ -605,7 +550,7 @@ def main():
 
             # Specific question
             elif args.question:
-                print(f"\n4. Answering question...")
+                print("\n4. Answering question...")
                 result = agent.answer_question(image_path, args.question)
 
                 print(f"\nQuestion: {args.question}")
@@ -616,7 +561,7 @@ def main():
 
             # Default: detailed analysis
             else:
-                print(f"\n4. Analyzing image...")
+                print("\n4. Analyzing image...")
                 result = agent.analyze_image(image_path, detailed=True)
 
                 print("\nImage Analysis:")

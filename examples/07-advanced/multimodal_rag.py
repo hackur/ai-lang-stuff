@@ -26,7 +26,7 @@ Usage:
 import base64
 import sys
 from pathlib import Path
-from typing import List, Dict, Optional, Union, Literal
+from typing import List, Dict, Optional
 import logging
 from dataclasses import dataclass
 from enum import Enum
@@ -44,12 +44,13 @@ sys.path.insert(0, str(project_root))
 from utils import OllamaManager, VectorStoreManager
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class MediaType(Enum):
     """Types of media in the knowledge base."""
+
     TEXT = "text"
     IMAGE = "image"
     MIXED = "mixed"
@@ -58,6 +59,7 @@ class MediaType(Enum):
 @dataclass
 class MultiModalDocument:
     """Document with multi-modal content."""
+
     content: str
     media_type: MediaType
     source_path: Optional[Path] = None
@@ -68,6 +70,7 @@ class MultiModalDocument:
 @dataclass
 class SearchResult:
     """Result from multi-modal search."""
+
     answer: str
     sources: List[Document]
     media_types: List[str]
@@ -90,7 +93,7 @@ class MultiModalRAG:
         vision_model: str = "qwen3-vl:8b",
         text_model: str = "qwen3:8b",
         embedding_model: str = "qwen3-embedding",
-        base_url: str = "http://localhost:11434"
+        base_url: str = "http://localhost:11434",
     ):
         """
         Initialize multi-modal RAG system.
@@ -107,17 +110,9 @@ class MultiModalRAG:
         self.base_url = base_url
 
         # Initialize models
-        self.vision_llm = ChatOllama(
-            model=vision_model,
-            base_url=base_url,
-            temperature=0.3
-        )
+        self.vision_llm = ChatOllama(model=vision_model, base_url=base_url, temperature=0.3)
 
-        self.text_llm = ChatOllama(
-            model=text_model,
-            base_url=base_url,
-            temperature=0.2
-        )
+        self.text_llm = ChatOllama(model=text_model, base_url=base_url, temperature=0.2)
 
         # Vector store manager
         self.vector_mgr = VectorStoreManager(embedding_model=embedding_model)
@@ -155,10 +150,7 @@ Make it comprehensive and searchable."""
             message = HumanMessage(
                 content=[
                     {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{image_b64}"
-                    }
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{image_b64}"},
                 ]
             )
 
@@ -171,11 +163,7 @@ Make it comprehensive and searchable."""
             raise
 
     def index_directory(
-        self,
-        data_dir: Path,
-        collection_name: str,
-        persist_dir: str,
-        rebuild: bool = False
+        self, data_dir: Path, collection_name: str, persist_dir: str, rebuild: bool = False
     ) -> tuple:
         """
         Index all text and image files in directory.
@@ -196,25 +184,24 @@ Make it comprehensive and searchable."""
         if collection_exists and not rebuild:
             logger.info(f"Loading existing collection: {collection_name}")
             vectorstore = self.vector_mgr.load_existing(
-                collection_name=collection_name,
-                persist_dir=persist_dir
+                collection_name=collection_name, persist_dir=persist_dir
             )
             return vectorstore, []
 
         logger.info("Building multi-modal index...")
 
         # Find all supported files
-        text_extensions = {'.txt', '.md', '.pdf', '.csv'}
-        image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
+        text_extensions = {".txt", ".md", ".pdf", ".csv"}
+        image_extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
 
         text_files = []
         image_files = []
 
         for ext in text_extensions:
-            text_files.extend(data_dir.glob(f'**/*{ext}'))
+            text_files.extend(data_dir.glob(f"**/*{ext}"))
 
         for ext in image_extensions:
-            image_files.extend(data_dir.glob(f'**/*{ext}'))
+            image_files.extend(data_dir.glob(f"**/*{ext}"))
 
         logger.info(f"Found {len(text_files)} text files, {len(image_files)} images")
 
@@ -223,22 +210,21 @@ Make it comprehensive and searchable."""
         # Process text files
         if text_files:
             logger.info("Processing text files...")
-            text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1000,
-                chunk_overlap=200
-            )
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
             for i, file_path in enumerate(text_files, 1):
                 logger.info(f"  Text {i}/{len(text_files)}: {file_path.name}")
 
                 try:
                     # Read file
-                    if file_path.suffix == '.pdf':
+                    if file_path.suffix == ".pdf":
                         # For PDF, you'd use PyPDF loader
-                        logger.warning(f"PDF support requires pypdf loader - skipping {file_path.name}")
+                        logger.warning(
+                            f"PDF support requires pypdf loader - skipping {file_path.name}"
+                        )
                         continue
                     else:
-                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                             content = f.read()
 
                     # Split into chunks
@@ -249,12 +235,12 @@ Make it comprehensive and searchable."""
                         doc = Document(
                             page_content=chunk,
                             metadata={
-                                'source': str(file_path),
-                                'filename': file_path.name,
-                                'type': 'text',
-                                'format': file_path.suffix[1:],
-                                'chunk': j
-                            }
+                                "source": str(file_path),
+                                "filename": file_path.name,
+                                "type": "text",
+                                "format": file_path.suffix[1:],
+                                "chunk": j,
+                            },
                         )
                         all_documents.append(doc)
 
@@ -277,12 +263,12 @@ Make it comprehensive and searchable."""
                     doc = Document(
                         page_content=description,
                         metadata={
-                            'source': str(image_path),
-                            'filename': image_path.name,
-                            'type': 'image',
-                            'format': image_path.suffix[1:].lower(),
-                            'image_path': str(image_path)
-                        }
+                            "source": str(image_path),
+                            "filename": image_path.name,
+                            "type": "image",
+                            "format": image_path.suffix[1:].lower(),
+                            "image_path": str(image_path),
+                        },
                     )
                     all_documents.append(doc)
 
@@ -298,19 +284,13 @@ Make it comprehensive and searchable."""
         # Create vector store
         logger.info("Creating vector store...")
         vectorstore = self.vector_mgr.create_from_documents(
-            documents=all_documents,
-            collection_name=collection_name,
-            persist_dir=persist_dir
+            documents=all_documents, collection_name=collection_name, persist_dir=persist_dir
         )
 
         return vectorstore, all_documents
 
     def search(
-        self,
-        vectorstore,
-        query: str,
-        k: int = 5,
-        media_filter: Optional[MediaType] = None
+        self, vectorstore, query: str, k: int = 5, media_filter: Optional[MediaType] = None
     ) -> List[Document]:
         """
         Search across multi-modal knowledge base.
@@ -329,12 +309,8 @@ Make it comprehensive and searchable."""
         # Perform similarity search
         if media_filter:
             # Filter by media type
-            filter_dict = {'type': media_filter.value}
-            results = vectorstore.similarity_search(
-                query,
-                k=k,
-                filter=filter_dict
-            )
+            filter_dict = {"type": media_filter.value}
+            results = vectorstore.similarity_search(query, k=k, filter=filter_dict)
         else:
             results = vectorstore.similarity_search(query, k=k)
 
@@ -342,11 +318,7 @@ Make it comprehensive and searchable."""
         return results
 
     def answer_with_sources(
-        self,
-        vectorstore,
-        query: str,
-        k: int = 5,
-        use_vision_for_images: bool = True
+        self, vectorstore, query: str, k: int = 5, use_vision_for_images: bool = True
     ) -> SearchResult:
         """
         Answer query using multi-modal sources.
@@ -368,12 +340,12 @@ Make it comprehensive and searchable."""
                 answer="No relevant information found.",
                 sources=[],
                 media_types=[],
-                confidence="none"
+                confidence="none",
             )
 
         # Separate text and image sources
-        text_docs = [d for d in docs if d.metadata.get('type') == 'text']
-        image_docs = [d for d in docs if d.metadata.get('type') == 'image']
+        text_docs = [d for d in docs if d.metadata.get("type") == "text"]
+        image_docs = [d for d in docs if d.metadata.get("type") == "image"]
 
         logger.info(f"Retrieved {len(text_docs)} text docs, {len(image_docs)} image docs")
 
@@ -384,7 +356,7 @@ Make it comprehensive and searchable."""
         if text_docs:
             context_parts.append("TEXT SOURCES:")
             for i, doc in enumerate(text_docs, 1):
-                filename = doc.metadata.get('filename', 'unknown')
+                filename = doc.metadata.get("filename", "unknown")
                 context_parts.append(f"\n[Text {i} - {filename}]")
                 context_parts.append(doc.page_content)
 
@@ -397,7 +369,7 @@ Make it comprehensive and searchable."""
                 logger.info("Re-analyzing images with vision model...")
                 # Use vision model on the most relevant image
                 top_image = image_docs[0]
-                image_path = Path(top_image.metadata.get('image_path', ''))
+                image_path = Path(top_image.metadata.get("image_path", ""))
 
                 if image_path.exists():
                     try:
@@ -405,11 +377,14 @@ Make it comprehensive and searchable."""
                         image_b64 = self.encode_image(image_path)
                         message = HumanMessage(
                             content=[
-                                {"type": "text", "text": f"Question: {query}\n\nAnswer based on this image."},
+                                {
+                                    "type": "text",
+                                    "text": f"Question: {query}\n\nAnswer based on this image.",
+                                },
                                 {
                                     "type": "image_url",
-                                    "image_url": f"data:image/jpeg;base64,{image_b64}"
-                                }
+                                    "image_url": f"data:image/jpeg;base64,{image_b64}",
+                                },
                             ]
                         )
                         vision_response = self.vision_llm.invoke([message])
@@ -420,42 +395,50 @@ Make it comprehensive and searchable."""
 
             # Add stored descriptions
             for i, doc in enumerate(image_docs, 1):
-                filename = doc.metadata.get('filename', 'unknown')
+                filename = doc.metadata.get("filename", "unknown")
                 context_parts.append(f"\n[Image {i} - {filename}]")
                 context_parts.append(doc.page_content)
 
         context = "\n".join(context_parts)
 
         # Generate answer
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are a knowledgeable assistant with access to both text documents and images.
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    """You are a knowledgeable assistant with access to both text documents and images.
 Answer questions accurately based on the provided sources.
 
 Guidelines:
 - Cite specific sources (e.g., "According to [Text 1]..." or "The image shows...")
 - If information comes from an image, mention it explicitly
 - If sources don't contain the answer, say so
-- Combine information from multiple sources when relevant"""),
-            ("human", """Sources:
+- Combine information from multiple sources when relevant""",
+                ),
+                (
+                    "human",
+                    """Sources:
 {context}
 
 Question: {query}
 
-Answer:""")
-        ])
+Answer:""",
+                ),
+            ]
+        )
 
         logger.info("Generating answer...")
         chain = prompt | self.text_llm
         response = chain.invoke({"context": context, "query": query})
 
         # Determine media types in results
-        media_types = list(set(d.metadata.get('type', 'unknown') for d in docs))
+        media_types = list(set(d.metadata.get("type", "unknown") for d in docs))
 
         return SearchResult(
             answer=response.content,
             sources=docs,
             media_types=media_types,
-            confidence="high" if len(docs) >= 3 else "medium" if docs else "low"
+            confidence="high" if len(docs) >= 3 else "medium" if docs else "low",
         )
 
     def interactive_session(self, vectorstore):
@@ -486,10 +469,7 @@ Answer:""")
                 # Process query
                 print("\nSearching knowledge base...")
                 result = self.answer_with_sources(
-                    vectorstore=vectorstore,
-                    query=query,
-                    k=5,
-                    use_vision_for_images=True
+                    vectorstore=vectorstore, query=query, k=5, use_vision_for_images=True
                 )
 
                 # Display answer
@@ -502,11 +482,13 @@ Answer:""")
                 if result.sources:
                     print(f"\nSources ({len(result.sources)}):")
                     for i, doc in enumerate(result.sources, 1):
-                        doc_type = doc.metadata.get('type', 'unknown')
-                        filename = doc.metadata.get('filename', 'unknown')
+                        doc_type = doc.metadata.get("type", "unknown")
+                        filename = doc.metadata.get("filename", "unknown")
                         print(f"  {i}. [{doc_type.upper()}] {filename}")
 
-                print(f"\n[Confidence: {result.confidence} | Media types: {', '.join(result.media_types)}]")
+                print(
+                    f"\n[Confidence: {result.confidence} | Media types: {', '.join(result.media_types)}]"
+                )
 
             except KeyboardInterrupt:
                 print("\n\nGoodbye!")
@@ -523,53 +505,29 @@ def main():
     parser = argparse.ArgumentParser(
         description="Multi-Modal RAG with unified text and image search"
     )
+    parser.add_argument("data_dir", help="Directory containing text and image files")
+    parser.add_argument("--index", action="store_true", help="Index the directory")
+    parser.add_argument("--query", "-q", help="Query the knowledge base")
     parser.add_argument(
-        "data_dir",
-        help="Directory containing text and image files"
+        "--interactive", "-i", action="store_true", help="Start interactive session"
     )
     parser.add_argument(
-        "--index",
-        action="store_true",
-        help="Index the directory"
-    )
-    parser.add_argument(
-        "--query", "-q",
-        help="Query the knowledge base"
-    )
-    parser.add_argument(
-        "--interactive", "-i",
-        action="store_true",
-        help="Start interactive session"
-    )
-    parser.add_argument(
-        "--collection",
-        default="multimodal_rag",
-        help="Collection name (default: multimodal_rag)"
+        "--collection", default="multimodal_rag", help="Collection name (default: multimodal_rag)"
     )
     parser.add_argument(
         "--persist-dir",
         default="./data/vector_stores",
-        help="Vector store directory (default: ./data/vector_stores)"
+        help="Vector store directory (default: ./data/vector_stores)",
     )
+    parser.add_argument("--rebuild", action="store_true", help="Rebuild index")
     parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Rebuild index"
+        "--vision-model", default="qwen3-vl:8b", help="Vision model (default: qwen3-vl:8b)"
     )
-    parser.add_argument(
-        "--vision-model",
-        default="qwen3-vl:8b",
-        help="Vision model (default: qwen3-vl:8b)"
-    )
-    parser.add_argument(
-        "--text-model",
-        default="qwen3:8b",
-        help="Text model (default: qwen3:8b)"
-    )
+    parser.add_argument("--text-model", default="qwen3:8b", help="Text model (default: qwen3:8b)")
     parser.add_argument(
         "--embedding-model",
         default="qwen3-embedding",
-        help="Embedding model (default: qwen3-embedding)"
+        help="Embedding model (default: qwen3-embedding)",
     )
 
     args = parser.parse_args()
@@ -607,7 +565,7 @@ def main():
     rag = MultiModalRAG(
         vision_model=args.vision_model,
         text_model=args.text_model,
-        embedding_model=args.embedding_model
+        embedding_model=args.embedding_model,
     )
 
     # Index or load
@@ -617,7 +575,7 @@ def main():
             data_dir=data_dir,
             collection_name=args.collection,
             persist_dir=args.persist_dir,
-            rebuild=args.rebuild or args.index
+            rebuild=args.rebuild or args.index,
         )
     except Exception as e:
         print(f"Error indexing directory: {e}")
@@ -627,12 +585,8 @@ def main():
     try:
         if args.query:
             # Single query mode
-            print(f"\n5. Processing query...")
-            result = rag.answer_with_sources(
-                vectorstore=vectorstore,
-                query=args.query,
-                k=5
-            )
+            print("\n5. Processing query...")
+            result = rag.answer_with_sources(vectorstore=vectorstore, query=args.query, k=5)
 
             print("\nAnswer:")
             print("=" * 80)
@@ -642,8 +596,8 @@ def main():
             if result.sources:
                 print(f"\nSources ({len(result.sources)}):")
                 for i, doc in enumerate(result.sources, 1):
-                    doc_type = doc.metadata.get('type', 'unknown')
-                    filename = doc.metadata.get('filename', 'unknown')
+                    doc_type = doc.metadata.get("type", "unknown")
+                    filename = doc.metadata.get("filename", "unknown")
                     print(f"  {i}. [{doc_type.upper()}] {filename}")
 
         elif args.interactive:
@@ -653,7 +607,7 @@ def main():
 
         else:
             print("\nSuccess! Knowledge base ready.")
-            print(f"Use --query 'your question' or --interactive to search.")
+            print("Use --query 'your question' or --interactive to search.")
 
     except Exception as e:
         logger.error(f"Error: {e}", exc_info=True)

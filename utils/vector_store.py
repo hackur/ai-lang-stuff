@@ -32,7 +32,7 @@ Example:
 import logging
 import shutil
 from pathlib import Path
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional
 
 from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
@@ -60,9 +60,7 @@ class VectorStoreManager:
     """
 
     def __init__(
-        self,
-        embedding_model: str = "qwen3-embedding",
-        base_url: str = "http://localhost:11434"
+        self, embedding_model: str = "qwen3-embedding", base_url: str = "http://localhost:11434"
     ):
         """Initialize the vector store manager.
 
@@ -73,8 +71,7 @@ class VectorStoreManager:
         self.embedding_model = embedding_model
         self.base_url = base_url
         logger.info(
-            f"Initialized VectorStoreManager with model={embedding_model}, "
-            f"base_url={base_url}"
+            f"Initialized VectorStoreManager with model={embedding_model}, " f"base_url={base_url}"
         )
 
     def _get_embeddings(self) -> Embeddings:
@@ -88,10 +85,7 @@ class VectorStoreManager:
             ValueError: If the embedding model is not available.
         """
         try:
-            embeddings = OllamaEmbeddings(
-                model=self.embedding_model,
-                base_url=self.base_url
-            )
+            embeddings = OllamaEmbeddings(model=self.embedding_model, base_url=self.base_url)
             logger.debug(f"Created embeddings instance for model: {self.embedding_model}")
             return embeddings
         except Exception as e:
@@ -109,7 +103,7 @@ class VectorStoreManager:
         persist_dir: str,
         store_type: VectorStoreType = "chroma",
         chunk_size: Optional[int] = None,
-        chunk_overlap: Optional[int] = None
+        chunk_overlap: Optional[int] = None,
     ) -> VectorStore:
         """Create a new vector store from documents.
 
@@ -158,8 +152,7 @@ class VectorStoreManager:
             from langchain.text_splitter import RecursiveCharacterTextSplitter
 
             splitter = RecursiveCharacterTextSplitter(
-                chunk_size=chunk_size,
-                chunk_overlap=chunk_overlap or chunk_size // 10
+                chunk_size=chunk_size, chunk_overlap=chunk_overlap or chunk_size // 10
             )
             documents = splitter.split_documents(documents)
             logger.info(f"Split documents into {len(documents)} chunks")
@@ -174,15 +167,12 @@ class VectorStoreManager:
                     documents=documents,
                     embedding=embeddings,
                     collection_name=collection_name,
-                    persist_directory=str(persist_path)
+                    persist_directory=str(persist_path),
                 )
                 logger.info(f"Created Chroma collection at {persist_path}")
 
             else:  # FAISS
-                vectorstore = FAISS.from_documents(
-                    documents=documents,
-                    embedding=embeddings
-                )
+                vectorstore = FAISS.from_documents(documents=documents, embedding=embeddings)
                 vectorstore.save_local(str(persist_path))
                 logger.info(f"Created FAISS index at {persist_path}")
 
@@ -197,10 +187,7 @@ class VectorStoreManager:
             raise
 
     def load_existing(
-        self,
-        collection_name: str,
-        persist_dir: str,
-        store_type: VectorStoreType = "chroma"
+        self, collection_name: str, persist_dir: str, store_type: VectorStoreType = "chroma"
     ) -> VectorStore:
         """Load an existing vector store from disk.
 
@@ -246,15 +233,13 @@ class VectorStoreManager:
                 vectorstore = Chroma(
                     collection_name=collection_name,
                     embedding_function=embeddings,
-                    persist_directory=str(persist_path)
+                    persist_directory=str(persist_path),
                 )
                 logger.info(f"Loaded Chroma collection: {collection_name}")
 
             else:  # FAISS
                 vectorstore = FAISS.load_local(
-                    str(persist_path),
-                    embeddings,
-                    allow_dangerous_deserialization=True
+                    str(persist_path), embeddings, allow_dangerous_deserialization=True
                 )
                 logger.info(f"Loaded FAISS index: {collection_name}")
 
@@ -265,10 +250,7 @@ class VectorStoreManager:
             raise
 
     def add_documents(
-        self,
-        vectorstore: VectorStore,
-        documents: List[Document],
-        persist_dir: Optional[str] = None
+        self, vectorstore: VectorStore, documents: List[Document], persist_dir: Optional[str] = None
     ) -> None:
         """Add new documents to an existing vector store.
 
@@ -301,9 +283,7 @@ class VectorStoreManager:
             # Persist FAISS if needed
             if isinstance(vectorstore, FAISS):
                 if not persist_dir:
-                    raise ValueError(
-                        "persist_dir is required when adding documents to FAISS store"
-                    )
+                    raise ValueError("persist_dir is required when adding documents to FAISS store")
                 vectorstore.save_local(persist_dir)
                 logger.info(f"Saved updated FAISS index to {persist_dir}")
 
@@ -312,10 +292,7 @@ class VectorStoreManager:
             raise
 
     def delete_collection(
-        self,
-        collection_name: str,
-        persist_dir: str,
-        store_type: VectorStoreType = "chroma"
+        self, collection_name: str, persist_dir: str, store_type: VectorStoreType = "chroma"
     ) -> None:
         """Delete a vector store collection from disk.
 
@@ -339,9 +316,7 @@ class VectorStoreManager:
         persist_path = Path(persist_dir) / store_type / collection_name
 
         if not persist_path.exists():
-            raise FileNotFoundError(
-                f"Collection '{collection_name}' not found at {persist_path}"
-            )
+            raise FileNotFoundError(f"Collection '{collection_name}' not found at {persist_path}")
 
         logger.info(f"Deleting {store_type} collection '{collection_name}' at {persist_path}")
 
@@ -353,9 +328,7 @@ class VectorStoreManager:
             raise
 
     def list_collections(
-        self,
-        persist_dir: str,
-        store_type: Optional[VectorStoreType] = None
+        self, persist_dir: str, store_type: Optional[VectorStoreType] = None
     ) -> dict[str, List[str]]:
         """List all available vector store collections.
 
@@ -389,7 +362,8 @@ class VectorStoreManager:
             store_path = base_path / stype
             if store_path.exists() and store_path.is_dir():
                 collections[stype] = [
-                    d.name for d in store_path.iterdir()
+                    d.name
+                    for d in store_path.iterdir()
                     if d.is_dir() and not d.name.startswith(".")
                 ]
                 logger.debug(f"Found {len(collections[stype])} {stype} collections")
@@ -397,11 +371,7 @@ class VectorStoreManager:
         return collections
 
     def similarity_search(
-        self,
-        vectorstore: VectorStore,
-        query: str,
-        k: int = 4,
-        filter: Optional[dict] = None
+        self, vectorstore: VectorStore, query: str, k: int = 4, filter: Optional[dict] = None
     ) -> List[Document]:
         """Perform similarity search with optional metadata filtering.
 
@@ -447,11 +417,7 @@ class VectorStoreManager:
             raise
 
     def similarity_search_with_score(
-        self,
-        vectorstore: VectorStore,
-        query: str,
-        k: int = 4,
-        filter: Optional[dict] = None
+        self, vectorstore: VectorStore, query: str, k: int = 4, filter: Optional[dict] = None
     ) -> List[tuple[Document, float]]:
         """Perform similarity search with relevance scores.
 
@@ -495,11 +461,12 @@ class VectorStoreManager:
 
 # Convenience functions for common operations
 
+
 def create_chroma_store(
     documents: List[Document],
     collection_name: str,
     persist_dir: str = "./data/vector_stores",
-    embedding_model: str = "qwen3-embedding"
+    embedding_model: str = "qwen3-embedding",
 ) -> Chroma:
     """Convenience function to create a Chroma vector store.
 
@@ -517,7 +484,7 @@ def create_chroma_store(
         documents=documents,
         collection_name=collection_name,
         persist_dir=persist_dir,
-        store_type="chroma"
+        store_type="chroma",
     )
 
 
@@ -525,7 +492,7 @@ def create_faiss_store(
     documents: List[Document],
     collection_name: str,
     persist_dir: str = "./data/vector_stores",
-    embedding_model: str = "qwen3-embedding"
+    embedding_model: str = "qwen3-embedding",
 ) -> FAISS:
     """Convenience function to create a FAISS vector store.
 
@@ -543,7 +510,7 @@ def create_faiss_store(
         documents=documents,
         collection_name=collection_name,
         persist_dir=persist_dir,
-        store_type="faiss"
+        store_type="faiss",
     )
 
 
@@ -551,7 +518,7 @@ def load_vector_store(
     collection_name: str,
     persist_dir: str = "./data/vector_stores",
     store_type: VectorStoreType = "chroma",
-    embedding_model: str = "qwen3-embedding"
+    embedding_model: str = "qwen3-embedding",
 ) -> VectorStore:
     """Convenience function to load an existing vector store.
 
@@ -566,7 +533,5 @@ def load_vector_store(
     """
     manager = VectorStoreManager(embedding_model=embedding_model)
     return manager.load_existing(
-        collection_name=collection_name,
-        persist_dir=persist_dir,
-        store_type=store_type
+        collection_name=collection_name, persist_dir=persist_dir, store_type=store_type
     )

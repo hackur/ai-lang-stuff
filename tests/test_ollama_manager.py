@@ -5,8 +5,7 @@ error handling, and convenience functions using mocked requests.
 """
 
 import pytest
-import time
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from requests.exceptions import ConnectionError, Timeout, RequestException
 import json
 
@@ -60,7 +59,7 @@ class TestOllamaManagerInit:
 class TestCheckOllamaRunning:
     """Test check_ollama_running method."""
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_check_ollama_running_success(self, mock_get, ollama_manager):
         """Test successful Ollama server check."""
         mock_response = Mock()
@@ -70,12 +69,9 @@ class TestCheckOllamaRunning:
         result = ollama_manager.check_ollama_running()
 
         assert result is True
-        mock_get.assert_called_once_with(
-            "http://localhost:11434/api/tags",
-            timeout=5
-        )
+        mock_get.assert_called_once_with("http://localhost:11434/api/tags", timeout=5)
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_check_ollama_running_connection_error(self, mock_get, ollama_manager):
         """Test Ollama server check with connection error."""
         mock_get.side_effect = ConnectionError("Connection refused")
@@ -84,7 +80,7 @@ class TestCheckOllamaRunning:
 
         assert result is False
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_check_ollama_running_timeout(self, mock_get, ollama_manager):
         """Test Ollama server check with timeout."""
         mock_get.side_effect = Timeout("Request timeout")
@@ -93,7 +89,7 @@ class TestCheckOllamaRunning:
 
         assert result is False
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_check_ollama_running_request_exception(self, mock_get, ollama_manager):
         """Test Ollama server check with generic request exception."""
         mock_get.side_effect = RequestException("Generic error")
@@ -106,29 +102,22 @@ class TestCheckOllamaRunning:
 class TestListModels:
     """Test list_models method."""
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_list_models_success(self, mock_get, ollama_manager):
         """Test successful model listing."""
         mock_response = Mock()
         mock_response.raise_for_status.return_value = None
         mock_response.json.return_value = {
-            "models": [
-                {"name": "qwen3:8b"},
-                {"name": "gemma3:4b"},
-                {"name": "qwen3:30b-a3b"}
-            ]
+            "models": [{"name": "qwen3:8b"}, {"name": "gemma3:4b"}, {"name": "qwen3:30b-a3b"}]
         }
         mock_get.return_value = mock_response
 
         result = ollama_manager.list_models()
 
         assert result == ["qwen3:8b", "gemma3:4b", "qwen3:30b-a3b"]
-        mock_get.assert_called_once_with(
-            "http://localhost:11434/api/tags",
-            timeout=30
-        )
+        mock_get.assert_called_once_with("http://localhost:11434/api/tags", timeout=30)
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_list_models_empty(self, mock_get, ollama_manager):
         """Test listing models when none are installed."""
         mock_response = Mock()
@@ -140,7 +129,7 @@ class TestListModels:
 
         assert result == []
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_list_models_filters_empty_names(self, mock_get, ollama_manager):
         """Test that empty model names are filtered out."""
         mock_response = Mock()
@@ -149,7 +138,7 @@ class TestListModels:
             "models": [
                 {"name": "qwen3:8b"},
                 {"name": ""},  # Empty name
-                {"other_field": "value"}  # Missing name
+                {"other_field": "value"},  # Missing name
             ]
         }
         mock_get.return_value = mock_response
@@ -158,7 +147,7 @@ class TestListModels:
 
         assert result == ["qwen3:8b"]
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_list_models_request_exception(self, mock_get, ollama_manager):
         """Test listing models with request exception."""
         mock_get.side_effect = RequestException("Connection failed")
@@ -171,7 +160,7 @@ class TestListModels:
 class TestEnsureModelAvailable:
     """Test ensure_model_available method."""
 
-    @patch.object(OllamaManager, 'list_models')
+    @patch.object(OllamaManager, "list_models")
     def test_ensure_model_available_already_installed(self, mock_list, ollama_manager):
         """Test ensuring a model that's already installed."""
         mock_list.return_value = ["qwen3:8b", "gemma3:4b"]
@@ -181,8 +170,8 @@ class TestEnsureModelAvailable:
         assert result is True
         mock_list.assert_called_once()
 
-    @patch.object(OllamaManager, 'pull_model')
-    @patch.object(OllamaManager, 'list_models')
+    @patch.object(OllamaManager, "pull_model")
+    @patch.object(OllamaManager, "list_models")
     def test_ensure_model_available_needs_pull(self, mock_list, mock_pull, ollama_manager):
         """Test ensuring a model that needs to be pulled."""
         mock_list.return_value = ["gemma3:4b"]
@@ -194,8 +183,8 @@ class TestEnsureModelAvailable:
         mock_list.assert_called_once()
         mock_pull.assert_called_once_with("qwen3:8b")
 
-    @patch.object(OllamaManager, 'pull_model')
-    @patch.object(OllamaManager, 'list_models')
+    @patch.object(OllamaManager, "pull_model")
+    @patch.object(OllamaManager, "list_models")
     def test_ensure_model_available_pull_fails(self, mock_list, mock_pull, ollama_manager):
         """Test ensuring a model when pull fails."""
         mock_list.return_value = []
@@ -210,8 +199,8 @@ class TestEnsureModelAvailable:
 class TestPullModel:
     """Test pull_model method."""
 
-    @patch('utils.ollama_manager.requests.post')
-    @patch('builtins.print')
+    @patch("utils.ollama_manager.requests.post")
+    @patch("builtins.print")
     def test_pull_model_success(self, mock_print, mock_post, ollama_manager):
         """Test successful model pull."""
         mock_response = Mock()
@@ -230,13 +219,10 @@ class TestPullModel:
 
         assert result is True
         mock_post.assert_called_once_with(
-            "http://localhost:11434/api/pull",
-            json={"name": "qwen3:8b"},
-            stream=True,
-            timeout=30
+            "http://localhost:11434/api/pull", json={"name": "qwen3:8b"}, stream=True, timeout=30
         )
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_pull_model_connection_error(self, mock_post, ollama_manager):
         """Test model pull with connection error."""
         mock_post.side_effect = ConnectionError("Cannot connect")
@@ -245,7 +231,7 @@ class TestPullModel:
 
         assert result is False
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_pull_model_timeout(self, mock_post, ollama_manager):
         """Test model pull with timeout."""
         mock_post.side_effect = Timeout("Request timeout")
@@ -254,7 +240,7 @@ class TestPullModel:
 
         assert result is False
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_pull_model_request_exception(self, mock_post, ollama_manager):
         """Test model pull with generic request exception."""
         mock_post.side_effect = RequestException("Generic error")
@@ -263,8 +249,8 @@ class TestPullModel:
 
         assert result is False
 
-    @patch('utils.ollama_manager.requests.post')
-    @patch('builtins.print')
+    @patch("utils.ollama_manager.requests.post")
+    @patch("builtins.print")
     def test_pull_model_handles_invalid_json(self, mock_print, mock_post, ollama_manager):
         """Test that pull_model handles invalid JSON lines gracefully."""
         mock_response = Mock()
@@ -283,7 +269,7 @@ class TestPullModel:
 class TestGetModelInfo:
     """Test get_model_info method."""
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_get_model_info_success(self, mock_post, ollama_manager):
         """Test successful model info retrieval."""
         mock_response = Mock()
@@ -291,10 +277,7 @@ class TestGetModelInfo:
         mock_response.json.return_value = {
             "modelfile": "FROM qwen3:8b",
             "parameters": {"temperature": 0.7},
-            "details": {
-                "parameter_size": "8B",
-                "quantization_level": "Q4_K_M"
-            }
+            "details": {"parameter_size": "8B", "quantization_level": "Q4_K_M"},
         }
         mock_post.return_value = mock_response
 
@@ -305,12 +288,10 @@ class TestGetModelInfo:
         assert "details" in result
         assert result["details"]["parameter_size"] == "8B"
         mock_post.assert_called_once_with(
-            "http://localhost:11434/api/show",
-            json={"name": "qwen3:8b"},
-            timeout=30
+            "http://localhost:11434/api/show", json={"name": "qwen3:8b"}, timeout=30
         )
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_get_model_info_not_found(self, mock_post, ollama_manager):
         """Test getting info for non-existent model."""
         mock_post.side_effect = RequestException("Model not found")
@@ -319,7 +300,7 @@ class TestGetModelInfo:
 
         assert result == {}
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_get_model_info_connection_error(self, mock_post, ollama_manager):
         """Test getting model info with connection error."""
         mock_post.side_effect = ConnectionError("Cannot connect")
@@ -332,8 +313,8 @@ class TestGetModelInfo:
 class TestBenchmarkModel:
     """Test benchmark_model method."""
 
-    @patch('utils.ollama_manager.time.time')
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.time.time")
+    @patch("utils.ollama_manager.requests.post")
     def test_benchmark_model_success(self, mock_post, mock_time, ollama_manager):
         """Test successful model benchmarking."""
         # Mock time progression
@@ -344,7 +325,7 @@ class TestBenchmarkModel:
         mock_response.json.return_value = {
             "response": "Hello! I'm doing well, thank you.",
             "eval_count": 250,
-            "eval_duration": 2000000000  # 2 seconds in nanoseconds
+            "eval_duration": 2000000000,  # 2 seconds in nanoseconds
         }
         mock_post.return_value = mock_response
 
@@ -357,17 +338,15 @@ class TestBenchmarkModel:
         assert result["model"] == "qwen3:8b"
         assert "error" not in result
 
-    @patch('utils.ollama_manager.time.time')
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.time.time")
+    @patch("utils.ollama_manager.requests.post")
     def test_benchmark_model_without_eval_info(self, mock_post, mock_time, ollama_manager):
         """Test benchmarking when eval_count/eval_duration not provided."""
         mock_time.side_effect = [100.0, 101.5]
 
         mock_response = Mock()
         mock_response.raise_for_status.return_value = None
-        mock_response.json.return_value = {
-            "response": "Test response"
-        }
+        mock_response.json.return_value = {"response": "Test response"}
         mock_post.return_value = mock_response
 
         result = ollama_manager.benchmark_model("qwen3:8b")
@@ -376,7 +355,7 @@ class TestBenchmarkModel:
         assert result["tokens_per_sec"] == 0.0
         assert "error" not in result
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_benchmark_model_request_exception(self, mock_post, ollama_manager):
         """Test benchmarking with request exception."""
         mock_post.side_effect = RequestException("Connection failed")
@@ -389,8 +368,8 @@ class TestBenchmarkModel:
         assert "error" in result
         assert "Connection failed" in result["error"]
 
-    @patch('utils.ollama_manager.time.time')
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.time.time")
+    @patch("utils.ollama_manager.requests.post")
     def test_benchmark_model_custom_prompt(self, mock_post, mock_time, ollama_manager):
         """Test benchmarking with custom prompt."""
         mock_time.side_effect = [100.0, 101.0]
@@ -400,7 +379,7 @@ class TestBenchmarkModel:
         mock_response.json.return_value = {
             "response": "Custom response",
             "eval_count": 100,
-            "eval_duration": 1000000000
+            "eval_duration": 1000000000,
         }
         mock_post.return_value = mock_response
 
@@ -410,12 +389,8 @@ class TestBenchmarkModel:
         assert result["prompt"] == custom_prompt
         mock_post.assert_called_once_with(
             "http://localhost:11434/api/generate",
-            json={
-                "model": "qwen3:8b",
-                "prompt": custom_prompt,
-                "stream": False
-            },
-            timeout=30
+            json={"model": "qwen3:8b", "prompt": custom_prompt, "stream": False},
+            timeout=30,
         )
 
 
@@ -476,7 +451,7 @@ class TestRecommendModel:
 class TestGetRunningModels:
     """Test get_running_models method."""
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_get_running_models_success(self, mock_get, ollama_manager):
         """Test successful retrieval of running models."""
         mock_response = Mock()
@@ -484,7 +459,7 @@ class TestGetRunningModels:
         mock_response.json.return_value = {
             "models": [
                 {"name": "qwen3:8b", "size": 8000000000},
-                {"name": "gemma3:4b", "size": 4000000000}
+                {"name": "gemma3:4b", "size": 4000000000},
             ]
         }
         mock_get.return_value = mock_response
@@ -494,12 +469,9 @@ class TestGetRunningModels:
         assert len(result) == 2
         assert result[0]["name"] == "qwen3:8b"
         assert result[1]["name"] == "gemma3:4b"
-        mock_get.assert_called_once_with(
-            "http://localhost:11434/api/ps",
-            timeout=30
-        )
+        mock_get.assert_called_once_with("http://localhost:11434/api/ps", timeout=30)
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_get_running_models_empty(self, mock_get, ollama_manager):
         """Test getting running models when none are running."""
         mock_response = Mock()
@@ -511,7 +483,7 @@ class TestGetRunningModels:
 
         assert result == []
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_get_running_models_request_exception(self, mock_get, ollama_manager):
         """Test getting running models with request exception."""
         mock_get.side_effect = RequestException("Connection failed")
@@ -524,7 +496,7 @@ class TestGetRunningModels:
 class TestConvenienceFunctions:
     """Test module-level convenience functions."""
 
-    @patch.object(OllamaManager, 'check_ollama_running')
+    @patch.object(OllamaManager, "check_ollama_running")
     def test_check_ollama_success(self, mock_check):
         """Test check_ollama convenience function."""
         mock_check.return_value = True
@@ -534,7 +506,7 @@ class TestConvenienceFunctions:
         assert result is True
         mock_check.assert_called_once()
 
-    @patch.object(OllamaManager, 'check_ollama_running')
+    @patch.object(OllamaManager, "check_ollama_running")
     def test_check_ollama_failure(self, mock_check):
         """Test check_ollama convenience function with failure."""
         mock_check.return_value = False
@@ -543,7 +515,7 @@ class TestConvenienceFunctions:
 
         assert result is False
 
-    @patch.object(OllamaManager, 'list_models')
+    @patch.object(OllamaManager, "list_models")
     def test_get_available_models(self, mock_list):
         """Test get_available_models convenience function."""
         mock_list.return_value = ["qwen3:8b", "gemma3:4b"]
@@ -553,7 +525,7 @@ class TestConvenienceFunctions:
         assert result == ["qwen3:8b", "gemma3:4b"]
         mock_list.assert_called_once()
 
-    @patch.object(OllamaManager, 'ensure_model_available')
+    @patch.object(OllamaManager, "ensure_model_available")
     def test_ensure_model_success(self, mock_ensure):
         """Test ensure_model convenience function."""
         mock_ensure.return_value = True
@@ -563,7 +535,7 @@ class TestConvenienceFunctions:
         assert result is True
         mock_ensure.assert_called_once_with("qwen3:8b")
 
-    @patch.object(OllamaManager, 'ensure_model_available')
+    @patch.object(OllamaManager, "ensure_model_available")
     def test_ensure_model_failure(self, mock_ensure):
         """Test ensure_model convenience function with failure."""
         mock_ensure.return_value = False
@@ -579,8 +551,14 @@ class TestModelRecommendations:
     def test_model_recommendations_contains_all_types(self, ollama_manager):
         """Test that all expected task types are in recommendations."""
         expected_types = [
-            "fast", "balanced", "quality", "embeddings",
-            "vision", "edge", "multilingual", "coding"
+            "fast",
+            "balanced",
+            "quality",
+            "embeddings",
+            "vision",
+            "edge",
+            "multilingual",
+            "coding",
         ]
 
         for task_type in expected_types:
@@ -596,7 +574,7 @@ class TestModelRecommendations:
 class TestErrorHandling:
     """Test comprehensive error handling scenarios."""
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_list_models_http_error(self, mock_get, ollama_manager):
         """Test list_models handling HTTP errors."""
         mock_response = Mock()
@@ -607,7 +585,7 @@ class TestErrorHandling:
 
         assert result == []
 
-    @patch('utils.ollama_manager.requests.post')
+    @patch("utils.ollama_manager.requests.post")
     def test_get_model_info_timeout(self, mock_post, ollama_manager):
         """Test get_model_info handling timeouts."""
         mock_post.side_effect = Timeout("Request timeout")
@@ -616,7 +594,7 @@ class TestErrorHandling:
 
         assert result == {}
 
-    @patch('utils.ollama_manager.requests.get')
+    @patch("utils.ollama_manager.requests.get")
     def test_get_running_models_connection_error(self, mock_get, ollama_manager):
         """Test get_running_models handling connection errors."""
         mock_get.side_effect = ConnectionError("Cannot connect")

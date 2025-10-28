@@ -28,16 +28,14 @@ Usage:
 
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 import logging
 from dataclasses import dataclass
 import json
 from datetime import datetime
 
 from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
 
 # Add project root to path for utils imports
 project_root = Path(__file__).parent.parent.parent
@@ -46,13 +44,14 @@ sys.path.insert(0, str(project_root))
 from utils import OllamaManager
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class TranscriptSegment:
     """A segment of transcribed audio."""
+
     text: str
     start_time: Optional[float] = None
     end_time: Optional[float] = None
@@ -63,6 +62,7 @@ class TranscriptSegment:
 @dataclass
 class AudioAnalysisResult:
     """Result from audio analysis."""
+
     summary: str
     key_points: List[str]
     speakers: List[str]
@@ -83,11 +83,7 @@ class AudioTranscriptionAgent:
     - Perform sentiment analysis
     """
 
-    def __init__(
-        self,
-        model: str = "qwen3:8b",
-        base_url: str = "http://localhost:11434"
-    ):
+    def __init__(self, model: str = "qwen3:8b", base_url: str = "http://localhost:11434"):
         """
         Initialize audio transcription agent.
 
@@ -98,11 +94,7 @@ class AudioTranscriptionAgent:
         self.model = model
         self.base_url = base_url
 
-        self.llm = ChatOllama(
-            model=model,
-            base_url=base_url,
-            temperature=0.3
-        )
+        self.llm = ChatOllama(model=model, base_url=base_url, temperature=0.3)
 
         logger.info(f"Initialized AudioTranscriptionAgent with model: {model}")
 
@@ -117,7 +109,7 @@ class AudioTranscriptionAgent:
             Transcript text.
         """
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
             logger.info(f"Loaded transcript from {file_path.name}")
             return content
@@ -140,7 +132,7 @@ class AudioTranscriptionAgent:
             List of TranscriptSegment objects.
         """
         segments = []
-        lines = content.strip().split('\n')
+        lines = content.strip().split("\n")
 
         for line in lines:
             # Simple parsing - extend for more complex formats
@@ -152,11 +144,7 @@ class AudioTranscriptionAgent:
         logger.info(f"Parsed {len(segments)} transcript segments")
         return segments
 
-    def summarize_transcript(
-        self,
-        transcript: str,
-        style: str = "concise"
-    ) -> str:
+    def summarize_transcript(self, transcript: str, style: str = "concise") -> str:
         """
         Generate summary of transcript.
 
@@ -170,26 +158,36 @@ class AudioTranscriptionAgent:
         style_prompts = {
             "concise": "Provide a concise 2-3 sentence summary of the main points.",
             "detailed": "Provide a detailed summary covering all major topics discussed.",
-            "bullet_points": "Summarize as a list of bullet points covering key topics."
+            "bullet_points": "Summarize as a list of bullet points covering key topics.",
         }
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert at analyzing and summarizing conversations and audio transcripts."),
-            ("human", """Transcript:
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "You are an expert at analyzing and summarizing conversations and audio transcripts.",
+                ),
+                (
+                    "human",
+                    """Transcript:
 {transcript}
 
 Task: {style_instruction}
 
-Summary:""")
-        ])
+Summary:""",
+                ),
+            ]
+        )
 
         try:
             logger.info(f"Generating {style} summary...")
             chain = prompt | self.llm
-            response = chain.invoke({
-                "transcript": transcript,
-                "style_instruction": style_prompts.get(style, style_prompts["concise"])
-            })
+            response = chain.invoke(
+                {
+                    "transcript": transcript,
+                    "style_instruction": style_prompts.get(style, style_prompts["concise"]),
+                }
+            )
 
             return response.content
 
@@ -208,32 +206,34 @@ Summary:""")
         Returns:
             List of key points.
         """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You extract the most important points from conversations."),
-            ("human", """Transcript:
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You extract the most important points from conversations."),
+                (
+                    "human",
+                    """Transcript:
 {transcript}
 
 Extract the {num_points} most important key points. Return as a numbered list.
 
-Key Points:""")
-        ])
+Key Points:""",
+                ),
+            ]
+        )
 
         try:
             logger.info(f"Extracting {num_points} key points...")
             chain = prompt | self.llm
-            response = chain.invoke({
-                "transcript": transcript,
-                "num_points": num_points
-            })
+            response = chain.invoke({"transcript": transcript, "num_points": num_points})
 
             # Parse numbered list
             content = response.content
             points = []
-            for line in content.split('\n'):
+            for line in content.split("\n"):
                 line = line.strip()
-                if line and (line[0].isdigit() or line.startswith('-') or line.startswith('*')):
+                if line and (line[0].isdigit() or line.startswith("-") or line.startswith("*")):
                     # Remove numbering/bullets
-                    clean_point = line.lstrip('0123456789.-* ')
+                    clean_point = line.lstrip("0123456789.-* ")
                     if clean_point:
                         points.append(clean_point)
 
@@ -253,28 +253,29 @@ Key Points:""")
         Returns:
             List of identified speakers.
         """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You identify and list speakers in conversation transcripts."),
-            ("human", """Transcript:
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You identify and list speakers in conversation transcripts."),
+                (
+                    "human",
+                    """Transcript:
 {transcript}
 
 Identify all speakers/participants in this conversation. If names are not mentioned, use descriptions like "Speaker 1", "Speaker 2", etc.
 
 Return only the list of speakers, one per line.
 
-Speakers:""")
-        ])
+Speakers:""",
+                ),
+            ]
+        )
 
         try:
             logger.info("Identifying speakers...")
             chain = prompt | self.llm
             response = chain.invoke({"transcript": transcript})
 
-            speakers = [
-                line.strip()
-                for line in response.content.split('\n')
-                if line.strip()
-            ]
+            speakers = [line.strip() for line in response.content.split("\n") if line.strip()]
 
             return speakers
 
@@ -292,9 +293,12 @@ Speakers:""")
         Returns:
             Dictionary with sentiment analysis.
         """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You analyze the sentiment and emotional tone of conversations."),
-            ("human", """Transcript:
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You analyze the sentiment and emotional tone of conversations."),
+                (
+                    "human",
+                    """Transcript:
 {transcript}
 
 Analyze the overall sentiment and emotional tone. Provide:
@@ -309,8 +313,10 @@ Format as JSON:
   "explanation": "brief explanation"
 }}
 
-Analysis:""")
-        ])
+Analysis:""",
+                ),
+            ]
+        )
 
         try:
             logger.info("Analyzing sentiment...")
@@ -324,7 +330,7 @@ Analysis:""")
                 sentiment_data = {
                     "sentiment": "unknown",
                     "tone": "unknown",
-                    "explanation": response.content
+                    "explanation": response.content,
                 }
 
             return sentiment_data
@@ -344,31 +350,29 @@ Analysis:""")
         Returns:
             List of topics.
         """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You identify the main topics and themes in conversations."),
-            ("human", """Transcript:
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "You identify the main topics and themes in conversations."),
+                (
+                    "human",
+                    """Transcript:
 {transcript}
 
 Identify the main topics or themes discussed. List up to {max_topics} topics.
 
 Return only the topics, one per line.
 
-Topics:""")
-        ])
+Topics:""",
+                ),
+            ]
+        )
 
         try:
             logger.info(f"Identifying topics (max {max_topics})...")
             chain = prompt | self.llm
-            response = chain.invoke({
-                "transcript": transcript,
-                "max_topics": max_topics
-            })
+            response = chain.invoke({"transcript": transcript, "max_topics": max_topics})
 
-            topics = [
-                line.strip()
-                for line in response.content.split('\n')
-                if line.strip()
-            ]
+            topics = [line.strip() for line in response.content.split("\n") if line.strip()]
 
             return topics[:max_topics]
 
@@ -377,9 +381,7 @@ Topics:""")
             raise
 
     def comprehensive_analysis(
-        self,
-        transcript: str,
-        include_sentiment: bool = True
+        self, transcript: str, include_sentiment: bool = True
     ) -> AudioAnalysisResult:
         """
         Perform comprehensive analysis of transcript.
@@ -416,13 +418,13 @@ Topics:""")
                 key_points=key_points,
                 speakers=speakers,
                 topics=topics,
-                sentiment=sentiment_data.get('sentiment', 'not analyzed'),
+                sentiment=sentiment_data.get("sentiment", "not analyzed"),
                 metadata={
-                    'model': self.model,
-                    'timestamp': datetime.now().isoformat(),
-                    'transcript_length': len(transcript),
-                    'sentiment_details': sentiment_data
-                }
+                    "model": self.model,
+                    "timestamp": datetime.now().isoformat(),
+                    "transcript_length": len(transcript),
+                    "sentiment_details": sentiment_data,
+                },
             )
 
             logger.info("Comprehensive analysis completed")
@@ -443,25 +445,30 @@ Topics:""")
         Returns:
             Answer text.
         """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "You answer questions about conversation transcripts accurately and concisely."),
-            ("human", """Transcript:
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "You answer questions about conversation transcripts accurately and concisely.",
+                ),
+                (
+                    "human",
+                    """Transcript:
 {transcript}
 
 Question: {question}
 
 Answer based on the transcript content. If the information isn't in the transcript, say so.
 
-Answer:""")
-        ])
+Answer:""",
+                ),
+            ]
+        )
 
         try:
             logger.info(f"Answering question: {question}")
             chain = prompt | self.llm
-            response = chain.invoke({
-                "transcript": transcript,
-                "question": question
-            })
+            response = chain.invoke({"transcript": transcript, "question": question})
 
             return response.content
 
@@ -495,8 +502,8 @@ def print_analysis_results(result: AudioAnalysisResult):
     for topic in result.topics:
         print(f"  - {topic}")
 
-    if result.metadata.get('sentiment_details'):
-        sentiment = result.metadata['sentiment_details']
+    if result.metadata.get("sentiment_details"):
+        sentiment = result.metadata["sentiment_details"]
         print("\n\nSENTIMENT ANALYSIS:")
         print("-" * 80)
         print(f"Overall Sentiment: {sentiment.get('sentiment', 'N/A')}")
@@ -513,34 +520,17 @@ def main():
     parser = argparse.ArgumentParser(
         description="Audio Transcription Agent for transcript analysis"
     )
-    parser.add_argument(
-        "--text-file",
-        help="Path to transcript text file"
-    )
-    parser.add_argument(
-        "--text",
-        help="Transcript text directly"
-    )
-    parser.add_argument(
-        "--question", "-q",
-        help="Ask a question about the transcript"
-    )
+    parser.add_argument("--text-file", help="Path to transcript text file")
+    parser.add_argument("--text", help="Transcript text directly")
+    parser.add_argument("--question", "-q", help="Ask a question about the transcript")
     parser.add_argument(
         "--summary-style",
         choices=["concise", "detailed", "bullet_points"],
         default="detailed",
-        help="Summary style (default: detailed)"
+        help="Summary style (default: detailed)",
     )
-    parser.add_argument(
-        "--model",
-        default="qwen3:8b",
-        help="LLM model (default: qwen3:8b)"
-    )
-    parser.add_argument(
-        "--no-sentiment",
-        action="store_true",
-        help="Skip sentiment analysis"
-    )
+    parser.add_argument("--model", default="qwen3:8b", help="LLM model (default: qwen3:8b)")
+    parser.add_argument("--no-sentiment", action="store_true", help="Skip sentiment analysis")
 
     args = parser.parse_args()
 
@@ -599,7 +589,7 @@ Speaker 2: We've completed the initial implementation and testing is underway.""
         # Process based on mode
         if args.question:
             # Question answering mode
-            print(f"\n5. Answering question...")
+            print("\n5. Answering question...")
             answer = agent.answer_question(transcript, args.question)
 
             print(f"\nQuestion: {args.question}")
@@ -612,8 +602,7 @@ Speaker 2: We've completed the initial implementation and testing is underway.""
             # Comprehensive analysis mode
             print("\n5. Performing comprehensive analysis...")
             result = agent.comprehensive_analysis(
-                transcript,
-                include_sentiment=not args.no_sentiment
+                transcript, include_sentiment=not args.no_sentiment
             )
 
             print_analysis_results(result)

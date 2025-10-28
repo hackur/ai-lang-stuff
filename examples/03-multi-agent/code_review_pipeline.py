@@ -228,14 +228,8 @@ Then list issues."""
         security_score = 50  # Default
         if "SECURITY_SCORE:" in analysis:
             try:
-                score_line = [
-                    line
-                    for line in analysis.split("\n")
-                    if "SECURITY_SCORE:" in line
-                ][0]
-                security_score = int(
-                    "".join(filter(str.isdigit, score_line))[:2]
-                )
+                score_line = [line for line in analysis.split("\n") if "SECURITY_SCORE:" in line][0]
+                security_score = int("".join(filter(str.isdigit, score_line))[:2])
             except (IndexError, ValueError):
                 pass
 
@@ -331,9 +325,7 @@ Then list suggestions."""
         style_score = 70  # Default
         if "STYLE_SCORE:" in analysis:
             try:
-                score_line = [
-                    line for line in analysis.split("\n") if "STYLE_SCORE:" in line
-                ][0]
+                score_line = [line for line in analysis.split("\n") if "STYLE_SCORE:" in line][0]
                 style_score = int("".join(filter(str.isdigit, score_line))[:2])
             except (IndexError, ValueError):
                 pass
@@ -395,15 +387,11 @@ def approval_gate_node(state: CodeReviewState) -> CodeReviewState:
     logger.info("APPROVAL GATE: Making final decision")
 
     # Count issues by severity
-    critical_count = sum(
-        1 for issue in state.get("issues", []) if issue["severity"] == "critical"
-    )
-    major_count = sum(
-        1 for issue in state.get("issues", []) if issue["severity"] == "major"
-    )
+    critical_count = sum(1 for issue in state.get("issues", []) if issue["severity"] == "critical")
+    major_count = sum(1 for issue in state.get("issues", []) if issue["severity"] == "major")
 
     security_score = state.get("security_score", 0)
-    style_score = state.get("style_score", 0)
+    state.get("style_score", 0)
 
     # Decision logic
     approved = False
@@ -499,7 +487,7 @@ Provide the corrected code:"""
             "fixed_code": fixed_code,
             "messages": [
                 AIMessage(
-                    content=f"Fixes applied. Review again.",
+                    content="Fixes applied. Review again.",
                     name="CodeFixer",
                 )
             ],
@@ -660,9 +648,7 @@ def main():
         workflow = create_code_review_pipeline()
 
         # Setup persistence
-        checkpointer = StateManager.get_checkpointer(
-            "./checkpoints_code_review.db"
-        )
+        checkpointer = StateManager.get_checkpointer("./checkpoints_code_review.db")
         app = workflow.compile(checkpointer=checkpointer)
 
         # Create thread ID
@@ -673,7 +659,7 @@ def main():
         print()
 
         # Sample code to review (intentionally has issues)
-        code_sample = '''def process_user_input(user_input):
+        code_sample = """def process_user_input(user_input):
     # Execute user command
     import os
     os.system(user_input)
@@ -683,7 +669,7 @@ def main():
 
     password = "admin123"  # Hardcoded password
 
-    return query'''
+    return query"""
 
         print("Code to review:")
         print("-" * 70)
@@ -781,7 +767,7 @@ def main():
 
         # Show checkpoint stats
         stats = StateManager.get_checkpoint_size("./checkpoints_code_review.db")
-        print(f"\nCheckpoint stats:")
+        print("\nCheckpoint stats:")
         print(f"  - Database size: {stats['file_size_mb']:.2f} MB")
         print(f"  - Total checkpoints: {stats['checkpoint_count']}")
 

@@ -6,7 +6,7 @@ Loads configuration from YAML files and environment variables with validation.
 
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import yaml
 from pydantic import BaseModel, Field, ValidationError

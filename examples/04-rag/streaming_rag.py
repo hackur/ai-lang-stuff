@@ -22,9 +22,8 @@ source citations appearing as they become relevant.
 
 import sys
 from pathlib import Path
-from typing import List, Iterator, Optional
+from typing import List, Iterator
 import logging
-import time
 import re
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -48,10 +47,7 @@ class StreamingRAG:
     """RAG system with streaming response generation."""
 
     def __init__(
-        self,
-        vectorstore,
-        llm_model: str = "qwen3:8b",
-        base_url: str = "http://localhost:11434"
+        self, vectorstore, llm_model: str = "qwen3:8b", base_url: str = "http://localhost:11434"
     ):
         """
         Initialize streaming RAG system.
@@ -66,12 +62,15 @@ class StreamingRAG:
             model=llm_model,
             base_url=base_url,
             temperature=0.3,
-            streaming=True  # Enable streaming
+            streaming=True,  # Enable streaming
         )
 
         # Prompt template with citation instructions
-        self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are a helpful AI assistant that answers questions using provided context.
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    """You are a helpful AI assistant that answers questions using provided context.
 
 Important guidelines:
 1. Base your answer on the provided context
@@ -83,17 +82,15 @@ Context:
 {context}
 
 Sources:
-{sources}"""),
-            ("human", "{question}")
-        ])
+{sources}""",
+                ),
+                ("human", "{question}"),
+            ]
+        )
 
         logger.info(f"Initialized StreamingRAG with model: {llm_model}")
 
-    def retrieve_with_scores(
-        self,
-        query: str,
-        k: int = 4
-    ) -> List[tuple[Document, float]]:
+    def retrieve_with_scores(self, query: str, k: int = 4) -> List[tuple[Document, float]]:
         """
         Retrieve documents with relevance scores.
 
@@ -127,10 +124,10 @@ Sources:
 
             # Format source citation
             source_info = f"[Source {i}]"
-            if 'source' in doc.metadata:
-                source_path = Path(doc.metadata['source'])
+            if "source" in doc.metadata:
+                source_path = Path(doc.metadata["source"])
                 source_info += f" {source_path.name}"
-            if 'page' in doc.metadata:
+            if "page" in doc.metadata:
                 source_info += f" (page {doc.metadata['page']})"
 
             source_parts.append(source_info)
@@ -140,11 +137,7 @@ Sources:
 
         return context, sources
 
-    def stream_answer(
-        self,
-        query: str,
-        k: int = 4
-    ) -> Iterator[dict]:
+    def stream_answer(self, query: str, k: int = 4) -> Iterator[dict]:
         """
         Stream answer generation with progressive citations.
 
@@ -157,42 +150,34 @@ Sources:
         """
         # Step 1: Retrieval
         yield {
-            'type': 'retrieval',
-            'status': 'started',
-            'message': 'Retrieving relevant documents...'
+            "type": "retrieval",
+            "status": "started",
+            "message": "Retrieving relevant documents...",
         }
 
         docs_with_scores = self.retrieve_with_scores(query, k=k)
 
         if not docs_with_scores:
+            yield {"type": "retrieval", "status": "complete", "count": 0}
             yield {
-                'type': 'retrieval',
-                'status': 'complete',
-                'count': 0
+                "type": "token",
+                "content": "I couldn't find relevant information to answer your question.",
             }
-            yield {
-                'type': 'token',
-                'content': "I couldn't find relevant information to answer your question."
-            }
-            yield {'type': 'complete'}
+            yield {"type": "complete"}
             return
 
         yield {
-            'type': 'retrieval',
-            'status': 'complete',
-            'count': len(docs_with_scores),
-            'documents': [doc for doc, _ in docs_with_scores]
+            "type": "retrieval",
+            "status": "complete",
+            "count": len(docs_with_scores),
+            "documents": [doc for doc, _ in docs_with_scores],
         }
 
         # Step 2: Format context
         context, sources = self.format_context(docs_with_scores)
 
         # Step 3: Stream generation
-        yield {
-            'type': 'generation',
-            'status': 'started',
-            'message': 'Generating answer...'
-        }
+        yield {"type": "generation", "status": "started", "message": "Generating answer..."}
 
         chain = self.prompt | self.llm
 
@@ -201,12 +186,8 @@ Sources:
         buffer = ""
 
         # Stream tokens
-        for chunk in chain.stream({
-            "context": context,
-            "sources": sources,
-            "question": query
-        }):
-            if hasattr(chunk, 'content'):
+        for chunk in chain.stream({"context": context, "sources": sources, "question": query}):
+            if hasattr(chunk, "content"):
                 content = chunk.content
             else:
                 content = str(chunk)
@@ -214,7 +195,7 @@ Sources:
             buffer += content
 
             # Check for source citations in buffer
-            source_pattern = r'\[Source (\d+)\]'
+            source_pattern = r"\[Source (\d+)\]"
             matches = re.finditer(source_pattern, buffer)
 
             for match in matches:
@@ -224,24 +205,16 @@ Sources:
                     doc, score = docs_with_scores[source_num - 1]
 
                     # Emit source reference
-                    yield {
-                        'type': 'source',
-                        'number': source_num,
-                        'document': doc,
-                        'score': score
-                    }
+                    yield {"type": "source", "number": source_num, "document": doc, "score": score}
 
             # Emit token
-            yield {
-                'type': 'token',
-                'content': content
-            }
+            yield {"type": "token", "content": content}
 
         # Step 4: Complete
         yield {
-            'type': 'complete',
-            'sources': docs_with_scores,
-            'mentioned_count': len(mentioned_sources)
+            "type": "complete",
+            "sources": docs_with_scores,
+            "mentioned_count": len(mentioned_sources),
         }
 
 
@@ -264,11 +237,7 @@ def load_documents(data_path: str) -> List[Document]:
 
     elif data_path_obj.is_dir():
         logger.info(f"Loading directory: {data_path}")
-        loader = DirectoryLoader(
-            str(data_path_obj),
-            glob="**/*.txt",
-            loader_cls=TextLoader
-        )
+        loader = DirectoryLoader(str(data_path_obj), glob="**/*.txt", loader_cls=TextLoader)
         return loader.load()
 
     else:
@@ -276,9 +245,7 @@ def load_documents(data_path: str) -> List[Document]:
 
 
 def chunk_documents(
-    documents: List[Document],
-    chunk_size: int = 800,
-    chunk_overlap: int = 150
+    documents: List[Document], chunk_size: int = 800, chunk_overlap: int = 150
 ) -> List[Document]:
     """
     Chunk documents for retrieval.
@@ -295,7 +262,7 @@ def chunk_documents(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         length_function=len,
-        separators=["\n\n", "\n", ". ", " ", ""]
+        separators=["\n\n", "\n", ". ", " ", ""],
     )
 
     chunks = text_splitter.split_documents(documents)
@@ -310,49 +277,47 @@ def display_streaming_response(stream: Iterator[dict]):
     Args:
         stream: Iterator of response chunks.
     """
-    sources_displayed = False
     answer_buffer = []
-    retrieved_sources = []
 
     for event in stream:
-        event_type = event['type']
+        event_type = event["type"]
 
-        if event_type == 'retrieval':
-            if event['status'] == 'started':
+        if event_type == "retrieval":
+            if event["status"] == "started":
                 print(f"\n{event['message']}", flush=True)
-            elif event['status'] == 'complete':
-                count = event['count']
+            elif event["status"] == "complete":
+                count = event["count"]
                 print(f"Retrieved {count} relevant documents.\n", flush=True)
-                retrieved_sources = event.get('documents', [])
+                event.get("documents", [])
 
-        elif event_type == 'generation':
-            if event['status'] == 'started':
+        elif event_type == "generation":
+            if event["status"] == "started":
                 print(f"{event['message']}\n", flush=True)
                 print("Answer:", flush=True)
                 print("-" * 60, flush=True)
 
-        elif event_type == 'token':
-            content = event['content']
+        elif event_type == "token":
+            content = event["content"]
             answer_buffer.append(content)
-            print(content, end='', flush=True)
+            print(content, end="", flush=True)
 
-        elif event_type == 'source':
+        elif event_type == "source":
             # Note: Source is mentioned in the answer
             pass
 
-        elif event_type == 'complete':
+        elif event_type == "complete":
             print("\n" + "-" * 60, flush=True)
 
             # Display sources
-            sources = event.get('sources', [])
-            mentioned_count = event.get('mentioned_count', 0)
+            sources = event.get("sources", [])
+            mentioned_count = event.get("mentioned_count", 0)
 
             if sources:
                 print(f"\nSources ({mentioned_count} cited, {len(sources)} retrieved):")
                 print("-" * 60)
                 for i, (doc, score) in enumerate(sources, 1):
-                    source_path = doc.metadata.get('source', 'unknown')
-                    if source_path != 'unknown':
+                    source_path = doc.metadata.get("source", "unknown")
+                    if source_path != "unknown":
                         source_path = Path(source_path).name
 
                     print(f"\n[Source {i}] - Relevance: {(1-score):.2%}")
@@ -404,35 +369,24 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Streaming RAG system")
+    parser.add_argument("data_path", help="Path to text file or directory")
     parser.add_argument(
-        "data_path",
-        help="Path to text file or directory"
-    )
-    parser.add_argument(
-        "--collection",
-        default="streaming_rag",
-        help="Collection name (default: streaming_rag)"
+        "--collection", default="streaming_rag", help="Collection name (default: streaming_rag)"
     )
     parser.add_argument(
         "--persist-dir",
         default="./data/vector_stores",
-        help="Vector store directory (default: ./data/vector_stores)"
+        help="Vector store directory (default: ./data/vector_stores)",
     )
     parser.add_argument(
-        "--llm-model",
-        default="qwen3:8b",
-        help="Ollama LLM model (default: qwen3:8b)"
+        "--llm-model", default="qwen3:8b", help="Ollama LLM model (default: qwen3:8b)"
     )
     parser.add_argument(
         "--embedding-model",
         default="qwen3-embedding",
-        help="Ollama embedding model (default: qwen3-embedding)"
+        help="Ollama embedding model (default: qwen3-embedding)",
     )
-    parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Rebuild vector store"
-    )
+    parser.add_argument("--rebuild", action="store_true", help="Rebuild vector store")
 
     args = parser.parse_args()
 
@@ -474,23 +428,17 @@ def main():
     if collection_exists and not args.rebuild:
         print(f"   Loading existing collection '{args.collection}'...")
         vectorstore = vector_mgr.load_existing(
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            collection_name=args.collection, persist_dir=args.persist_dir
         )
     else:
         print(f"   Creating vector store '{args.collection}'...")
         vectorstore = vector_mgr.create_from_documents(
-            documents=chunks,
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            documents=chunks, collection_name=args.collection, persist_dir=args.persist_dir
         )
 
     # Step 6: Create streaming RAG
     print("\n6. Initializing streaming RAG...")
-    streaming_rag = StreamingRAG(
-        vectorstore=vectorstore,
-        llm_model=args.llm_model
-    )
+    streaming_rag = StreamingRAG(vectorstore=vectorstore, llm_model=args.llm_model)
 
     # Step 7: Start interactive session
     print("\n7. Starting interactive session...")

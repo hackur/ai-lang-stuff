@@ -77,6 +77,18 @@ packages = ["utils", "workflows", "src"]
 line-length = 100
 target-version = "py310"
 
+[tool.ruff.lint]
+# Ignore E402 (module import not at top) for examples with sys.path manipulation
+ignore = ["E402"]
+
+[tool.ruff.lint.per-file-ignores]
+# Allow unused imports in __init__.py files (they're re-exported)
+"**/__init__.py" = ["F401"]
+# Allow unused imports in test files (fixtures, mocks)
+"tests/**/*.py" = ["F401", "F841"]
+# Allow in examples (educational code may have intentional patterns)
+"examples/**/*.py" = ["E402", "F841"]
+
 [tool.black]
 line-length = 100
 target-version = ["py310", "py311", "py312", "py313"]
@@ -96,7 +108,7 @@ addopts = "-v --cov=src --cov-report=html --cov-report=term"
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv", "examples"]
-skips = ["B101", "B601"]
+skips = ["B101", "B601", "B311"]  # B311: Allow random for non-security purposes
 
 [tool.coverage.run]
 source = ["src"]

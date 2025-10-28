@@ -9,7 +9,7 @@ import operator
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Annotated, Dict, List, Optional, Type, TypedDict, get_type_hints
+from typing import Any, Annotated, Dict, List, Optional, Type, TypedDict
 
 from langchain_core.messages import BaseMessage
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -94,19 +94,13 @@ class StateManager:
         try:
             # Validate field types
             for field_name, field_type in fields.items():
-                if not isinstance(field_type, type) and not hasattr(
-                    field_type, "__origin__"
-                ):
-                    raise TypeError(
-                        f"Invalid type for field '{field_name}': {field_type}"
-                    )
+                if not isinstance(field_type, type) and not hasattr(field_type, "__origin__"):
+                    raise TypeError(f"Invalid type for field '{field_name}': {field_type}")
 
             # Create TypedDict dynamically
             state_schema = TypedDict(class_name, fields)
 
-            logger.info(
-                f"Created state schema '{class_name}' with fields: {list(fields.keys())}"
-            )
+            logger.info(f"Created state schema '{class_name}' with fields: {list(fields.keys())}")
             return state_schema
 
         except Exception as e:
@@ -262,13 +256,9 @@ class StateManager:
 
             if thread_id:
                 # Delete specific thread
-                cursor.execute(
-                    "DELETE FROM checkpoints WHERE thread_id = ?", (thread_id,)
-                )
+                cursor.execute("DELETE FROM checkpoints WHERE thread_id = ?", (thread_id,))
                 deleted = cursor.rowcount
-                logger.info(
-                    f"Deleted {deleted} checkpoints for thread_id: {thread_id}"
-                )
+                logger.info(f"Deleted {deleted} checkpoints for thread_id: {thread_id}")
             else:
                 # Delete all checkpoints
                 cursor.execute("SELECT COUNT(*) FROM checkpoints")

@@ -67,11 +67,7 @@ def main():
     fs_tools = []
     try:
         # Configure filesystem MCP client
-        fs_config = MCPConfig(
-            host="localhost",
-            port=8001,
-            timeout=30.0
-        )
+        fs_config = MCPConfig(host="localhost", port=8001, timeout=30.0)
 
         # Create filesystem client with base path restriction
         base_path = Path(__file__).parent.parent  # Restrict to examples/ directory
@@ -80,7 +76,7 @@ def main():
         # Get filesystem tools
         fs_tools = fs_client.to_langchain_tools()
 
-        print(f"✓ Filesystem MCP client initialized")
+        print("✓ Filesystem MCP client initialized")
         print(f"  Base path: {base_path}")
         print(f"  Tools: {len(fs_tools)}")
 
@@ -101,13 +97,13 @@ def main():
             Tool(
                 name="list_directory",
                 description="List contents of a directory. Input: directory path as string.",
-                func=mock_list_dir
+                func=mock_list_dir,
             ),
             Tool(
                 name="write_file",
                 description="Write content to a file. Input: JSON with 'path' and 'content' keys.",
-                func=mock_write_file
-            )
+                func=mock_write_file,
+            ),
         ]
         print(f"✓ Created {len(fs_tools)} mock filesystem tools")
     print()
@@ -119,12 +115,7 @@ def main():
     search_tools = []
     try:
         # Configure web search MCP client
-        search_config = MCPConfig(
-            host="localhost",
-            port=8002,
-            timeout=60.0,
-            max_retries=3
-        )
+        search_config = MCPConfig(host="localhost", port=8002, timeout=60.0, max_retries=3)
 
         # Create web search client
         search_client = WebSearchMCP(config=search_config)
@@ -132,7 +123,7 @@ def main():
         # Get search tools
         search_tools = search_client.to_langchain_tools()
 
-        print(f"✓ Web search MCP client initialized")
+        print("✓ Web search MCP client initialized")
         print(f"  Server: {search_config.base_url}")
         print(f"  Tools: {len(search_tools)}")
 
@@ -150,7 +141,7 @@ def main():
             Tool(
                 name="web_search",
                 description="Search the web for information. Input: search query string.",
-                func=mock_search
+                func=mock_search,
             )
         ]
         print(f"✓ Created {len(search_tools)} mock search tools")
@@ -180,10 +171,11 @@ def main():
     )
 
     # Create comprehensive agent prompt
-    prompt = ChatPromptTemplate.from_messages([
-        (
-            "system",
-            """You are a powerful AI assistant with both filesystem and web search capabilities.
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """You are a powerful AI assistant with both filesystem and web search capabilities.
 
 Your capabilities:
 
@@ -214,11 +206,12 @@ Guidelines:
 - Verify paths before writing files
 - Provide progress updates for multi-step tasks
 
-Be thorough, organized, and user-focused."""
-        ),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}"),
-    ])
+Be thorough, organized, and user-focused.""",
+            ),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
 
     # Create the agent
     agent = create_tool_calling_agent(llm, all_tools, prompt)
@@ -228,7 +221,7 @@ Be thorough, organized, and user-focused."""
         verbose=True,  # Show full reasoning process
         max_iterations=8,  # Allow more iterations for complex workflows
         handle_parsing_errors=True,
-        return_intermediate_steps=True
+        return_intermediate_steps=True,
     )
 
     print("✓ Agent created and ready")
@@ -244,7 +237,7 @@ Be thorough, organized, and user-focused."""
     focusing on Ollama integration. Then, list the example directories we have
     and tell me which ones would benefit from updates based on your findings."""
 
-    print(f"Complex Task:")
+    print("Complex Task:")
     print(f"{task}")
     print()
     print("Agent execution:")
@@ -267,7 +260,9 @@ Be thorough, organized, and user-focused."""
             print("-" * 70)
             for i, (action, observation) in enumerate(result["intermediate_steps"], 1):
                 print(f"\nStep {i}: Used {action.tool}")
-                print(f"Purpose: {action.tool_input if isinstance(action.tool_input, str) else str(action.tool_input)[:100]}")
+                print(
+                    f"Purpose: {action.tool_input if isinstance(action.tool_input, str) else str(action.tool_input)[:100]}"
+                )
                 # Show abbreviated observation
                 obs_preview = observation[:150] + "..." if len(observation) > 150 else observation
                 print(f"Result: {obs_preview}")

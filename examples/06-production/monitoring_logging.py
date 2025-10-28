@@ -39,13 +39,13 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from langchain_core.callbacks import BaseCallbackHandler
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from langchain_core.outputs import LLMResult
 from langchain_ollama import ChatOllama
 
@@ -219,14 +219,15 @@ class MonitoringCallbackHandler(BaseCallbackHandler):
         self.metrics = metrics
         self.request_start_time: Optional[float] = None
 
-    def on_llm_start(
-        self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
-    ) -> None:
+    def on_llm_start(self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None:
         """Called when LLM starts."""
         self.request_start_time = time.time()
         self.logger.info(
             "LLM request started",
-            extra={"prompts_count": len(prompts), "model": kwargs.get("invocation_params", {}).get("model")},
+            extra={
+                "prompts_count": len(prompts),
+                "model": kwargs.get("invocation_params", {}).get("model"),
+            },
         )
 
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:

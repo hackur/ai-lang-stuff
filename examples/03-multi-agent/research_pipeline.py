@@ -135,11 +135,7 @@ Provide 3-4 key findings with supporting details."""
         logger.error(f"RESEARCHER: Error - {str(e)}")
         return {
             "errors": [f"Researcher error: {str(e)}"],
-            "messages": [
-                AIMessage(
-                    content=f"Research failed: {str(e)}", name="Researcher"
-                )
-            ],
+            "messages": [AIMessage(content=f"Research failed: {str(e)}", name="Researcher")],
         }
 
 
@@ -214,9 +210,7 @@ Provide your analysis with:
         logger.error(f"ANALYZER: Error - {str(e)}")
         return {
             "errors": [f"Analyzer error: {str(e)}"],
-            "messages": [
-                AIMessage(content=f"Analysis failed: {str(e)}", name="Analyzer")
-            ],
+            "messages": [AIMessage(content=f"Analysis failed: {str(e)}", name="Analyzer")],
         }
 
 
@@ -293,11 +287,7 @@ Provide a clear, actionable summary (3-4 paragraphs) that:
         logger.error(f"SUMMARIZER: Error - {str(e)}")
         return {
             "errors": [f"Summarizer error: {str(e)}"],
-            "messages": [
-                AIMessage(
-                    content=f"Summary failed: {str(e)}", name="Summarizer"
-                )
-            ],
+            "messages": [AIMessage(content=f"Summary failed: {str(e)}", name="Summarizer")],
         }
 
 
@@ -433,7 +423,7 @@ def main():
 
         # Show checkpoint stats
         stats = StateManager.get_checkpoint_size("./checkpoints_research.db")
-        print(f"\nCheckpoint stats:")
+        print("\nCheckpoint stats:")
         print(f"  - Database size: {stats['file_size_mb']:.2f} MB")
         print(f"  - Total checkpoints: {stats['checkpoint_count']}")
         print(f"  - Thread count: {stats['thread_count']}")

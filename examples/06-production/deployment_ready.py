@@ -43,7 +43,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import psutil
 from aiohttp import web
@@ -144,9 +144,7 @@ class ApplicationMetrics:
     def get_prometheus_format(self) -> str:
         """Get metrics in Prometheus format."""
         avg_response_time = (
-            self.total_response_time_ms / self.total_requests
-            if self.total_requests > 0
-            else 0
+            self.total_response_time_ms / self.total_requests if self.total_requests > 0 else 0
         )
 
         metrics = [
@@ -213,7 +211,7 @@ class AgentApplication:
         self.setup_routes()
 
         logger.info(
-            f"Application initialized",
+            "Application initialized",
             extra={"model": model_name, "host": host, "port": port},
         )
 
@@ -232,9 +230,7 @@ class AgentApplication:
         try:
             # Test Ollama connection
             logger.info("Testing Ollama connection...")
-            test_response = await asyncio.to_thread(
-                self.llm.invoke, [HumanMessage(content="test")]
-            )
+            test_response = await asyncio.to_thread(self.llm.invoke, [HumanMessage(content="test")])
             logger.info(f"Ollama connection successful: {test_response.content[:50]}...")
 
             self.is_ready = True
@@ -326,14 +322,10 @@ class AgentApplication:
         Returns: {"response": "agent response", "metadata": {...}}
         """
         if not self.is_ready:
-            return web.json_response(
-                {"error": "Service not ready"}, status=503
-            )
+            return web.json_response({"error": "Service not ready"}, status=503)
 
         if self.is_shutting_down:
-            return web.json_response(
-                {"error": "Service shutting down"}, status=503
-            )
+            return web.json_response({"error": "Service shutting down"}, status=503)
 
         start_time = time.time()
 
@@ -343,16 +335,12 @@ class AgentApplication:
             message = data.get("message")
 
             if not message:
-                return web.json_response(
-                    {"error": "Missing 'message' field"}, status=400
-                )
+                return web.json_response({"error": "Missing 'message' field"}, status=400)
 
             # Process request
             logger.info(f"Processing chat request: {message[:50]}...")
 
-            response = await asyncio.to_thread(
-                self.llm.invoke, [HumanMessage(content=message)]
-            )
+            response = await asyncio.to_thread(self.llm.invoke, [HumanMessage(content=message)])
 
             response_time_ms = (time.time() - start_time) * 1000
 
@@ -409,11 +397,11 @@ class AgentApplication:
 
         logger.info(f"Server started on http://{self.host}:{self.port}")
         logger.info("Available endpoints:")
-        logger.info(f"  - GET  /health          - Comprehensive health check")
-        logger.info(f"  - GET  /health/ready    - Readiness probe")
-        logger.info(f"  - GET  /health/live     - Liveness probe")
-        logger.info(f"  - GET  /metrics         - Prometheus metrics")
-        logger.info(f"  - POST /api/v1/chat     - Chat endpoint")
+        logger.info("  - GET  /health          - Comprehensive health check")
+        logger.info("  - GET  /health/ready    - Readiness probe")
+        logger.info("  - GET  /health/live     - Liveness probe")
+        logger.info("  - GET  /metrics         - Prometheus metrics")
+        logger.info("  - POST /api/v1/chat     - Chat endpoint")
 
         # Keep running
         try:

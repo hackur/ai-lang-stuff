@@ -29,8 +29,7 @@ References:
 """
 
 import torch
-import numpy as np
-from typing import List, Dict, Tuple, Set
+from typing import List, Dict, Tuple
 from dataclasses import dataclass
 from transformer_lens import HookedTransformer
 from transformer_lens.utils import get_act_name
@@ -41,6 +40,7 @@ import networkx as nx
 @dataclass
 class Component:
     """Represents a model component (attention head, MLP, etc.)."""
+
     layer: int
     component_type: str  # "attn_head", "mlp", "resid"
     head: int = None  # Only for attention heads
@@ -55,9 +55,11 @@ class Component:
         return hash((self.layer, self.component_type, self.head))
 
     def __eq__(self, other):
-        return (self.layer == other.layer and
-                self.component_type == other.component_type and
-                self.head == other.head)
+        return (
+            self.layer == other.layer
+            and self.component_type == other.component_type
+            and self.head == other.head
+        )
 
 
 class CircuitDiscovery:
@@ -74,10 +76,7 @@ class CircuitDiscovery:
         self.device = next(model.parameters()).device
 
     def compute_direct_effect(
-        self,
-        tokens: torch.Tensor,
-        source: Component,
-        target_token_pos: int = -1
+        self, tokens: torch.Tensor, source: Component, target_token_pos: int = -1
     ) -> float:
         """
         Compute direct effect of a component on the output.
@@ -117,10 +116,7 @@ class CircuitDiscovery:
         return torch.norm(target_logits).item()
 
     def compute_connection_strength(
-        self,
-        tokens: torch.Tensor,
-        source: Component,
-        target: Component
+        self, tokens: torch.Tensor, source: Component, target: Component
     ) -> float:
         """
         Compute strength of connection between two components.
@@ -174,10 +170,7 @@ class CircuitDiscovery:
         return abs(correlation.item())
 
     def find_important_components(
-        self,
-        tokens: torch.Tensor,
-        threshold: float = 0.1,
-        top_k: int = 20
+        self, tokens: torch.Tensor, threshold: float = 0.1, top_k: int = 20
     ) -> List[Tuple[Component, float]]:
         """
         Identify components with large direct effect on output.
@@ -222,7 +215,7 @@ class CircuitDiscovery:
         self,
         tokens: torch.Tensor,
         important_components: List[Component],
-        connection_threshold: float = 0.3
+        connection_threshold: float = 0.3,
     ) -> Dict[Tuple[Component, Component], float]:
         """
         Trace connections between important components to find circuit.
@@ -258,7 +251,7 @@ class CircuitDiscovery:
         self,
         components: List[Tuple[Component, float]],
         connections: Dict[Tuple[Component, Component], float],
-        save_path: str = None
+        save_path: str = None,
     ):
         """
         Visualize discovered circuit as a directed graph.
@@ -277,7 +270,7 @@ class CircuitDiscovery:
                 str(component),
                 importance=importance,
                 layer=component.layer,
-                component_type=component.component_type
+                component_type=component.component_type,
             )
 
         # Add edges
@@ -310,22 +303,18 @@ class CircuitDiscovery:
         plt.figure(figsize=(14, 8))
 
         # Node colors based on importance
-        importances = [data['importance'] for _, data in G.nodes(data=True)]
+        importances = [data["importance"] for _, data in G.nodes(data=True)]
         max_importance = max(importances) if importances else 1.0
 
-        node_colors = [data['importance'] / max_importance for _, data in G.nodes(data=True)]
+        node_colors = [data["importance"] / max_importance for _, data in G.nodes(data=True)]
 
         # Draw nodes
-        nodes = nx.draw_networkx_nodes(
-            G, pos,
-            node_color=node_colors,
-            node_size=800,
-            cmap='YlOrRd',
-            vmin=0, vmax=1
+        nx.draw_networkx_nodes(
+            G, pos, node_color=node_colors, node_size=800, cmap="YlOrRd", vmin=0, vmax=1
         )
 
         # Draw edges with varying thickness
-        edge_weights = [G[u][v]['weight'] for u, v in G.edges()]
+        edge_weights = [G[u][v]["weight"] for u, v in G.edges()]
         max_weight = max(edge_weights) if edge_weights else 1.0
 
         for (u, v), weight in zip(G.edges(), edge_weights):
@@ -333,40 +322,38 @@ class CircuitDiscovery:
             width = 1 + 3 * (weight / max_weight)
 
             nx.draw_networkx_edges(
-                G, pos,
+                G,
+                pos,
                 [(u, v)],
                 width=width,
                 alpha=alpha,
-                edge_color='gray',
+                edge_color="gray",
                 arrows=True,
                 arrowsize=15,
-                connectionstyle="arc3,rad=0.1"
+                connectionstyle="arc3,rad=0.1",
             )
 
         # Draw labels
-        nx.draw_networkx_labels(G, pos, font_size=9, font_weight='bold')
+        nx.draw_networkx_labels(G, pos, font_size=9, font_weight="bold")
 
         # Add colorbar for node importance
-        sm = plt.cm.ScalarMappable(cmap='YlOrRd', norm=plt.Normalize(vmin=0, vmax=max_importance))
+        sm = plt.cm.ScalarMappable(cmap="YlOrRd", norm=plt.Normalize(vmin=0, vmax=max_importance))
         sm.set_array([])
-        cbar = plt.colorbar(sm, ax=plt.gca(), label='Component Importance')
+        plt.colorbar(sm, ax=plt.gca(), label="Component Importance")
 
-        plt.title("Discovered Computational Circuit", fontsize=16, fontweight='bold')
+        plt.title("Discovered Computational Circuit", fontsize=16, fontweight="bold")
         plt.xlabel("Layer", fontsize=12)
-        plt.axis('off')
+        plt.axis("off")
         plt.tight_layout()
 
         if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
             print(f"\nCircuit visualization saved to: {save_path}")
 
         plt.show()
 
     def analyze_component_function(
-        self,
-        tokens: torch.Tensor,
-        component: Component,
-        top_k_tokens: int = 10
+        self, tokens: torch.Tensor, component: Component, top_k_tokens: int = 10
     ) -> Dict:
         """
         Analyze what a component computes.
@@ -412,10 +399,7 @@ class CircuitDiscovery:
             for idx, val in zip(bottom_indices, bottom_values)
         ]
 
-        return {
-            "promoted": promoted,
-            "suppressed": suppressed
-        }
+        return {"promoted": promoted, "suppressed": suppressed}
 
 
 def demonstrate_induction_circuit(model: HookedTransformer):
@@ -429,9 +413,9 @@ def demonstrate_induction_circuit(model: HookedTransformer):
     1. Previous token heads (attend to previous token)
     2. Induction heads (attend to token after previous occurrence)
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DISCOVERING INDUCTION CIRCUIT")
-    print("="*70)
+    print("=" * 70)
     print("\nTask: Complete repeated sequence [A][B]...[A] → [B]")
     print("This is the basic mechanism for in-context learning!")
 
@@ -442,7 +426,7 @@ def demonstrate_induction_circuit(model: HookedTransformer):
     tokens = model.to_tokens(prompt)
 
     print(f"\nPrompt: {prompt}")
-    print(f"Expected completion: 'mat' (repeating the pattern)")
+    print("Expected completion: 'mat' (repeating the pattern)")
 
     # Find important components
     print("\n1. Identifying important components...")
@@ -464,7 +448,7 @@ def demonstrate_induction_circuit(model: HookedTransformer):
 
     # Analyze key components
     print("\n3. Analyzing component functions...")
-    print("="*70)
+    print("=" * 70)
 
     for comp, importance in important[:5]:
         print(f"\n{comp} (importance: {importance:.3f})")
@@ -490,9 +474,9 @@ def demonstrate_factual_circuit(model: HookedTransformer):
     2. Middle layers: retrieve associated fact
     3. Late layers: format output
     """
-    print("\n\n" + "="*70)
+    print("\n\n" + "=" * 70)
     print("DISCOVERING FACTUAL RECALL CIRCUIT")
-    print("="*70)
+    print("=" * 70)
     print("\nTask: Recall factual knowledge")
 
     discovery = CircuitDiscovery(model)
@@ -523,7 +507,7 @@ def demonstrate_factual_circuit(model: HookedTransformer):
 
     # Analyze components
     print("\n3. Analyzing component functions...")
-    print("="*70)
+    print("=" * 70)
 
     for comp, importance in important[:3]:
         print(f"\n{comp} (importance: {importance:.3f})")
@@ -540,16 +524,15 @@ def main():
     """Run circuit discovery demonstrations."""
 
     # Load model
-    device = "cuda" if torch.cuda.is_available() else \
-             "mps" if torch.backends.mps.is_available() else "cpu"
+    device = (
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps" if torch.backends.mps.is_available() else "cpu"
+    )
 
     print(f"Loading model on {device}...")
     model = HookedTransformer.from_pretrained(
-        "gpt2-small",
-        center_unembed=True,
-        center_writing_weights=True,
-        fold_ln=True,
-        device=device
+        "gpt2-small", center_unembed=True, center_writing_weights=True, fold_ln=True, device=device
     )
 
     # Discover induction circuit
@@ -559,10 +542,11 @@ def main():
     demonstrate_factual_circuit(model)
 
     # Summary
-    print("\n\n" + "="*70)
+    print("\n\n" + "=" * 70)
     print("SUMMARY: UNDERSTANDING CIRCUITS")
-    print("="*70)
-    print("""
+    print("=" * 70)
+    print(
+        """
 Key Concepts:
 
 1. WHAT IS A CIRCUIT?
@@ -611,9 +595,10 @@ The field of mechanistic interpretability is rapidly evolving.
 Circuits are a powerful tool for understanding neural networks at
 a mechanistic level, moving beyond just correlations to causal
 understanding of how models implement specific computations.
-    """)
+    """
+    )
 
-    print("="*70)
+    print("=" * 70)
 
 
 if __name__ == "__main__":

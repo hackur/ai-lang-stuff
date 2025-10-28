@@ -121,7 +121,7 @@ def main():
     data = json.loads(json_output)
     print(f"  Total tools: {data['total_tools']}")
     print(f"  Categories: {list(data['categories'].keys())}")
-    print(f"  Category breakdown:")
+    print("  Category breakdown:")
     for cat, count in data["categories"].items():
         print(f"    - {cat}: {count} tool(s)")
     print()

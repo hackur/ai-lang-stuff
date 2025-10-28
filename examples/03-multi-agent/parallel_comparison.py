@@ -142,9 +142,7 @@ def model_executor_node(
         # Estimate tokens (rough approximation)
         tokens = len(response_content.split())
 
-        logger.info(
-            f"MODEL[{model_name}]: Complete. {tokens} tokens in {duration_ms:.0f}ms"
-        )
+        logger.info(f"MODEL[{model_name}]: Complete. {tokens} tokens in {duration_ms:.0f}ms")
 
         return {
             "responses": [
@@ -238,7 +236,7 @@ Declare a winner based on overall quality."""
         winner = "tie"
         for resp in responses:
             model_name = resp["model_name"]
-            if f"winner" in comparison.lower() and model_name in comparison.lower():
+            if "winner" in comparison.lower() and model_name in comparison.lower():
                 # Found winner mention
                 winner = model_name
                 break
@@ -390,9 +388,7 @@ def main():
         workflow = create_parallel_comparison_graph()
 
         # Setup persistence
-        checkpointer = StateManager.get_checkpointer(
-            "./checkpoints_parallel_comparison.db"
-        )
+        checkpointer = StateManager.get_checkpointer("./checkpoints_parallel_comparison.db")
         app = workflow.compile(checkpointer=checkpointer)
 
         # Create thread ID
@@ -477,10 +473,8 @@ def main():
                 print(f"  - {error}")
 
         # Show checkpoint stats
-        stats = StateManager.get_checkpoint_size(
-            "./checkpoints_parallel_comparison.db"
-        )
-        print(f"\nCheckpoint stats:")
+        stats = StateManager.get_checkpoint_size("./checkpoints_parallel_comparison.db")
+        print("\nCheckpoint stats:")
         print(f"  - Database size: {stats['file_size_mb']:.2f} MB")
         print(f"  - Total checkpoints: {stats['checkpoint_count']}")
 

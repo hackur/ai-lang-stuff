@@ -40,7 +40,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
-from pydantic import BaseModel, Field, SecretStr, ValidationError, validator
+from pydantic import BaseModel, Field, SecretStr, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -323,7 +323,9 @@ class ConfigFactory:
         return AppConfig(
             environment=Environment.PRODUCTION,
             debug=False,
-            logging=LoggingConfig(level="WARNING", format="json", output_file=Path("/var/log/agent/app.log")),
+            logging=LoggingConfig(
+                level="WARNING", format="json", output_file=Path("/var/log/agent/app.log")
+            ),
             model=ModelConfig(name="qwen3:8b", temperature=0.5),
             monitoring=MonitoringConfig(
                 enable_metrics=True, enable_tracing=True, langsmith_project="production"
@@ -507,7 +509,7 @@ def main():
         # Validate configuration
         issues = manager.validate()
         if issues:
-            print(f"\n⚠️  Validation Issues:")
+            print("\n⚠️  Validation Issues:")
             for issue in issues:
                 print(f"   - {issue}")
 

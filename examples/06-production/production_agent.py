@@ -34,17 +34,15 @@ import logging
 import signal
 import sys
 import time
-from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
 
 import yaml
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
-from pydantic import BaseModel, Field, ValidationError, validator
+from pydantic import BaseModel, Field, validator
 from tenacity import (
     retry,
     retry_if_exception_type,
@@ -68,9 +66,7 @@ class AgentConfig(BaseModel):
     max_retries: int = Field(default=3, ge=0, description="Maximum retry attempts")
     log_level: str = Field(default="INFO", description="Logging level")
     enable_metrics: bool = Field(default=True, description="Enable performance metrics")
-    max_concurrent_requests: int = Field(
-        default=5, ge=1, description="Max concurrent requests"
-    )
+    max_concurrent_requests: int = Field(default=5, ge=1, description="Max concurrent requests")
 
     @validator("log_level")
     def validate_log_level(cls, v):
@@ -282,9 +278,7 @@ class HealthCheck:
         try:
             # Simple test invocation
             response = await asyncio.wait_for(
-                asyncio.to_thread(
-                    self.agent.llm.invoke, [HumanMessage(content="health check")]
-                ),
+                asyncio.to_thread(self.agent.llm.invoke, [HumanMessage(content="health check")]),
                 timeout=5.0,
             )
             return bool(response)
@@ -395,7 +389,7 @@ class ProductionAgent:
         request_id = request_id or f"req_{int(time.time() * 1000)}"
 
         self.logger.info(
-            f"Processing request",
+            "Processing request",
             extra={"request_id": request_id, "message_length": len(request.message)},
         )
 
@@ -415,9 +409,7 @@ class ProductionAgent:
 
                 if request.context:
                     context_str = yaml.dump(request.context)
-                    messages.append(
-                        SystemMessage(content=f"Context information:\n{context_str}")
-                    )
+                    messages.append(SystemMessage(content=f"Context information:\n{context_str}"))
 
                 messages.append(HumanMessage(content=request.message))
 
@@ -556,8 +548,7 @@ async def main():
         # Process multiple concurrent requests
         print("3. Processing concurrent requests...")
         requests = [
-            AgentRequest(message=f"What is the capital of country #{i}?")
-            for i in range(1, 4)
+            AgentRequest(message=f"What is the capital of country #{i}?") for i in range(1, 4)
         ]
 
         results = await asyncio.gather(

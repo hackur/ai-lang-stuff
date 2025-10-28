@@ -4,9 +4,8 @@ Tests for retry strategies, error classification, graceful degradation,
 health checks, circuit breakers, and recovery orchestration.
 """
 
-import asyncio
 import time
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -196,9 +195,7 @@ class TestCircuitBreaker:
 
     def test_closes_after_successful_recovery(self):
         """Test circuit closes after successful recovery."""
-        breaker = CircuitBreaker(
-            failure_threshold=2, recovery_timeout=0.5, success_threshold=2
-        )
+        breaker = CircuitBreaker(failure_threshold=2, recovery_timeout=0.5, success_threshold=2)
 
         attempt = {"count": 0}
 
@@ -650,9 +647,7 @@ class TestIntegration:
                 raise ConnectionError("Temporary failure")
             return f"success: {value}"
 
-        result = manager.execute_with_recovery(
-            operation, "test_value", checkpoint_key="test_op"
-        )
+        result = manager.execute_with_recovery(operation, "test_value", checkpoint_key="test_op")
 
         assert result == "success: test_value"
         assert attempt["count"] == 2

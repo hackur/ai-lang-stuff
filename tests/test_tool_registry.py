@@ -3,7 +3,6 @@ Tests for the ToolRegistry class.
 """
 
 import json
-from pathlib import Path
 
 import pytest
 

@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from langchain_core.tools import StructuredTool
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -151,9 +151,7 @@ class ToolRegistry:
         """
         if name not in self._tools:
             available = ", ".join(self._tools.keys())
-            raise KeyError(
-                f"Tool '{name}' not found in registry. Available tools: {available}"
-            )
+            raise KeyError(f"Tool '{name}' not found in registry. Available tools: {available}")
 
         return self._tools[name].tool
 
@@ -175,9 +173,7 @@ class ToolRegistry:
 
         return [t.to_dict() for t in tools]
 
-    def get_langchain_tools(
-        self, categories: Optional[List[str]] = None
-    ) -> List[Any]:
+    def get_langchain_tools(self, categories: Optional[List[str]] = None) -> List[Any]:
         """
         Convert registered tools to LangChain Tool objects.
 
@@ -202,9 +198,7 @@ class ToolRegistry:
 
         if categories:
             tools = [t for t in tools if t.category in categories]
-            logger.debug(
-                f"Filtered tools by categories {categories}: {len(tools)} tools"
-            )
+            logger.debug(f"Filtered tools by categories {categories}: {len(tools)} tools")
 
         langchain_tools = []
         for metadata in tools:
@@ -219,9 +213,7 @@ class ToolRegistry:
                 langchain_tools.append(lc_tool)
                 logger.debug(f"Converted tool '{metadata.name}' to LangChain Tool")
             except Exception as e:
-                logger.error(
-                    f"Failed to convert tool '{metadata.name}' to LangChain Tool: {e}"
-                )
+                logger.error(f"Failed to convert tool '{metadata.name}' to LangChain Tool: {e}")
 
         logger.info(f"Generated {len(langchain_tools)} LangChain tools")
         return langchain_tools
@@ -268,9 +260,7 @@ class ToolRegistry:
 
                     # Check for docstring
                     if not obj.__doc__:
-                        logger.debug(
-                            f"Skipping {module_name}.{name}: no docstring"
-                        )
+                        logger.debug(f"Skipping {module_name}.{name}: no docstring")
                         continue
 
                     # Extract description from docstring

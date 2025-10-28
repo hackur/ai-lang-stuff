@@ -67,18 +67,17 @@ def main():
         config = MCPConfig(
             host="localhost",
             port=8001,  # Filesystem MCP server port
-            timeout=30.0
+            timeout=30.0,
         )
 
         # Note: This example shows the synchronous pattern using async client
         # In production, you'd typically run this in an async context
-        import asyncio
 
         # Create filesystem client with base path restriction
         base_path = Path(__file__).parent.parent  # Restrict to examples/ directory
         fs_client = FilesystemMCP(config=config, base_path=base_path)
 
-        print(f"✓ MCP filesystem client initialized")
+        print("✓ MCP filesystem client initialized")
         print(f"  Base path: {base_path}")
         print(f"  Server: {config.base_url}")
     except Exception as e:
@@ -120,16 +119,17 @@ def main():
             Tool(
                 name="list_directory",
                 description="List contents of a directory. Input: directory path as string.",
-                func=mock_list_dir
+                func=mock_list_dir,
             )
         ]
         print(f"✓ Created {len(tools)} mock filesystem tools (for demo)")
 
     # Create agent prompt
-    prompt = ChatPromptTemplate.from_messages([
-        (
-            "system",
-            """You are a helpful AI assistant with filesystem access capabilities.
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """You are a helpful AI assistant with filesystem access capabilities.
 
 You can:
 - Read file contents using read_file
@@ -143,11 +143,12 @@ When given a task:
 3. Provide clear explanations of what you're doing
 4. Show results in a user-friendly format
 
-Be concise but thorough in your responses."""
-        ),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}"),
-    ])
+Be concise but thorough in your responses.""",
+            ),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
 
     # Create the agent
     agent = create_tool_calling_agent(llm, tools, prompt)
@@ -156,7 +157,7 @@ Be concise but thorough in your responses."""
         tools=tools,
         verbose=True,  # Show reasoning process
         max_iterations=5,
-        handle_parsing_errors=True
+        handle_parsing_errors=True,
     )
 
     print("✓ Agent created and ready")

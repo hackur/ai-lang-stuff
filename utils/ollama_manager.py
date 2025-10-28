@@ -13,7 +13,7 @@ Example:
 
 import logging
 import time
-from typing import Dict, List, Optional
+from typing import Dict, List
 import requests
 from requests.exceptions import RequestException, ConnectionError, Timeout
 
@@ -51,7 +51,7 @@ class OllamaManager:
             base_url: The base URL of the Ollama server
             timeout: Request timeout in seconds
         """
-        self.base_url = base_url.rstrip('/')
+        self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         logger.info(f"Initialized OllamaManager with base_url={self.base_url}")
 
@@ -71,7 +71,7 @@ class OllamaManager:
         try:
             response = requests.get(
                 f"{self.base_url}/api/tags",
-                timeout=5  # Short timeout for health check
+                timeout=5,  # Short timeout for health check
             )
             response.raise_for_status()
             logger.info("Ollama server is running")
@@ -104,10 +104,7 @@ class OllamaManager:
             >>> print(f"Found {len(models)} models")
         """
         try:
-            response = requests.get(
-                f"{self.base_url}/api/tags",
-                timeout=self.timeout
-            )
+            response = requests.get(f"{self.base_url}/api/tags", timeout=self.timeout)
             response.raise_for_status()
             data = response.json()
 
@@ -170,10 +167,7 @@ class OllamaManager:
             logger.info(f"Starting pull for model '{model}'")
 
             response = requests.post(
-                f"{self.base_url}/api/pull",
-                json={"name": model},
-                stream=True,
-                timeout=self.timeout
+                f"{self.base_url}/api/pull", json={"name": model}, stream=True, timeout=self.timeout
             )
             response.raise_for_status()
 
@@ -182,6 +176,7 @@ class OllamaManager:
                 if line:
                     try:
                         import json
+
                         data = json.loads(line)
                         status = data.get("status", "")
 
@@ -201,8 +196,7 @@ class OllamaManager:
 
         except ConnectionError:
             logger.error(
-                f"Cannot connect to Ollama server at {self.base_url}. "
-                "Is Ollama running?"
+                f"Cannot connect to Ollama server at {self.base_url}. " "Is Ollama running?"
             )
             return False
         except Timeout:
@@ -232,9 +226,7 @@ class OllamaManager:
         """
         try:
             response = requests.post(
-                f"{self.base_url}/api/show",
-                json={"name": model},
-                timeout=self.timeout
+                f"{self.base_url}/api/show", json={"name": model}, timeout=self.timeout
             )
             response.raise_for_status()
             data = response.json()
@@ -276,12 +268,8 @@ class OllamaManager:
 
             response = requests.post(
                 f"{self.base_url}/api/generate",
-                json={
-                    "model": model,
-                    "prompt": prompt,
-                    "stream": False
-                },
-                timeout=self.timeout
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=self.timeout,
             )
             response.raise_for_status()
 
@@ -304,12 +292,11 @@ class OllamaManager:
                 "tokens_per_sec": tokens_per_sec,
                 "prompt": prompt,
                 "response": response_text,
-                "model": model
+                "model": model,
             }
 
             logger.info(
-                f"Benchmark complete: latency={latency:.2f}s, "
-                f"tokens/sec={tokens_per_sec:.1f}"
+                f"Benchmark complete: latency={latency:.2f}s, " f"tokens/sec={tokens_per_sec:.1f}"
             )
 
             return results
@@ -322,7 +309,7 @@ class OllamaManager:
                 "prompt": prompt,
                 "response": "",
                 "model": model,
-                "error": str(e)
+                "error": str(e),
             }
 
     def recommend_model(self, task_type: str) -> str:
@@ -378,10 +365,7 @@ class OllamaManager:
             ...     print(f"Running: {model['name']}")
         """
         try:
-            response = requests.get(
-                f"{self.base_url}/api/ps",
-                timeout=self.timeout
-            )
+            response = requests.get(f"{self.base_url}/api/ps", timeout=self.timeout)
             response.raise_for_status()
             data = response.json()
 

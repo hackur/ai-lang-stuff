@@ -22,7 +22,7 @@ from typing import List
 
 from langchain.chains import RetrievalQA
 from langchain.text_splitter import Language, RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 from langchain_ollama import ChatOllama
@@ -72,7 +72,7 @@ def load_codebase(directory: str, extensions: List[str] = None) -> List[Document
                 ".pytest_cache",
                 "build",
                 "dist",
-                ".egg-info"
+                ".egg-info",
             ]
 
             if any(skip_dir in file_path.parts for skip_dir in skip_dirs):
@@ -84,13 +84,15 @@ def load_codebase(directory: str, extensions: List[str] = None) -> List[Document
 
                 # Add enhanced metadata
                 for doc in docs:
-                    doc.metadata.update({
-                        "file_path": str(file_path),
-                        "file_name": file_path.name,
-                        "relative_path": str(file_path.relative_to(directory_path)),
-                        "extension": file_path.suffix,
-                        "directory": str(file_path.parent.relative_to(directory_path))
-                    })
+                    doc.metadata.update(
+                        {
+                            "file_path": str(file_path),
+                            "file_name": file_path.name,
+                            "relative_path": str(file_path.relative_to(directory_path)),
+                            "extension": file_path.suffix,
+                            "directory": str(file_path.parent.relative_to(directory_path)),
+                        }
+                    )
 
                 documents.extend(docs)
 
@@ -106,7 +108,7 @@ def chunk_code_documents(
     documents: List[Document],
     language: Language = Language.PYTHON,
     chunk_size: int = 1500,
-    chunk_overlap: int = 300
+    chunk_overlap: int = 300,
 ) -> List[Document]:
     """Split code documents using language-aware chunking.
 
@@ -123,9 +125,7 @@ def chunk_code_documents(
     """
     # Use language-aware text splitter
     splitter = RecursiveCharacterTextSplitter.from_language(
-        language=language,
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap
+        language=language, chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
 
     chunks = splitter.split_documents(documents)
@@ -148,7 +148,7 @@ def create_code_search_chain(vectorstore, llm_model: str = "qwen3:8b"):
     llm = ChatOllama(
         model=llm_model,
         temperature=0.1,  # Very low temperature for code explanation
-        base_url="http://localhost:11434"
+        base_url="http://localhost:11434",
     )
 
     # Custom prompt template for code understanding
@@ -163,20 +163,15 @@ Question: {question}
 
 Helpful Answer (include file paths when relevant):"""
 
-    PROMPT = PromptTemplate(
-        template=prompt_template,
-        input_variables=["context", "question"]
-    )
+    PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
     # Create RetrievalQA chain with higher k for code search
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
-        retriever=vectorstore.as_retriever(
-            search_kwargs={"k": 6}  # Higher k for code context
-        ),
+        retriever=vectorstore.as_retriever(search_kwargs={"k": 6}),  # Higher k for code context
         return_source_documents=True,
-        chain_type_kwargs={"prompt": PROMPT}
+        chain_type_kwargs={"prompt": PROMPT},
     )
 
     return qa_chain
@@ -270,8 +265,10 @@ def interactive_code_search(qa_chain):
                 doc.metadata.get("file_name", "unknown")
                 for doc in result.get("source_documents", [])
             )
-            print(f"\n(Found relevant code in {len(unique_files)} files, "
-                  f"{num_sources} snippets total)")
+            print(
+                f"\n(Found relevant code in {len(unique_files)} files, "
+                f"{num_sources} snippets total)"
+            )
             print("Type 'sources' to view the code snippets")
 
         except KeyboardInterrupt:
@@ -287,40 +284,30 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Semantic Code Search with RAG")
-    parser.add_argument(
-        "directory",
-        help="Path to code directory to index"
-    )
+    parser.add_argument("directory", help="Path to code directory to index")
     parser.add_argument(
         "--collection",
         default="codebase_search",
-        help="Name for the vector store collection (default: codebase_search)"
+        help="Name for the vector store collection (default: codebase_search)",
     )
     parser.add_argument(
         "--persist-dir",
         default="./data/vector_stores",
-        help="Directory to store vector database (default: ./data/vector_stores)"
+        help="Directory to store vector database (default: ./data/vector_stores)",
     )
     parser.add_argument(
-        "--extensions",
-        nargs="+",
-        default=[".py"],
-        help="File extensions to index (default: .py)"
+        "--extensions", nargs="+", default=[".py"], help="File extensions to index (default: .py)"
     )
     parser.add_argument(
-        "--llm-model",
-        default="qwen3:8b",
-        help="Ollama LLM model to use (default: qwen3:8b)"
+        "--llm-model", default="qwen3:8b", help="Ollama LLM model to use (default: qwen3:8b)"
     )
     parser.add_argument(
         "--embedding-model",
         default="qwen3-embedding",
-        help="Ollama embedding model to use (default: qwen3-embedding)"
+        help="Ollama embedding model to use (default: qwen3-embedding)",
     )
     parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Force rebuild of vector store even if it exists"
+        "--rebuild", action="store_true", help="Force rebuild of vector store even if it exists"
     )
 
     args = parser.parse_args()
@@ -363,8 +350,7 @@ def main():
     if collection_exists and not args.rebuild:
         print(f"\n4. Loading existing collection '{args.collection}'...")
         vectorstore = vector_mgr.load_existing(
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            collection_name=args.collection, persist_dir=args.persist_dir
         )
         print(f"   -> Loaded from {persist_path / 'chroma' / args.collection}")
 
@@ -389,9 +375,7 @@ def main():
         # Create vector store
         print("\n   Creating vector store (this may take a while)...")
         vectorstore = vector_mgr.create_from_documents(
-            documents=chunks,
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            documents=chunks, collection_name=args.collection, persist_dir=args.persist_dir
         )
         print(f"   -> Saved to {persist_path / 'chroma' / args.collection}")
 

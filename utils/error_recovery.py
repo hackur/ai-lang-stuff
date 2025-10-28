@@ -16,11 +16,11 @@ import random
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
 from functools import wraps
 import psutil
 import requests
-from requests.exceptions import ConnectionError, Timeout, RequestException
+from requests.exceptions import ConnectionError, Timeout
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -358,9 +358,7 @@ class CircuitBreaker:
             logger.warning("Circuit opened: recovery failed")
             self.state = CircuitState.OPEN
         elif self.failure_count >= self.failure_threshold:
-            logger.warning(
-                f"Circuit opened: {self.failure_count} failures exceeded threshold"
-            )
+            logger.warning(f"Circuit opened: {self.failure_count} failures exceeded threshold")
             self.state = CircuitState.OPEN
 
     def reset(self) -> None:
@@ -1144,9 +1142,7 @@ def with_retry(
     return decorator
 
 
-def with_circuit_breaker(
-    failure_threshold: int = 5, recovery_timeout: float = 60.0
-) -> Callable:
+def with_circuit_breaker(failure_threshold: int = 5, recovery_timeout: float = 60.0) -> Callable:
     """Decorator to add circuit breaker to a function.
 
     Args:
