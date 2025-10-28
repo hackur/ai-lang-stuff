@@ -85,6 +85,11 @@ gpu = [
     { name = "faiss-gpu" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pre-commit" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "bandit", extras = ["toml"], marker = "extra == 'dev'", specifier = ">=1.7.0" },
@@ -130,6 +135,9 @@ requires-dist = [
     { name = "transformer-lens", marker = "python_full_version < '3.13'", specifier = ">=2.0.0" },
 ]
 provides-extras = ["dev", "gpu"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pre-commit", specifier = ">=4.3.0" }]
 
 [[package]]
 name = "aiohappyeyeballs"

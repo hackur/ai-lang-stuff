@@ -1,0 +1,35 @@
+{
+  "tools": [
+    {
+      "name": "search_web",
+      "description": "Search the web for information",
+      "category": "web",
+      "signature": "(query: str, max_results: int = 5) -> str"
+    },
+    {
+      "name": "read_file",
+      "description": "Read contents of a file",
+      "category": "filesystem",
+      "signature": "(filepath: str) -> str"
+    },
+    {
+      "name": "query_vector_db",
+      "description": "Query a vector database",
+      "category": "database",
+      "signature": "(query: str, top_k: int = 3) -> list"
+    },
+    {
+      "name": "run_ollama_model",
+      "description": "Run inference with an Ollama model",
+      "category": "models",
+      "signature": "(model: str, prompt: str) -> str"
+    }
+  ],
+  "categories": {
+    "web": 1,
+    "filesystem": 1,
+    "database": 1,
+    "models": 1
+  },
+  "total_tools": 4
+}
