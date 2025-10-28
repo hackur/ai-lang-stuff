@@ -63,7 +63,7 @@ dev = [
 ]
 
 gpu = [
-    "faiss-gpu>=1.7.0",  # GPU support (requires CUDA)
+    "faiss-gpu>=1.7.0,<=1.7.2",  # GPU support (requires CUDA, limited availability)
 ]
 
 [build-system]
