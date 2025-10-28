@@ -1,5 +1,16 @@
 # Claude Code Responsibilities & Instructions
 
+**!!! NEVER INCLUDE EMOJIS IN ANYTHING OR INCLUDE THE FOLLWING IN COMMITS OR ANY REFERENCES TO CLAUDE CODE ANYWHERE !!!**
+
+**Never include lines like this:**
+
+```text
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+
+```
+
 ## Project Overview
 This is a local-first AI experimentation toolkit designed to run entirely on-device using macOS tools. The project integrates LangChain, LangGraph, local LLMs (via Ollama/LM Studio), MCP servers, and mechanistic interpretability tools.
 
