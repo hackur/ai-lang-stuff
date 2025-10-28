@@ -5,7 +5,7 @@
 
 ---
 
-## 🎯 What Is This?
+## What Is This?
 
 A complete toolkit for building AI agents that run **entirely on your machine** using:
 - **Local LLMs** via Ollama (Qwen3, Gemma3)
@@ -18,7 +18,7 @@ A complete toolkit for building AI agents that run **entirely on your machine** 
 
 ---
 
-## ⚡ Quick Start (5 Minutes)
+## Quick Start (5 Minutes)
 
 ### 1. Install Prerequisites
 
@@ -37,9 +37,9 @@ brew install ollama uv node
 ollama serve
 
 # In a new terminal, pull models
-ollama pull qwen3:8b              # Primary model (6GB)
-ollama pull qwen3-embedding       # For RAG (2GB)
-ollama pull gemma3:4b             # Alternative (3GB)
+ollama pull qwen3:8b # Primary model (6GB)
+ollama pull qwen3-embedding # For RAG (2GB)
+ollama pull gemma3:4b # Alternative (3GB)
 ```
 
 ### 3. Install Python Dependencies
@@ -64,18 +64,18 @@ uv run python examples/01-foundation/compare_models.py
 
 ---
 
-## 📚 What's Available Now
+## What's Available Now
 
-### Examples (Milestone 1 ✅)
+### Examples (Milestone 1 )
 - `examples/01-foundation/simple_chat.py` - Basic LLM interaction
 - `examples/01-foundation/streaming_chat.py` - Token streaming
 - `examples/01-foundation/compare_models.py` - Model comparison
 
-### MCP Servers (Built ✅)
+### MCP Servers (Built )
 - `mcp-servers/custom/filesystem/` - File operations
 - `mcp-servers/custom/web-search/` - Web search
 
-### Agents (Updated ✅)
+### Agents (Updated )
 - `orchestration-specialist` - Master coordinator
 - `local-model-manager` - Ollama expertise
 - `mcp-integration-specialist` - Tool integration
@@ -84,7 +84,7 @@ uv run python examples/01-foundation/compare_models.py
 
 ---
 
-## 🗺️ Development Roadmap
+## Development Roadmap
 
 ### Currently Building
 See **`docs/DEVELOPMENT-PLAN-PHASE-2.md`** for the complete 36-task plan.
@@ -104,71 +104,71 @@ See **`docs/DEVELOPMENT-PLAN-PHASE-2.md`** for the complete 36-task plan.
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 ai-lang-stuff/
-├── .claude/                    # Claude Code configuration
-│   ├── agents/                 # Specialized agent docs
-│   ├── commands/               # Slash commands
-│   └── skills/                 # Reusable skills
-├── docs/                       # Documentation
-│   ├── DEVELOPMENT-PLAN-PHASE-2.md  # 36-task plan
-│   └── DEVELOPMENT-PLAN-20-POINTS.md  # Original plan
-├── examples/                   # Runnable examples
-│   ├── 01-foundation/          # ✅ Basic examples
-│   ├── 02-mcp/                 # 🔄 MCP integration
-│   ├── 03-multi-agent/         # 📝 Orchestration
-│   ├── 04-rag/                 # 📝 RAG systems
-│   ├── 05-interpretability/    # 📝 Model analysis
-│   └── 06-production/          # 📝 Production patterns
-├── mcp-servers/                # Custom MCP servers
-│   └── custom/
-│       ├── filesystem/         # ✅ File operations
-│       └── web-search/         # ✅ Web search
-├── utils/                      # 🔄 Utilities (building)
-├── tests/                      # 📝 Test suites
-├── CLAUDE.md                   # Claude's instructions
-├── QUICKSTART.md              # This file
-└── README.md                   # 📝 Main documentation (coming)
+ .claude/ # Claude Code configuration
+ agents/ # Specialized agent docs
+ commands/ # Slash commands
+ skills/ # Reusable skills
+ docs/ # Documentation
+ DEVELOPMENT-PLAN-PHASE-2.md # 36-task plan
+ DEVELOPMENT-PLAN-20-POINTS.md # Original plan
+ examples/ # Runnable examples
+ 01-foundation/ # Basic examples
+ 02-mcp/ # MCP integration
+ 03-multi-agent/ # Orchestration
+ 04-rag/ # RAG systems
+ 05-interpretability/ # Model analysis
+ 06-production/ # Production patterns
+ mcp-servers/ # Custom MCP servers
+ custom/
+ filesystem/ # File operations
+ web-search/ # Web search
+ utils/ # Utilities (building)
+ tests/ # Test suites
+ CLAUDE.md # Claude's instructions
+ QUICKSTART.md # This file
+ README.md # Main documentation (coming)
 ```
 
-**Legend**: ✅ Complete | 🔄 In Progress | 📝 Planned
+**Legend**: Complete | In Progress | Planned
 
 ---
 
-## 🤖 Recommended Models
+## Recommended Models
 
 ### For General Use
 ```bash
-ollama pull qwen3:8b          # Best balance (6GB)
-ollama pull qwen3:30b-a3b     # Fast MoE (8GB)
+ollama pull qwen3:8b # Best balance (6GB)
+ollama pull qwen3:30b-a3b # Fast MoE (8GB)
 ```
 
 ### For RAG Systems
 ```bash
-ollama pull qwen3-embedding   # Embeddings (2GB)
+ollama pull qwen3-embedding # Embeddings (2GB)
 ```
 
 ### For Vision Tasks
 ```bash
-ollama pull qwen3-vl:8b       # Vision model (7GB)
+ollama pull qwen3-vl:8b # Vision model (7GB)
 ```
 
 ### For Constrained Resources
 ```bash
-ollama pull gemma3:4b         # Smallest (3GB)
+ollama pull gemma3:4b # Smallest (3GB)
 ```
 
 ---
 
-## 🔧 Common Commands
+## Common Commands
 
 ### Check Ollama Status
 ```bash
-ollama list                   # List installed models
-ps aux | grep ollama          # Check if running
-curl http://localhost:11434/api/tags  # Test API
+ollama list # List installed models
+ps aux | grep ollama # Check if running
+curl http://localhost:11434/api/tags # Test API
 ```
 
 ### Run Examples
@@ -178,12 +178,12 @@ uv run python examples/01-foundation/simple_chat.py
 
 ### Start Development Server (Future)
 ```bash
-npx langgraph@latest dev      # LangGraph Studio
+npx langgraph@latest dev # LangGraph Studio
 ```
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 ### Main Guides
 - **CLAUDE.md** - Complete instructions for Claude Code
@@ -200,7 +200,7 @@ All agents have comprehensive guides in `.claude/agents/`:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Ollama Not Running
 ```bash
@@ -237,7 +237,7 @@ uv run python -c "from langchain_ollama import ChatOllama; print('OK')"
 
 ---
 
-## 🎓 Learning Path
+## Learning Path
 
 ### Beginner
 1. Run `simple_chat.py` - Understand basic LLM interaction
@@ -256,12 +256,12 @@ uv run python -c "from langchain_ollama import ChatOllama; print('OK')"
 
 ---
 
-## 🚀 Next Steps
+## Next Steps
 
 ### Immediate
-1. ✅ Ensure Ollama running with models installed
-2. ✅ Run the 3 foundation examples
-3. ✅ Read agent documentation in `.claude/agents/`
+1. Ensure Ollama running with models installed
+2. Run the 3 foundation examples
+3. Read agent documentation in `.claude/agents/`
 
 ### This Week
 1. Wait for core utilities to be built (`utils/`)
@@ -275,7 +275,7 @@ uv run python -c "from langchain_ollama import ChatOllama; print('OK')"
 
 ---
 
-## 💡 Key Principles
+## Key Principles
 
 ### 1. Local-First
 Everything runs on your machine. No API keys, no cloud services, no internet required (after initial setup).
@@ -291,7 +291,7 @@ Type hints, tests, error handling. This isn't just toy code.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is an active development project. See `docs/DEVELOPMENT-PLAN-PHASE-2.md` for:
 - 36 specific tasks
@@ -301,7 +301,7 @@ This is an active development project. See `docs/DEVELOPMENT-PLAN-PHASE-2.md` fo
 
 ---
 
-## 📞 Getting Help
+## Getting Help
 
 ### Documentation
 - Check `CLAUDE.md` for comprehensive instructions
@@ -315,7 +315,7 @@ This is an active development project. See `docs/DEVELOPMENT-PLAN-PHASE-2.md` fo
 
 ---
 
-## 🎯 Current Status
+## Current Status
 
 **Phase**: Foundation Complete, Building Phase 2
 **Next Up**: Core utilities and MCP examples

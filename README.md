@@ -1,17 +1,17 @@
-# Local-First AI Toolkit 🤖
+# Local-First AI Toolkit
 
 ![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
-**A complete toolkit for building production AI applications entirely on your local machine** - no API keys, no cloud dependencies, complete privacy.
+**A comprehensive toolkit for building AI applications entirely on your local machine** - no API keys, no cloud dependencies, complete privacy.
 
 Build sophisticated agent workflows, RAG systems, and multi-modal AI applications using local LLMs (Qwen, Gemma, Llama) with LangChain, LangGraph, and full mechanistic interpretability.
 
 ---
 
-## 🚀 Quick Start (macOS - 10 Minutes)
+## Quick Start (macOS - 10 Minutes)
 
 ### Prerequisites Check
 
@@ -78,15 +78,15 @@ uv sync --python 3.12
 source .venv/bin/activate
 
 # Verify installation
-python --version  # Should show 3.12.x
+python --version # Should show 3.12.x
 ```
 
 #### Step 4: Download Models
 
 ```bash
 # Download recommended models
-ollama pull qwen3:8b        # General purpose (4.4 GB)
-ollama pull gemma3:4b       # Fast, lightweight (2.7 GB)
+ollama pull qwen3:8b # General purpose (4.4 GB)
+ollama pull gemma3:4b # Fast, lightweight (2.7 GB)
 ollama pull qwen3-embedding # For RAG (274 MB)
 
 # Verify models
@@ -107,7 +107,7 @@ uv run python examples/tool_registry_demo.py
 
 ---
 
-## 📦 Using uv for Python Package Management
+## Using uv for Python Package Management
 
 This project uses **uv** - a fast, modern Python package manager written in Rust. It's 10-100x faster than pip and handles dependency resolution better.
 
@@ -198,7 +198,7 @@ uv sync --all-extras
 
 ---
 
-## 🎮 How to Use This Toolkit
+## How to Use This Toolkit
 
 ### Basic Workflow
 
@@ -256,7 +256,7 @@ uv run python examples/07-advanced/audio_transcription.py
 
 ### Using Core Utilities
 
-The `utils/` directory contains production-ready utilities:
+The `utils/` directory contains working utilities:
 
 ```python
 # Ollama Manager - model operations and health checks
@@ -264,9 +264,9 @@ from utils.ollama_manager import OllamaManager
 
 manager = OllamaManager()
 if manager.check_ollama_running():
-    manager.ensure_model_available("qwen3:8b")
-    models = manager.list_models()
-    stats = manager.benchmark_model("qwen3:8b")
+ manager.ensure_model_available("qwen3:8b")
+ models = manager.list_models()
+ stats = manager.benchmark_model("qwen3:8b")
 
 # MCP Client - filesystem and web search tools
 from utils.mcp_client import FilesystemMCP, WebSearchMCP
@@ -332,9 +332,9 @@ tools = search.get_langchain_tools()
 
 # Create agent
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful research assistant."),
-    ("human", "{input}"),
-    ("placeholder", "{agent_scratchpad}"),
+ ("system", "You are a helpful research assistant."),
+ ("human", "{input}"),
+ ("placeholder", "{agent_scratchpad}"),
 ])
 
 agent = create_tool_calling_agent(llm, tools, prompt)
@@ -347,7 +347,7 @@ print(result)
 
 ---
 
-## 🔒 Sandbox Mode for Safe Execution
+## Sandbox Mode for Safe Execution
 
 Run examples in isolated environments for testing and experimentation.
 
@@ -359,18 +359,18 @@ docker build -t ai-lang-stuff-sandbox -f Dockerfile.sandbox .
 
 # Run example in sandbox
 docker run --rm \
-  -v $(pwd)/examples:/workspace/examples:ro \
-  -v $(pwd)/utils:/workspace/utils:ro \
-  ai-lang-stuff-sandbox \
-  python examples/error_handling_demo.py
+ -v $(pwd)/examples:/workspace/examples:ro \
+ -v $(pwd)/utils:/workspace/utils:ro \
+ ai-lang-stuff-sandbox \
+ python examples/error_handling_demo.py
 
 # Run with Ollama access (expose host network)
 docker run --rm \
-  --network host \
-  -v $(pwd)/examples:/workspace/examples:ro \
-  -v $(pwd)/utils:/workspace/utils:ro \
-  ai-lang-stuff-sandbox \
-  python examples/01-foundation/basic_llm_interaction.py
+ --network host \
+ -v $(pwd)/examples:/workspace/examples:ro \
+ -v $(pwd)/utils:/workspace/utils:ro \
+ ai-lang-stuff-sandbox \
+ python examples/01-foundation/basic_llm_interaction.py
 ```
 
 ### Using Python venv Sandbox
@@ -394,8 +394,8 @@ deactivate
 
 ```bash
 # Install firejail
-sudo apt install firejail  # Ubuntu/Debian
-sudo dnf install firejail  # Fedora
+sudo apt install firejail # Ubuntu/Debian
+sudo dnf install firejail # Fedora
 
 # Run in sandbox with limited network
 firejail --net=none python examples/error_handling_demo.py
@@ -427,7 +427,7 @@ python my_experimental_agent.py
 
 # 4. If successful, add to main project
 deactivate
-uv add langchain-experimental  # Add to main project
+uv add langchain-experimental # Add to main project
 
 # 5. Clean up sandbox
 rm -rf sandbox/
@@ -435,7 +435,7 @@ rm -rf sandbox/
 
 ---
 
-## ⚠️ Important: Python Version
+## Important: Python Version
 
 **Use Python 3.10, 3.11, or 3.12 - NOT 3.13**
 
@@ -457,7 +457,7 @@ uv sync
 
 ---
 
-## 🌟 What's Included
+## What's Included
 
 ### Core Utilities (`utils/`)
 
@@ -531,12 +531,12 @@ ailang rag query "How do I..."
 
 ---
 
-## 📋 System Requirements
+## System Requirements
 
 ### Minimum
 
 - macOS 11+ (Big Sur)
-- Python 3.10-3.12 (⚠️ NOT 3.13)
+- Python 3.10-3.12 ( NOT 3.13)
 - 8 GB RAM (16 GB recommended)
 - 10 GB free disk space
 - Intel with AVX2 or Apple Silicon
@@ -560,7 +560,7 @@ ailang rag query "How do I..."
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Python 3.13 Dependency Error
 
@@ -616,7 +616,7 @@ python -c "import langchain; print('OK')"
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Complete dev guide
 - **[MASTER-PLAN-SEQUENTIAL.md](MASTER-PLAN-SEQUENTIAL.md)** - 35-point roadmap
@@ -625,7 +625,7 @@ python -c "import langchain; print('OK')"
 
 ---
 
-## 🎯 Example Use Cases
+## Example Use Cases
 
 ### Document Q&A
 
@@ -650,7 +650,7 @@ uv run python examples/07-advanced/vision_agent.py
 
 ---
 
-## 🔧 Development
+## Development
 
 ### Setup
 
@@ -675,27 +675,27 @@ ruff format .
 
 ```
 ai-lang-stuff/
-├── utils/          # Core utilities
-├── examples/       # 30+ examples
-├── tests/          # Test suite
-├── docs/           # Documentation
-├── cli/            # CLI tool
-├── workflows/      # LangGraph workflows
-└── scripts/        # Automation
+ utils/ # Core utilities
+ examples/ # 30+ examples
+ tests/ # Test suite
+ docs/ # Documentation
+ cli/ # CLI tool
+ workflows/ # LangGraph workflows
+ scripts/ # Automation
 ```
 
 ---
 
-## 🚀 Performance Tips
+## Performance Tips
 
 ### Model Selection
 
 | Task | Model | Speed | Quality |
 |------|-------|-------|---------|
-| Fast | gemma3:4b | 🚀🚀🚀 | ⭐⭐⭐ |
-| Balanced | qwen3:8b | 🚀🚀 | ⭐⭐⭐⭐ |
-| Best | qwen3:70b | 🚀 | ⭐⭐⭐⭐⭐ |
-| Vision | qwen3-vl:8b | 🚀🚀 | ⭐⭐⭐⭐ |
+| Fast | gemma3:4b | | |
+| Balanced | qwen3:8b | | |
+| Best | qwen3:70b | | |
+| Vision | qwen3-vl:8b | | |
 
 ### Quantization
 
@@ -712,7 +712,7 @@ ollama pull qwen3:8b-q8_0
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! See [DEVELOPMENT.md](DEVELOPMENT.md).
 
@@ -733,13 +733,13 @@ git push origin feature/your-feature
 
 ---
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **LangChain** - Orchestration framework
 - **Ollama** - Local LLM runtime
@@ -748,7 +748,7 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## 📞 Support
+## Support
 
 - **Issues**: [GitHub Issues](https://github.com/hackur/ai-lang-stuff/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/hackur/ai-lang-stuff/discussions)
@@ -756,7 +756,7 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 **Current**: Alpha (0.1.0)
 - [x] Core utilities
@@ -776,8 +776,8 @@ See [MASTER-PLAN-SEQUENTIAL.md](MASTER-PLAN-SEQUENTIAL.md) for full roadmap.
 
 ---
 
-**Status**: 🚀 Active Development | **Version**: 0.1.0-alpha
+**Status**: Active Development | **Version**: 0.1.0-alpha
 
-Built with ❤️ for the local-first AI community.
+Built with for the local-first AI community.
 
 **Zero API keys. Zero cloud. 100% local. Complete privacy.**

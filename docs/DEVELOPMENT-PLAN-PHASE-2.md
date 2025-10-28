@@ -20,9 +20,9 @@ This plan outlines the immediate next steps to build out the local-first AI expe
 
 ---
 
-## 📊 Current State Assessment
+## Current State Assessment
 
-### ✅ Completed
+### Completed
 - [x] Orchestration specialist agent (updated for this project)
 - [x] Local model manager agent
 - [x] MCP integration specialist agent
@@ -31,12 +31,12 @@ This plan outlines the immediate next steps to build out the local-first AI expe
 - [x] Basic examples: simple_chat.py, streaming_chat.py, compare_models.py
 - [x] Custom MCP servers: filesystem, web-search
 
-### 🔄 In Progress
+### In Progress
 - [ ] Interpretability researcher agent (90% complete)
 - [ ] Example creator agent
 - [ ] Core utilities implementation
 
-### 📝 Pending
+### Pending
 - [ ] Milestone 2-6 examples
 - [ ] Comprehensive documentation
 - [ ] Test suites
@@ -44,24 +44,24 @@ This plan outlines the immediate next steps to build out the local-first AI expe
 
 ---
 
-## 🎯 20+ POINT TASK PLAN
+## 20+ POINT TASK PLAN
 
 ## Phase 1: Complete Agent Architecture (Priority: P0)
 **Timeline**: 2-3 hours
 
-### ✅ 1. Complete Interpretability Researcher Agent
+### 1. Complete Interpretability Researcher Agent
 **Status**: 90% complete, needs final save
 **File**: `.claude/agents/interpretability-researcher.md`
 **Action**: Finish and save the agent documentation
 **Timeline**: 10 min
 
-### 📝 2. Create Example Creator Agent
+### 2. Create Example Creator Agent
 **File**: `.claude/agents/example-creator.md`
 **Purpose**: Specialist for building runnable examples following project patterns
 **Includes**: Example structure, documentation standards, testing approaches
 **Timeline**: 30 min
 
-### 📝 3. Clean Up Legacy Slash Commands
+### 3. Clean Up Legacy Slash Commands
 **Action**: Remove Laravel/Nova-specific commands
 **Remove**:
 - `.claude/commands/nova-resource.md`
@@ -75,7 +75,7 @@ This plan outlines the immediate next steps to build out the local-first AI expe
 **Keep**: ultrathink.md, code-quality.md, refactor-plan.md, qfix.md, qplan.md, search-pattern.md
 **Timeline**: 20 min
 
-### 📝 4. Clean Up Legacy Skills
+### 4. Clean Up Legacy Skills
 **Action**: Remove Laravel-specific skills
 **Remove**:
 - `.claude/skills/laravel-package-specialist/`
@@ -89,7 +89,7 @@ This plan outlines the immediate next steps to build out the local-first AI expe
 
 **Timeline**: 30 min
 
-### 📝 5. Update Model References Throughout
+### 5. Update Model References Throughout
 **Action**: Replace all model references with latest Claude models
 **Context**: Current Claude models are Sonnet 4.5, Haiku 4.5, Opus 4.1
 **Files to Update**:
@@ -105,7 +105,7 @@ This plan outlines the immediate next steps to build out the local-first AI expe
 ## Phase 2: Core Utilities Implementation (Priority: P1)
 **Timeline**: 6-8 hours
 
-### 📝 6. Create Ollama Manager Utility
+### 6. Create Ollama Manager Utility
 **File**: `utils/ollama_manager.py`
 **Functions**:
 ```python
@@ -119,50 +119,50 @@ def recommend_model(task_type: str) -> str
 ```
 **Timeline**: 1.5 hours
 
-### 📝 7. Create MCP Client Wrapper Library
+### 7. Create MCP Client Wrapper Library
 **File**: `utils/mcp_client.py`
 **Classes**:
 ```python
 class MCPClient:
-    """Base MCP client with connection management"""
+ """Base MCP client with connection management"""
 
 class FilesystemMCP(MCPClient):
-    """Filesystem MCP server wrapper"""
+ """Filesystem MCP server wrapper"""
 
 class WebSearchMCP(MCPClient):
-    """Web search MCP server wrapper"""
+ """Web search MCP server wrapper"""
 ```
 **Features**: Connection pooling, retry logic, error handling, LangChain tool conversion
 **Timeline**: 2 hours
 
-### 📝 8. Create Vector Store Utilities
+### 8. Create Vector Store Utilities
 **File**: `utils/vector_store.py`
 **Classes**:
 ```python
 class VectorStoreManager:
-    """Manage local vector stores (Chroma/FAISS)"""
+ """Manage local vector stores (Chroma/FAISS)"""
 
-    def create_from_documents(...)
-    def load_existing(...)
-    def add_documents(...)
-    def delete_collection(...)
-    def list_collections(...)
+ def create_from_documents(...)
+ def load_existing(...)
+ def add_documents(...)
+ def delete_collection(...)
+ def list_collections(...)
 ```
 **Timeline**: 1.5 hours
 
-### 📝 9. Create State Manager Utility
+### 9. Create State Manager Utility
 **File**: `utils/state_manager.py`
 **Purpose**: LangGraph state persistence helpers
 **Features**: SQLite checkpointing, state schemas, common state patterns
 **Timeline**: 1.5 hours
 
-### 📝 10. Create Tool Registry
+### 10. Create Tool Registry
 **File**: `utils/tool_registry.py`
 **Purpose**: Central registry of all available tools/utilities
 **Features**: Auto-discovery, tool metadata, agent-friendly API
 **Timeline**: 1 hour
 
-### 📝 11. Create Utils __init__.py
+### 11. Create Utils __init__.py
 **File**: `utils/__init__.py`
 **Purpose**: Clean imports and package initialization
 **Timeline**: 15 min
@@ -172,7 +172,7 @@ class VectorStoreManager:
 ## Phase 3: Milestone 2 - MCP Integration Examples (Priority: P1)
 **Timeline**: 3-4 hours
 
-### 📝 12. Filesystem Agent Example
+### 12. Filesystem Agent Example
 **File**: `examples/02-mcp/filesystem_agent.py`
 **Purpose**: Demonstrate agent using filesystem MCP server
 **Features**:
@@ -189,7 +189,7 @@ uv run python examples/02-mcp/filesystem_agent.py
 ```
 **Timeline**: 1 hour
 
-### 📝 13. Web Search Agent Example
+### 13. Web Search Agent Example
 **File**: `examples/02-mcp/web_search_agent.py`
 **Purpose**: Demonstrate agent using web search MCP server
 **Features**:
@@ -204,7 +204,7 @@ uv run python examples/02-mcp/web_search_agent.py
 ```
 **Timeline**: 1 hour
 
-### 📝 14. Combined Tools Agent Example
+### 14. Combined Tools Agent Example
 **File**: `examples/02-mcp/combined_tools_agent.py`
 **Purpose**: Agent using multiple MCP tools together
 **Features**:
@@ -219,7 +219,7 @@ uv run python examples/02-mcp/combined_tools_agent.py
 ```
 **Timeline**: 1.5 hours
 
-### 📝 15. Create Milestone 2 README
+### 15. Create Milestone 2 README
 **File**: `examples/02-mcp/README.md`
 **Content**: Overview, prerequisites, usage instructions, expected output
 **Timeline**: 30 min
@@ -229,7 +229,7 @@ uv run python examples/02-mcp/combined_tools_agent.py
 ## Phase 4: Milestone 3 - Multi-Agent Orchestration (Priority: P1)
 **Timeline**: 4-5 hours
 
-### 📝 16. Sequential Research Pipeline Example
+### 16. Sequential Research Pipeline Example
 **File**: `examples/03-multi-agent/research_pipeline.py`
 **Purpose**: Demonstrate sequential agent workflow
 **Pattern**: Researcher → Analyzer → Summarizer
@@ -241,7 +241,7 @@ uv run python examples/02-mcp/combined_tools_agent.py
 **Example Output**: Research report generated through 3-stage pipeline
 **Timeline**: 1.5 hours
 
-### 📝 17. Parallel Model Comparison Example
+### 17. Parallel Model Comparison Example
 **File**: `examples/03-multi-agent/parallel_comparison.py`
 **Purpose**: Demonstrate parallel execution with LangGraph Send API
 **Pattern**: Launch 3 models in parallel → Merge results
@@ -253,7 +253,7 @@ uv run python examples/02-mcp/combined_tools_agent.py
 **Example Output**: Side-by-side comparison of qwen3:8b, gemma3:4b, qwen3:30b-a3b
 **Timeline**: 1.5 hours
 
-### 📝 18. Code Review Pipeline Example
+### 18. Code Review Pipeline Example
 **File**: `examples/03-multi-agent/code_review_pipeline.py`
 **Purpose**: Multi-agent code review workflow
 **Pattern**: Code Analyzer → Reviewer → Documenter
@@ -264,7 +264,7 @@ uv run python examples/02-mcp/combined_tools_agent.py
 
 **Timeline**: 1.5 hours
 
-### 📝 19. Create Milestone 3 README
+### 19. Create Milestone 3 README
 **File**: `examples/03-multi-agent/README.md`
 **Content**: Orchestration patterns explained, diagrams, usage
 **Timeline**: 30 min
@@ -274,7 +274,7 @@ uv run python examples/02-mcp/combined_tools_agent.py
 ## Phase 5: Milestone 4 - RAG Systems (Priority: P1)
 **Timeline**: 4-5 hours
 
-### 📝 20. Document QA Example
+### 20. Document QA Example
 **File**: `examples/04-rag/document_qa.py`
 **Purpose**: Question answering over PDF documents
 **Features**:
@@ -290,7 +290,7 @@ uv run python examples/04-rag/document_qa.py path/to/document.pdf
 ```
 **Timeline**: 1.5 hours
 
-### 📝 21. Codebase Search Example
+### 21. Codebase Search Example
 **File**: `examples/04-rag/codebase_search.py`
 **Purpose**: Semantic search over code repository
 **Features**:
@@ -306,7 +306,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 ```
 **Timeline**: 2 hours
 
-### 📝 22. Multimodal RAG Example (Optional)
+### 22. Multimodal RAG Example (Optional)
 **File**: `examples/04-rag/multimodal_rag.py`
 **Purpose**: RAG with text + images using qwen3-vl
 **Features**:
@@ -316,7 +316,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 2 hours (if time permits)
 
-### 📝 23. Create Milestone 4 README
+### 23. Create Milestone 4 README
 **File**: `examples/04-rag/README.md`
 **Content**: RAG concepts, chunking strategies, usage examples
 **Timeline**: 30 min
@@ -326,7 +326,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 ## Phase 6: Documentation & Polish (Priority: P2)
 **Timeline**: 4-5 hours
 
-### 📝 24. Create Comprehensive Main README
+### 24. Create Comprehensive Main README
 **File**: `README.md`
 **Sections**:
 - Project overview
@@ -339,7 +339,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 2 hours
 
-### 📝 25. Create Agent Tool Usage Guide
+### 25. Create Agent Tool Usage Guide
 **File**: `docs/agent-tool-usage.md`
 **Content**:
 - How agents use utilities
@@ -349,7 +349,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 1 hour
 
-### 📝 26. Create Agent Coordination Guide
+### 26. Create Agent Coordination Guide
 **File**: `docs/agent-coordination-patterns.md`
 **Content**:
 - Sequential pipelines
@@ -360,7 +360,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 1 hour
 
-### 📝 27. Update CLAUDE.md with Current State
+### 27. Update CLAUDE.md with Current State
 **File**: `CLAUDE.md`
 **Updates**:
 - Remove Laravel references
@@ -370,7 +370,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 30 min
 
-### 📝 28. Create Architecture Decision Records
+### 28. Create Architecture Decision Records
 **Directory**: `docs/adr/`
 **Files**:
 - `001-local-first-architecture.md`
@@ -385,7 +385,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 ## Phase 7: Testing & Validation (Priority: P2)
 **Timeline**: 5-6 hours
 
-### 📝 29. Create MCP Server Tests
+### 29. Create MCP Server Tests
 **File**: `tests/test_mcp_servers.py`
 **Coverage**:
 - Filesystem server operations
@@ -395,7 +395,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 1.5 hours
 
-### 📝 30. Create Utility Tests
+### 30. Create Utility Tests
 **Files**:
 - `tests/test_ollama_manager.py`
 - `tests/test_mcp_client.py`
@@ -404,13 +404,13 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 **Timeline**: 2 hours
 
-### 📝 31. Create Example Integration Tests
+### 31. Create Example Integration Tests
 **File**: `tests/test_examples.py`
 **Purpose**: Ensure all examples run successfully
 **Approach**: Smoke tests with mock responses
 **Timeline**: 1.5 hours
 
-### 📝 32. Create Performance Benchmarks
+### 32. Create Performance Benchmarks
 **File**: `tests/benchmarks/model_performance.py`
 **Metrics**: Speed, memory, quality for different models
 **Timeline**: 1.5 hours
@@ -420,30 +420,30 @@ uv run python examples/04-rag/codebase_search.py ./project
 ## Phase 8: Advanced Features (Priority: P3)
 **Timeline**: 6-8 hours (optional)
 
-### 📝 33. Milestone 5 - Interpretability Examples
+### 33. Milestone 5 - Interpretability Examples
 **File**: `examples/05-interpretability/attention_viz.ipynb`
 **Purpose**: Jupyter notebook for attention visualization
 **Features**: TransformerLens integration, interactive plots
 **Timeline**: 2 hours
 
-### 📝 34. Milestone 6 - Production Patterns
+### 34. Milestone 6 - Production Patterns
 **File**: `examples/06-production/production_agent.py`
 **Purpose**: Production-ready agent template
 **Features**: Error handling, logging, monitoring, config management
 **Timeline**: 2 hours
 
-### 📝 35. LangGraph Studio Integration
+### 35. LangGraph Studio Integration
 **Action**: Setup visual workflow editor
 **Files**: Configuration, example workflows
 **Timeline**: 1.5 hours
 
-### 📝 36. Observability Setup
+### 36. Observability Setup
 **Action**: LangSmith or local tracing alternative
 **Timeline**: 2 hours
 
 ---
 
-## 📊 Implementation Summary
+## Implementation Summary
 
 | Phase | Tasks | Est. Time | Priority | Focus |
 |-------|-------|-----------|----------|-------|
@@ -459,47 +459,47 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 ---
 
-## 🎯 Recommended Execution Order
+## Recommended Execution Order
 
 ### Week 1 (8-10 hours)
 **Goal**: Complete foundation and first working examples
 
-1. ✅ Complete agent architecture (Phase 1: 2-3h)
-2. ✅ Build core utilities (Phase 2: 6-8h)
-3. ✅ Start with ollama_manager and mcp_client first
+1. Complete agent architecture (Phase 1: 2-3h)
+2. Build core utilities (Phase 2: 6-8h)
+3. Start with ollama_manager and mcp_client first
 
 **Deliverable**: Working utilities that agents can use
 
 ### Week 2 (10-12 hours)
 **Goal**: Milestone 2 & 3 complete
 
-1. ✅ Complete Milestone 2 - MCP examples (Phase 3: 3-4h)
-2. ✅ Complete Milestone 3 - Multi-agent (Phase 4: 4-5h)
-3. ✅ Start documentation (Phase 6: 2-3h)
+1. Complete Milestone 2 - MCP examples (Phase 3: 3-4h)
+2. Complete Milestone 3 - Multi-agent (Phase 4: 4-5h)
+3. Start documentation (Phase 6: 2-3h)
 
 **Deliverable**: 7 working examples demonstrating core capabilities
 
 ### Week 3 (8-10 hours)
 **Goal**: RAG and documentation complete
 
-1. ✅ Complete Milestone 4 - RAG (Phase 5: 4-5h)
-2. ✅ Complete documentation (Phase 6: 4-5h)
-3. ✅ Create main README
+1. Complete Milestone 4 - RAG (Phase 5: 4-5h)
+2. Complete documentation (Phase 6: 4-5h)
+3. Create main README
 
 **Deliverable**: Complete documentation, 10+ examples
 
 ### Week 4 (8-10 hours)
 **Goal**: Testing and polish
 
-1. ✅ Complete testing suite (Phase 7: 5-6h)
-2. ✅ Advanced features as time permits (Phase 8: 3-4h)
-3. ✅ Final polish and validation
+1. Complete testing suite (Phase 7: 5-6h)
+2. Advanced features as time permits (Phase 8: 3-4h)
+3. Final polish and validation
 
 **Deliverable**: Production-ready toolkit with tests
 
 ---
 
-## 🔧 Technical Decisions
+## Technical Decisions
 
 ### Local Models (Ollama)
 - **Primary**: qwen3:8b (balanced)
@@ -523,7 +523,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 ---
 
-## ✅ Success Criteria
+## Success Criteria
 
 ### Technical
 - [ ] All utilities working and tested
@@ -547,7 +547,7 @@ uv run python examples/04-rag/codebase_search.py ./project
 
 ---
 
-## 🚀 Getting Started Right Now
+## Getting Started Right Now
 
 ### Immediate Actions (Next 30 minutes)
 
@@ -561,18 +561,18 @@ uv run python examples/04-rag/codebase_search.py ./project
 ```python
 # Skeleton to start with
 class OllamaManager:
-    def __init__(self, base_url: str = "http://localhost:11434"):
-        self.base_url = base_url
+ def __init__(self, base_url: str = "http://localhost:11434"):
+ self.base_url = base_url
 
-    def check_ollama_running(self) -> bool:
-        """Check if Ollama server is running"""
-        pass
+ def check_ollama_running(self) -> bool:
+ """Check if Ollama server is running"""
+ pass
 
-    def ensure_model_available(self, model: str) -> bool:
-        """Ensure model is available, pull if needed"""
-        pass
+ def ensure_model_available(self, model: str) -> bool:
+ """Ensure model is available, pull if needed"""
+ pass
 
-    # ... implement other methods
+ # ... implement other methods
 ```
 
 ### First Example to Build (Next hour after utilities)
@@ -581,7 +581,7 @@ class OllamaManager:
 
 ---
 
-## 📝 Notes
+## Notes
 
 ### Project Principles
 1. **Local-First**: Everything runs on-device
@@ -590,11 +590,11 @@ class OllamaManager:
 4. **Production-Quality**: Type hints, tests, error handling
 
 ### Common Pitfalls to Avoid
-- ❌ Don't assume Ollama is running - check first
-- ❌ Don't hardcode paths - use config
-- ❌ Don't skip docstrings - document everything
-- ❌ Don't create examples without README
-- ❌ Don't build utilities without tests
+- Don't assume Ollama is running - check first
+- Don't hardcode paths - use config
+- Don't skip docstrings - document everything
+- Don't create examples without README
+- Don't build utilities without tests
 
 ### Model Context Update
 **Important**: When this plan references "Claude models" in documentation, we're referring to:
@@ -606,7 +606,7 @@ These are the AI assistants (not local Ollama models). Update all documentation 
 
 ---
 
-## 📚 Resources
+## Resources
 
 ### Official Documentation
 - LangChain: https://python.langchain.com/

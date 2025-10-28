@@ -23,6 +23,7 @@ def test_chat_ollama_initialization():
     assert llm.model == "qwen3:8b"
 
 
+@pytest.mark.ollama
 @pytest.mark.integration
 def test_model_response():
     """Test that model can generate a response (requires Ollama running)."""
@@ -35,6 +36,7 @@ def test_model_response():
     assert len(response.content) > 0
 
 
+@pytest.mark.ollama
 @pytest.mark.integration
 def test_streaming_response():
     """Test that model can stream responses."""

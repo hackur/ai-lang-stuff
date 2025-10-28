@@ -7,11 +7,11 @@
 ![Tests](https://img.shields.io/badge/tests-pytest-green)
 ![Coverage](https://img.shields.io/badge/coverage-80%25%2B-brightgreen)
 
-**Status**: 🚀 Active Development | **Version**: 0.1.0-alpha | **Last Updated**: 2025-10-28
+**Status**: Active Development | **Version**: 0.1.0-alpha | **Last Updated**: 2025-10-28
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Quick Start](#quick-start)
 - [Development Environment](#development-environment)
@@ -25,7 +25,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -54,12 +54,12 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 2. Create virtual environment and install dependencies
 uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate # On Windows: .venv\Scripts\activate
 uv sync
 
 # 3. Install Ollama (macOS)
 brew install ollama
-ollama serve  # Start Ollama server
+ollama serve # Start Ollama server
 
 # 4. Pull recommended models
 ollama pull qwen3:8b
@@ -74,7 +74,7 @@ make test
 
 ---
 
-## 🛠️ Development Environment
+## Development Environment
 
 ### Required Tools
 
@@ -117,67 +117,67 @@ VISION_MODEL=qwen3-vl:8b
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ai-lang-stuff/
-├── .claude/                    # Claude Code configuration
-│   ├── agents/                # Agent definitions
-│   ├── commands/              # Custom slash commands
-│   └── skills/                # Reusable skills
-├── .github/                   # CI/CD workflows
-│   ├── workflows/            # GitHub Actions
-│   └── ISSUE_TEMPLATE/       # Issue templates
-├── cli/                       # Command-line interface
-│   ├── ailang/               # CLI implementation
-│   └── tests/                # CLI tests
-├── config/                    # Configuration files
-│   └── models.yaml           # Model configurations
-├── docs/                      # Documentation
-│   ├── adr/                  # Architecture Decision Records
-│   ├── api-reference/        # API documentation
-│   └── *.md                  # Guides and tutorials
-├── examples/                  # Working examples
-│   ├── 01-foundation/        # Basic examples
-│   ├── 02-mcp/               # MCP integration
-│   ├── 03-multi-agent/       # Multi-agent workflows
-│   ├── 04-rag/               # RAG systems
-│   ├── 05-interpretability/  # Model analysis
-│   ├── 06-production/        # Production patterns
-│   └── 07-advanced/          # Advanced features
-├── mcp-servers/               # MCP server implementations
-│   ├── custom/               # Custom servers
-│   └── template/             # Server template
-├── plans/                     # Research and planning
-├── scripts/                   # Automation scripts
-│   ├── setup.sh              # Environment setup
-│   ├── dev.sh                # Development server
-│   ├── test.sh               # Test runner
-│   └── benchmark.sh          # Performance tests
-├── src/                       # Source code (when refactored)
-├── tests/                     # Test suite
-│   ├── unit/                 # Unit tests
-│   ├── integration/          # Integration tests
-│   └── benchmarks/           # Performance tests
-├── utils/                     # Core utilities
-│   ├── ollama_manager.py     # Ollama integration
-│   ├── mcp_client.py         # MCP client
-│   ├── vector_store.py       # Vector databases
-│   ├── state_manager.py      # State persistence
-│   └── tool_registry.py      # Tool management
-├── workflows/                 # LangGraph workflows
-├── .gitignore                 # Git exclusions
-├── .pre-commit-config.yaml    # Pre-commit hooks
-├── CLAUDE.md                  # Claude instructions
-├── DEVELOPMENT.md             # This file
-├── Makefile                   # Common tasks
-├── pyproject.toml             # Python project config
-└── README.md                  # User documentation
+ .claude/ # Claude Code configuration
+ agents/ # Agent definitions
+ commands/ # Custom slash commands
+ skills/ # Reusable skills
+ .github/ # CI/CD workflows
+ workflows/ # GitHub Actions
+ ISSUE_TEMPLATE/ # Issue templates
+ cli/ # Command-line interface
+ ailang/ # CLI implementation
+ tests/ # CLI tests
+ config/ # Configuration files
+ models.yaml # Model configurations
+ docs/ # Documentation
+ adr/ # Architecture Decision Records
+ api-reference/ # API documentation
+ *.md # Guides and tutorials
+ examples/ # Working examples
+ 01-foundation/ # Basic examples
+ 02-mcp/ # MCP integration
+ 03-multi-agent/ # Multi-agent workflows
+ 04-rag/ # RAG systems
+ 05-interpretability/ # Model analysis
+ 06-production/ # Production patterns
+ 07-advanced/ # Advanced features
+ mcp-servers/ # MCP server implementations
+ custom/ # Custom servers
+ template/ # Server template
+ plans/ # Research and planning
+ scripts/ # Automation scripts
+ setup.sh # Environment setup
+ dev.sh # Development server
+ test.sh # Test runner
+ benchmark.sh # Performance tests
+ src/ # Source code (when refactored)
+ tests/ # Test suite
+ unit/ # Unit tests
+ integration/ # Integration tests
+ benchmarks/ # Performance tests
+ utils/ # Core utilities
+ ollama_manager.py # Ollama integration
+ mcp_client.py # MCP client
+ vector_store.py # Vector databases
+ state_manager.py # State persistence
+ tool_registry.py # Tool management
+ workflows/ # LangGraph workflows
+ .gitignore # Git exclusions
+ .pre-commit-config.yaml # Pre-commit hooks
+ CLAUDE.md # Claude instructions
+ DEVELOPMENT.md # This file
+ Makefile # Common tasks
+ pyproject.toml # Python project config
+ README.md # User documentation
 ```
 
 ---
 
-## 🔄 Development Workflow
+## Development Workflow
 
 ### Daily Development
 
@@ -213,62 +213,62 @@ gh pr create
 make install
 
 # Run tests
-make test                    # All tests
-make test-unit              # Unit tests only
-make test-integration       # Integration tests
-make test-benchmarks        # Performance benchmarks
+make test # All tests
+make test-unit # Unit tests only
+make test-integration # Integration tests
+make test-benchmarks # Performance benchmarks
 
 # Code quality
-make lint                    # Run ruff linter
-make format                  # Format code
-make type-check              # Run mypy
-make pre-commit              # Run all pre-commit hooks
+make lint # Run ruff linter
+make format # Format code
+make type-check # Run mypy
+make pre-commit # Run all pre-commit hooks
 
 # Development
-make dev                     # Start dev environment
-make clean                   # Clean artifacts
-make docs                    # Build documentation
+make dev # Start dev environment
+make clean # Clean artifacts
+make docs # Build documentation
 
 # Benchmarks
-make benchmark               # Run all benchmarks
-make benchmark-models        # Benchmark models
-make benchmark-vector        # Benchmark vector stores
+make benchmark # Run all benchmarks
+make benchmark-models # Benchmark models
+make benchmark-vector # Benchmark vector stores
 
 # Examples
-make examples-list           # List all examples
-make examples-run NAME=mcp  # Run specific example
+make examples-list # List all examples
+make examples-run NAME=mcp # Run specific example
 ```
 
 ### Using Development Scripts
 
 ```bash
 # Setup and validation
-./scripts/setup.sh           # Complete environment setup
-./scripts/validate.sh        # Validate project health
+./scripts/setup.sh # Complete environment setup
+./scripts/validate.sh # Validate project health
 ./scripts/verify-ci-setup.sh # Check CI/CD config
 
 # Development
-./scripts/dev.sh start       # Start development server
-./scripts/dev.sh stop        # Stop all services
-./scripts/dev.sh status      # Check service status
-./scripts/dev.sh menu        # Interactive menu
+./scripts/dev.sh start # Start development server
+./scripts/dev.sh stop # Stop all services
+./scripts/dev.sh status # Check service status
+./scripts/dev.sh menu # Interactive menu
 
 # Testing
-./scripts/run_tests.sh all   # Run all tests
-./scripts/run_tests.sh unit  # Unit tests only
+./scripts/run_tests.sh all # Run all tests
+./scripts/run_tests.sh unit # Unit tests only
 ./scripts/benchmark.sh model # Benchmark models
 
 # Cleanup
-./scripts/clean.sh cache     # Clean caches
-./scripts/clean.sh all       # Full cleanup
+./scripts/clean.sh cache # Clean caches
+./scripts/clean.sh all # Full cleanup
 
 # Models
-./scripts/pull_models.sh qwen3:8b gemma3:4b  # Download models
+./scripts/pull_models.sh qwen3:8b gemma3:4b # Download models
 ```
 
 ---
 
-## ✅ Code Quality
+## Code Quality
 
 ### Pre-Commit Hooks
 
@@ -342,44 +342,44 @@ mypy . --strict
 from typing import Dict, List, Optional
 
 def process_data(
-    input_data: List[str],
-    config: Optional[Dict[str, Any]] = None
+ input_data: List[str],
+ config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, List[str]]:
-    """Process input data according to configuration.
+ """Process input data according to configuration.
 
-    Args:
-        input_data: List of strings to process
-        config: Optional configuration dictionary
+ Args:
+ input_data: List of strings to process
+ config: Optional configuration dictionary
 
-    Returns:
-        Dictionary mapping categories to processed strings
+ Returns:
+ Dictionary mapping categories to processed strings
 
-    Raises:
-        ValueError: If input_data is empty
-    """
-    if not input_data:
-        raise ValueError("input_data cannot be empty")
+ Raises:
+ ValueError: If input_data is empty
+ """
+ if not input_data:
+ raise ValueError("input_data cannot be empty")
 
-    # Implementation
-    return {"processed": input_data}
+ # Implementation
+ return {"processed": input_data}
 ```
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Test Organization
 
 ```
 tests/
-├── conftest.py                # Shared fixtures
-├── test_*.py                  # Unit tests
-├── integration/               # Integration tests
-│   ├── conftest.py
-│   └── test_*.py
-└── benchmarks/                # Performance tests
-    ├── benchmark_runner.py
-    └── test_*_performance.py
+ conftest.py # Shared fixtures
+ test_*.py # Unit tests
+ integration/ # Integration tests
+ conftest.py
+ test_*.py
+ benchmarks/ # Performance tests
+ benchmark_runner.py
+ test_*_performance.py
 ```
 
 ### Running Tests
@@ -419,18 +419,18 @@ from utils.ollama_manager import OllamaManager
 
 @pytest.fixture
 def ollama_manager():
-    """Provide OllamaManager instance."""
-    return OllamaManager()
+ """Provide OllamaManager instance."""
+ return OllamaManager()
 
 def test_check_ollama_running(ollama_manager):
-    """Test Ollama server status check."""
-    # Arrange - done by fixture
+ """Test Ollama server status check."""
+ # Arrange - done by fixture
 
-    # Act
-    result = ollama_manager.check_ollama_running()
+ # Act
+ result = ollama_manager.check_ollama_running()
 
-    # Assert
-    assert isinstance(result, bool)
+ # Assert
+ assert isinstance(result, bool)
 ```
 
 **Integration Test Example:**
@@ -438,24 +438,24 @@ def test_check_ollama_running(ollama_manager):
 @pytest.mark.integration
 @pytest.mark.requires_ollama
 def test_mcp_filesystem_integration():
-    """Test MCP filesystem server integration."""
-    from utils.mcp_client import FilesystemMCP
+ """Test MCP filesystem server integration."""
+ from utils.mcp_client import FilesystemMCP
 
-    client = FilesystemMCP()
-    result = client.list_files("./examples")
+ client = FilesystemMCP()
+ result = client.list_files("./examples")
 
-    assert "files" in result
-    assert len(result["files"]) > 0
+ assert "files" in result
+ assert len(result["files"]) > 0
 ```
 
 ### Test Markers
 
 ```python
-@pytest.mark.unit           # Unit test
-@pytest.mark.integration    # Integration test
-@pytest.mark.slow           # Slow test (>5s)
-@pytest.mark.requires_ollama  # Requires Ollama running
-@pytest.mark.requires_model   # Requires specific model
+@pytest.mark.unit # Unit test
+@pytest.mark.integration # Integration test
+@pytest.mark.slow # Slow test (>5s)
+@pytest.mark.requires_ollama # Requires Ollama running
+@pytest.mark.requires_model # Requires specific model
 ```
 
 ### Coverage Goals
@@ -467,7 +467,7 @@ def test_mcp_filesystem_integration():
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### Documentation Standards
 
@@ -498,7 +498,7 @@ uv add mkdocs mkdocs-material
 mkdocs build
 
 # Serve locally
-mkdocs serve  # http://localhost:8000
+mkdocs serve # http://localhost:8000
 
 # Deploy to GitHub Pages
 mkdocs gh-deploy
@@ -508,35 +508,35 @@ mkdocs gh-deploy
 
 ```python
 def example_function(param1: str, param2: int = 0) -> Dict[str, Any]:
-    """One-line summary of function.
+ """One-line summary of function.
 
-    More detailed description if needed. Explain what the function
-    does, why it exists, and any important details.
+ More detailed description if needed. Explain what the function
+ does, why it exists, and any important details.
 
-    Args:
-        param1: Description of param1
-        param2: Description of param2, defaults to 0
+ Args:
+ param1: Description of param1
+ param2: Description of param2, defaults to 0
 
-    Returns:
-        Dictionary containing results with keys:
-        - key1: Description
-        - key2: Description
+ Returns:
+ Dictionary containing results with keys:
+ - key1: Description
+ - key2: Description
 
-    Raises:
-        ValueError: When param1 is empty
-        TypeError: When param2 is negative
+ Raises:
+ ValueError: When param1 is empty
+ TypeError: When param2 is negative
 
-    Examples:
-        >>> result = example_function("test", 5)
-        >>> result["key1"]
-        "value1"
-    """
-    pass
+ Examples:
+ >>> result = example_function("test", 5)
+ >>> result["key1"]
+ "value1"
+ """
+ pass
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 ### Getting Started
 
@@ -601,7 +601,7 @@ Closes #123
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -702,9 +702,9 @@ ollama pull qwen3:8b-q4_k_m
 
 ---
 
-## 📊 Project Status
+## Project Status
 
-### Current Phase: **Phase 2 - Validation** ✅
+### Current Phase: **Phase 2 - Validation**
 
 - [x] Core utilities implemented
 - [x] Documentation infrastructure
@@ -726,13 +726,13 @@ See [MASTER-PLAN-SEQUENTIAL.md](MASTER-PLAN-SEQUENTIAL.md) for detailed 35-point
 
 ---
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **LangChain** for the orchestration framework
 - **Ollama** for local LLM runtime
@@ -741,6 +741,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Happy Developing!** 🚀
+**Happy Developing!**
 
 For questions or discussions, open an issue or start a discussion on GitHub.

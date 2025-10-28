@@ -73,13 +73,13 @@ repos:
       - id: check-builtin-literals  # Require literal syntax
       - id: check-docstring-first  # Checks for docstrings
 
-  # Markdown linting
-  - repo: https://github.com/markdownlint/markdownlint
-    rev: v0.12.0
-    hooks:
-      - id: markdownlint
-        args: ['--fix']
-        exclude: ^.claude/
+  # Markdown linting (disabled - requires Ruby)
+  # - repo: https://github.com/markdownlint/markdownlint
+  #   rev: v0.12.0
+  #   hooks:
+  #     - id: markdownlint
+  #       args: ['--fix']
+  #       exclude: ^.claude/
 
   # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
