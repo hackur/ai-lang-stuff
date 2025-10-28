@@ -349,9 +349,9 @@ class TestOutputPatterns:
             docstring_end = content.find('"""', docstring_start + 3)
             docstring = content[docstring_start:docstring_end]
 
-            assert (
-                "Prerequisites" in docstring or "Expected" in docstring
-            ), f"Missing Prerequisites/Expected in {example.name}"
+            assert "Prerequisites" in docstring or "Expected" in docstring, (
+                f"Missing Prerequisites/Expected in {example.name}"
+            )
 
     def test_examples_have_main_function(self):
         """Test that all examples have a main() function."""
