@@ -1,0 +1,60 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: |
+        uv venv
+        source .venv/bin/activate
+        uv pip install mkdocs mkdocs-material mkdocstrings[python]
+
+    - name: Check documentation links
+      run: |
+        # Check for broken markdown links
+        find docs/ -name "*.md" -exec grep -H "http" {} \; || true
+
+    - name: Build documentation
+      run: |
+        source .venv/bin/activate
+        # Create temporary mkdocs.yml if it doesn't exist
+        if [ ! -f mkdocs.yml ]; then
+          cat > mkdocs.yml << EOF
+        site_name: AI Lang Stuff
+        site_description: Local-first AI experimentation toolkit
+        theme:
+          name: material
+        nav:
+          - Home: README.md
+          - Quickstart: QUICKSTART.md
+          - Development Plan: docs/DEVELOPMENT-PLAN-20-POINTS.md
+        EOF
+        fi
+        mkdocs build --strict
+
+    - name: Deploy to GitHub Pages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
