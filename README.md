@@ -1,907 +1,455 @@
-# AI Lang Stuff
+# Local-First AI Toolkit 🤖
 
-> A comprehensive local-first AI experimentation toolkit for building sophisticated agent workflows entirely on-device
+![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey)
+![Status](https://img.shields.io/badge/status-alpha-orange)
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Node.js 18+](https://img.shields.io/badge/node-18+-green.svg)](https://nodejs.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![LangChain](https://img.shields.io/badge/LangChain-1.0+-purple.svg)](https://python.langchain.com/)
-[![Ollama](https://img.shields.io/badge/Ollama-latest-orange.svg)](https://ollama.ai/)
+**A complete toolkit for building production AI applications entirely on your local machine** - no API keys, no cloud dependencies, complete privacy.
 
-**Zero API keys. Zero cloud dependencies. Zero data leaving your machine.**
-
-Run cutting-edge AI agent workflows using local LLMs (Qwen3, Gemma 3, Llama), LangChain orchestration, Model Context Protocol (MCP) servers, and mechanistic interpretability tools—all on macOS with Ollama and LM Studio.
+Build sophisticated agent workflows, RAG systems, and multi-modal AI applications using local LLMs (Qwen, Gemma, Llama) with LangChain, LangGraph, and full mechanistic interpretability.
 
 ---
 
-## Features
+## 🚀 Quick Start (macOS - 10 Minutes)
 
-- **Local-First Architecture**: Everything runs on-device using Ollama or LM Studio
-- **Multi-Agent Orchestration**: Build complex agent workflows with LangGraph
-- **MCP Integration**: Extend agent capabilities via Model Context Protocol servers
-- **RAG Systems**: Vector stores (ChromaDB, FAISS) for document Q&A
-- **Mechanistic Interpretability**: Analyze model internals with TransformerLens
-- **Production Patterns**: Error handling, logging, state management, observability
-- **Model Comparison**: Side-by-side testing of Qwen3, Gemma 3, and Llama models
-- **Vision Support**: Multi-modal workflows with Qwen-VL and Llava
-- **LangSmith Integration**: Local tracing and debugging for agent workflows
-- **Zero Dependencies**: No external APIs or cloud services required
-
----
-
-## Quick Start
-
-Get up and running in less than 5 minutes:
-
-### 1. Install Ollama
+### Prerequisites Check
 
 ```bash
-# macOS
-brew install ollama
+# Check if you have Python 3.10-3.12 (NOT 3.13)
+python3 --version
 
+# If you have Python 3.13, install 3.12:
+brew install python@3.12
+```
+
+### One-Command Install
+
+```bash
+# Clone and setup everything
+git clone https://github.com/hackur/ai-lang-stuff.git
+cd ai-lang-stuff
+./scripts/setup.sh
+```
+
+### Manual Setup
+
+#### Step 1: Install Prerequisites
+
+```bash
+# Install Homebrew (if needed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python 3.12 (recommended)
+brew install python@3.12
+
+# Install uv (fast Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# Install Ollama (local LLM runtime)
+brew install ollama
+```
+
+#### Step 2: Start Ollama
+
+```bash
 # Start Ollama server
 ollama serve
+
+# Or run as background service
+brew services start ollama
+
+# Verify it's running
+curl http://localhost:11434/api/tags
 ```
 
-### 2. Pull Required Models
-
-```bash
-# Primary model for examples (balanced performance)
-ollama pull qwen3:8b
-
-# Fast MoE model for production
-ollama pull qwen3:30b-a3b
-
-# Lightweight model for edge/mobile
-ollama pull gemma3:4b
-
-# Embedding model for RAG
-ollama pull qwen3-embedding
-
-# Vision model (optional)
-ollama pull qwen3-vl:8b
-```
-
-### 3. Clone and Install Dependencies
+#### Step 3: Setup Project
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/hackur/ai-lang-stuff.git
 cd ai-lang-stuff
 
-# Install Python dependencies with uv (fast!)
-pip install uv
+# Sync dependencies (uv way - recommended)
+uv sync --python 3.12
+
+# Activate virtual environment
+source .venv/bin/activate
+
+# Verify installation
+python --version  # Should show 3.12.x
+```
+
+#### Step 4: Download Models
+
+```bash
+# Download recommended models
+ollama pull qwen3:8b        # General purpose (4.4 GB)
+ollama pull gemma3:4b       # Fast, lightweight (2.7 GB)
+ollama pull qwen3-embedding # For RAG (274 MB)
+
+# Verify models
+ollama list
+```
+
+#### Step 5: Run First Example
+
+```bash
+# Test basic example
+uv run python examples/error_handling_demo.py
+
+# Test tool registry
+uv run python examples/tool_registry_demo.py
+
+# Success! You're ready to build.
+```
+
+---
+
+## ⚠️ Important: Python Version
+
+**Use Python 3.10, 3.11, or 3.12 - NOT 3.13**
+
+Some dependencies (transformer-lens) don't support Python 3.13 yet.
+
+### If You Have Python 3.13:
+
+```bash
+# Install Python 3.12
+brew install python@3.12
+
+# Create venv with correct Python
+uv venv --python 3.12
+
+# Activate and sync
+source .venv/bin/activate
 uv sync
-
-# Install Node.js dependencies (for LangGraph Studio)
-npm install
 ```
 
-### 4. Run Your First Example
+---
+
+## 🌟 What's Included
+
+### Core Utilities (`utils/`)
+
+Battle-tested utilities for production AI:
+
+- **ollama_manager.py** - Ollama operations and model management
+- **mcp_client.py** - Model Context Protocol integration
+- **vector_store.py** - ChromaDB & FAISS for RAG
+- **state_manager.py** - Persistent agent state
+- **tool_registry.py** - Tool discovery and management
+- **error_recovery.py** - Production error handling
+
+### 30+ Working Examples
+
+**Foundation (01/):**
+- Basic LLM interactions
+- Prompt engineering
+- Model comparison
+
+**MCP Integration (02/):**
+- Filesystem operations
+- Web search integration
+- Combined tool usage
+
+**Multi-Agent (03/):**
+- Research pipelines
+- Code review workflows
+- Parallel agent execution
+
+**RAG Systems (04/):**
+- Document Q&A
+- Code search
+- Reranking & streaming
+- Vision RAG
+
+**Interpretability (05/):**
+- Activation patching
+- Circuit discovery
+- Attention visualization
+
+**Production (06/):**
+- Monitoring & logging
+- Config management
+- Deployment patterns
+
+**Advanced (07/):**
+- Vision agents
+- Audio transcription
+- Multimodal RAG
+- Document understanding
+
+### CLI Tool
 
 ```bash
-# Simple chat with local LLM
-uv run python examples/01-foundation/simple_chat.py
+# Install CLI
+cd cli && pip install -e .
 
-# Compare multiple models
-uv run python examples/01-foundation/compare_models.py
+# Model operations
+ailang models list
+ailang models pull qwen3:8b
+ailang models benchmark
 
-# Streaming responses
-uv run python examples/01-foundation/streaming_chat.py
-```
+# Run examples
+ailang examples list
+ailang examples run mcp-filesystem
 
-**Expected output**: The model will respond with helpful explanations in under 5 seconds.
-
----
-
-## Project Structure
-
-```
-ai-lang-stuff/
-├── .claude/                    # Claude Code configuration
-│   ├── agents/                 # Specialized agent definitions
-│   ├── commands/               # Custom slash commands
-│   └── skills/                 # Reusable Claude skills
-├── config/                     # Application configuration files
-│   ├── models.yaml             # Model configurations (Qwen3, Gemma 3)
-│   └── settings.yaml           # Application settings
-├── docs/                       # Comprehensive documentation
-│   ├── DEVELOPMENT-PLAN-PHASE-2.md  # Current 36-task development plan
-│   └── DEVELOPMENT-PLAN-20-POINTS.md # Original planning document
-├── examples/                   # Working examples by milestone
-│   ├── 01-foundation/          # Basic LLM interactions
-│   ├── 02-mcp/                 # MCP server integration
-│   ├── 03-multi-agent/         # LangGraph orchestration
-│   ├── 04-rag/                 # RAG and vector stores
-│   ├── 05-interpretability/    # Model analysis
-│   └── 06-production/          # Production patterns
-├── mcp-servers/                # Custom MCP server implementations
-│   └── custom/
-│       ├── filesystem/         # File operations MCP server
-│       └── web-search/         # Web search MCP server
-├── plans/                      # Research and planning documents
-│   ├── 0-readme.md             # Vision and intended usage (25+ thoughts)
-│   ├── 1-research-plan.md      # Research findings and milestones
-│   └── 3-kitchen-sink-plan.md  # Concrete examples and use cases
-├── scripts/                    # Automation scripts
-├── src/                        # Source code (when refactored from examples)
-├── tests/                      # Test suites
-├── utils/                      # Core utilities
-│   ├── ollama_manager.py       # Ollama integration utilities
-│   ├── mcp_client.py           # MCP client wrappers
-│   ├── vector_store.py         # Vector store management
-│   ├── state_manager.py        # State persistence for agents
-│   └── tool_registry.py        # Centralized tool registry
-├── CLAUDE.md                   # Claude Code instructions
-├── main.py                     # Main entry point
-├── pyproject.toml              # Python dependencies (uv-compatible)
-├── package.json                # Node.js dependencies
-└── README.md                   # This file
+# RAG operations
+ailang rag index ./docs
+ailang rag query "How do I..."
 ```
 
 ---
 
-## Examples
+## 📋 System Requirements
 
-### Milestone 1: Foundation (Complete)
+### Minimum
 
-Basic LLM interactions and model comparisons:
+- macOS 11+ (Big Sur)
+- Python 3.10-3.12 (⚠️ NOT 3.13)
+- 8 GB RAM (16 GB recommended)
+- 10 GB free disk space
+- Intel with AVX2 or Apple Silicon
 
-- **[simple_chat.py](examples/01-foundation/simple_chat.py)** - Chat with a local LLM
-- **[streaming_chat.py](examples/01-foundation/streaming_chat.py)** - Real-time token streaming
-- **[compare_models.py](examples/01-foundation/compare_models.py)** - Side-by-side model comparison
+### Recommended
 
-### Milestone 2: MCP Integration (Coming Soon)
+- macOS 14+ (Sonoma)
+- Python 3.12
+- 16-32 GB RAM
+- 50 GB disk space
+- Apple Silicon (M1/M2/M3)
 
-Extend agent capabilities with Model Context Protocol servers:
+### Performance
 
-- `filesystem_agent.py` - File operations via MCP
-- `web_search_agent.py` - Web search integration
-- `combined_tools_agent.py` - Multi-tool coordination
-
-### Milestone 3: Multi-Agent Orchestration (Coming Soon)
-
-Complex workflows with LangGraph:
-
-- `research_pipeline.py` - Multi-hop research workflow
-- `parallel_comparison.py` - Parallel agent execution
-- `code_review_pipeline.py` - Automated code review
-
-### Milestone 4: RAG Systems (Coming Soon)
-
-Retrieval-Augmented Generation with local vector stores:
-
-- `document_qa.py` - Q&A over local documents
-- `codebase_search.py` - Semantic code search
-- `multimodal_rag.py` - Vision + text RAG
-
-### Milestone 5: Interpretability (Coming Soon)
-
-Analyze model internals with TransformerLens:
-
-- `attention_viz.ipynb` - Visualize attention patterns
-- `activation_analysis.py` - Analyze model activations
-
-### Milestone 6: Production Patterns (Coming Soon)
-
-Production-ready implementations:
-
-- `production_agent.py` - Error handling, logging, monitoring
+| Hardware | qwen3:8b | Notes |
+|----------|----------|-------|
+| M1 Max | ~40 tok/s | Excellent |
+| M2 Pro | ~35 tok/s | Very good |
+| M3 Pro | ~45 tok/s | Best |
+| Intel i7 | ~15 tok/s | Workable |
 
 ---
 
-## Utilities
+## 🛠️ Troubleshooting
 
-The `utils/` directory provides five core utilities that power all examples:
+### Python 3.13 Dependency Error
 
-### 1. Ollama Manager (`ollama_manager.py`)
-
-Manage Ollama models and server interactions:
-
-```python
-from utils.ollama_manager import OllamaManager
-
-manager = OllamaManager()
-
-# Check if Ollama is running
-if manager.check_ollama_running():
-    # Ensure model is available (auto-pull if needed)
-    manager.ensure_model_available("qwen3:8b")
-
-    # List all installed models
-    models = manager.list_models()
-
-    # Get model info and performance stats
-    info = manager.get_model_info("qwen3:8b")
-
-    # Benchmark a model
-    stats = manager.benchmark_model("qwen3:8b", "Explain quantum computing")
-
-    # Get model recommendation for task type
-    recommended = manager.recommend_model("fast_coding")
-```
-
-### 2. MCP Client (`mcp_client.py`)
-
-Interact with Model Context Protocol servers:
-
-```python
-from utils.mcp_client import FilesystemMCP, WebSearchMCP
-
-# Filesystem operations
-fs = FilesystemMCP()
-files = fs.list_files("/path/to/dir")
-content = fs.read_file("/path/to/file.txt")
-
-# Web search
-search = WebSearchMCP()
-results = search.search("local LLMs 2024", num_results=5)
-page = search.fetch_url("https://example.com")
-
-# Convert to LangChain tools
-tools = fs.get_langchain_tools()
-```
-
-### 3. Vector Store Manager (`vector_store.py`)
-
-Manage local vector stores for RAG:
-
-```python
-from utils.vector_store import VectorStoreManager
-
-manager = VectorStoreManager(store_type="chroma")
-
-# Create vector store from documents
-store = manager.create_from_documents(
-    documents=docs,
-    collection_name="my_docs",
-    embedding_model="qwen3-embedding"
-)
-
-# Add more documents
-manager.add_documents(docs, collection_name="my_docs")
-
-# Perform similarity search
-results = manager.similarity_search("query", collection_name="my_docs")
-
-# List all collections
-collections = manager.list_collections()
-```
-
-### 4. State Manager (`state_manager.py`)
-
-Persist agent state across sessions:
-
-```python
-from utils.state_manager import StateManager
-
-# SQLite-backed state management
-manager = StateManager(db_path="agent_state.db")
-
-# Save agent state
-manager.save_state(
-    agent_id="research_agent",
-    state={"messages": [...], "context": {...}}
-)
-
-# Load agent state
-state = manager.load_state("research_agent")
-
-# List checkpoints for time-travel debugging
-checkpoints = manager.list_checkpoints("research_agent")
-```
-
-### 5. Tool Registry (`tool_registry.py`)
-
-Centralized registry for managing tools:
-
-```python
-from utils.tool_registry import get_registry
-
-registry = get_registry()
-
-# Register a custom tool
-def my_calculator(x: int, y: int) -> int:
-    """Add two numbers"""
-    return x + y
-
-registry.register_tool(
-    name="add",
-    tool=my_calculator,
-    description="Add two numbers",
-    category="other"
-)
-
-# Auto-discover utilities
-registry.auto_discover_utilities()
-
-# Get LangChain-compatible tools
-tools = registry.get_langchain_tools(categories=["web", "filesystem"])
-
-# Export registry to JSON
-registry.to_json("tools.json")
-```
-
----
-
-## Model Recommendations
-
-Choose the right model for your task:
-
-| Task Type | Model | Rationale | Context | Speed |
-|-----------|-------|-----------|---------|-------|
-| **Fast Coding** | `qwen3:30b-a3b` | MoE optimized for speed | 30K | ⚡⚡⚡ |
-| **Complex Reasoning** | `qwen3:8b` | Dense, reliable | 32K | ⚡⚡ |
-| **Long Context** | `qwen3:70b` | Best quality | 128K | ⚡ |
-| **Multilingual** | `gemma3:12b` | 140+ languages | 32K | ⚡⚡ |
-| **Edge/Mobile** | `gemma3:4b` | Minimal resources | 8K | ⚡⚡⚡ |
-| **Vision Tasks** | `qwen3-vl:8b` | Best local vision | 32K | ⚡⚡ |
-| **Embeddings** | `qwen3-embedding` | For RAG systems | N/A | ⚡⚡⚡ |
-
-### Performance Tips
-
-- **Use quantization**: Q4 and Q5 variants reduce memory usage by 60-75%
-- **Batch requests**: Process multiple prompts together for efficiency
-- **Cache responses**: Use `@lru_cache` for repeated queries
-- **Stream tokens**: Use streaming for better perceived performance
-- **Profile first**: Test with different models before committing
-
----
-
-## Troubleshooting
-
-### Ollama Connection Issues
-
-**Problem**: `Connection refused to localhost:11434`
-
-**Solution**:
 ```bash
-# Check if Ollama is running
+# Install Python 3.12
+brew install python@3.12
+
+# Recreate venv
+rm -rf .venv
+uv venv --python 3.12
+source .venv/bin/activate
+uv sync
+```
+
+### Ollama Connection Error
+
+```bash
+# Check if running
 ps aux | grep ollama
 
-# Start Ollama server
+# Start Ollama
 ollama serve
 
-# Verify connection
+# Verify
 curl http://localhost:11434/api/tags
 ```
 
 ### Model Not Found
 
-**Problem**: `Model 'qwen3:8b' not found`
-
-**Solution**:
 ```bash
-# List installed models
-ollama list
-
-# Pull the model
+# Pull model
 ollama pull qwen3:8b
 
-# Verify installation
-ollama list | grep qwen3
+# List available
+ollama list
+
+# Test
+ollama run qwen3:8b "Hello"
 ```
 
 ### Import Errors
 
-**Problem**: `ModuleNotFoundError: No module named 'langchain_ollama'`
-
-**Solution**:
 ```bash
-# Check installation
-uv pip list | grep langchain
+# Activate venv
+source .venv/bin/activate
 
-# Reinstall dependencies
+# Reinstall
 uv sync
 
-# Verify import
-uv run python -c "import langchain_ollama; print('OK')"
+# Verify
+python -c "import langchain; print('OK')"
 ```
-
-### Slow Response Times
-
-**Problem**: Agent takes >30 seconds to respond
-
-**Solution**:
-1. Switch to smaller model: `qwen3:8b` → `gemma3:4b`
-2. Use quantized variant: `qwen3:8b-q4` instead of `qwen3:8b`
-3. Reduce context window: Limit conversation history
-4. Enable prompt caching: Use `@lru_cache` decorator
-5. Profile with: `python -m cProfile script.py`
-
-### MCP Server Connection Failed
-
-**Problem**: `MCP server connection failed`
-
-**Solution**:
-```bash
-# Check if MCP server is running
-ps aux | grep mcp
-
-# Verify port availability
-lsof -i :8080
-
-# Test server directly
-curl http://localhost:8080/health
-
-# Check server logs
-tail -f mcp-servers/custom/filesystem/logs/server.log
-```
-
-### Memory Issues
-
-**Problem**: `Out of memory` errors
-
-**Solution**:
-1. Use smaller models: `gemma3:4b` or `qwen3:8b-q4`
-2. Reduce batch size for vector store operations
-3. Clear vector store cache: `rm -rf ~/.cache/chroma`
-4. Limit conversation history: Keep only last 10 messages
-5. Monitor with: `top -o MEM` or Activity Monitor
 
 ---
 
-## Development
+## 📚 Documentation
 
-### Contributing
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Complete dev guide
+- **[MASTER-PLAN-SEQUENTIAL.md](MASTER-PLAN-SEQUENTIAL.md)** - 35-point roadmap
+- **[docs/api-reference/](docs/api-reference/)** - API docs
+- **[docs/adr/](docs/adr/)** - Architecture decisions
 
-We welcome contributions! Here's how to get started:
+---
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/my-feature`
-3. **Make your changes** following our coding standards
-4. **Write tests** for new functionality
-5. **Run tests**: `uv run pytest`
-6. **Submit a pull request**
+## 🎯 Example Use Cases
 
-### Coding Standards
-
-#### Python
-
-- Follow **PEP 8** style guide
-- Use **type hints** for all functions
-- Document with **docstrings** (Google style)
-- Format with **Ruff**: `ruff format .`
-- Lint with: `ruff check .`
-
-```python
-def example_function(name: str, count: int = 1) -> dict[str, Any]:
-    """
-    Brief description of function.
-
-    Args:
-        name: The name parameter
-        count: Number of iterations (default: 1)
-
-    Returns:
-        Dictionary containing results
-
-    Raises:
-        ValueError: If count is negative
-    """
-    if count < 0:
-        raise ValueError("Count must be non-negative")
-
-    return {"name": name, "count": count}
-```
-
-#### JavaScript/TypeScript
-
-- Use **ESLint** for linting
-- Use **Prettier** for formatting
-- Prefer `async/await` over promises
-- Document with **JSDoc** comments
-
-```javascript
-/**
- * Fetch data from MCP server
- * @param {string} url - The MCP server URL
- * @param {Object} params - Query parameters
- * @returns {Promise<Object>} The response data
- */
-async function fetchFromMCP(url, params) {
-  try {
-    const response = await fetch(url, { params });
-    return await response.json();
-  } catch (error) {
-    console.error("MCP fetch failed:", error);
-    throw error;
-  }
-}
-```
-
-### Running Tests
+### Document Q&A
 
 ```bash
-# Run all tests
-uv run pytest
-
-# Run with coverage
-uv run pytest --cov=src --cov-report=html
-
-# Run specific test file
-uv run pytest tests/test_ollama_manager.py
-
-# Run with verbose output
-uv run pytest -v
-
-# Run only integration tests
-uv run pytest -m integration
+uv run python examples/04-rag/document_qa.py
+# Index documents, ask questions
 ```
 
-### Building Documentation
+### Code Review
 
 ```bash
-# Generate API documentation
-uv run pdoc --html src -o docs/api
-
-# Build Sphinx docs (if configured)
-cd docs && make html
+uv run python examples/03-multi-agent/code_review_pipeline.py
+# Multi-agent code analysis
 ```
 
-### Project Commands
+### Vision Understanding
 
 ```bash
-# Format code
-ruff format .
+# Requires: ollama pull qwen3-vl:8b
+uv run python examples/07-advanced/vision_agent.py
+```
 
-# Lint code
+---
+
+## 🔧 Development
+
+### Setup
+
+```bash
+# Install dev dependencies
+uv sync
+
+# Install pre-commit hooks
+pre-commit install
+
+# Run tests
+pytest
+
+# Lint
 ruff check .
 
-# Type check
-mypy src/
+# Format
+ruff format .
+```
 
-# Run LangGraph Studio
-npm run studio
+### Project Structure
 
-# Run development server
-npm run dev
+```
+ai-lang-stuff/
+├── utils/          # Core utilities
+├── examples/       # 30+ examples
+├── tests/          # Test suite
+├── docs/           # Documentation
+├── cli/            # CLI tool
+├── workflows/      # LangGraph workflows
+└── scripts/        # Automation
 ```
 
 ---
 
-## Architecture
+## 🚀 Performance Tips
 
-### High-Level Overview
+### Model Selection
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     User Application                         │
-└─────────────────┬───────────────────────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    LangGraph Orchestration                   │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ Agent 1  │  │ Agent 2  │  │ Agent 3  │  │ Agent N  │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  │
-└───────┼─────────────┼─────────────┼─────────────┼─────────┘
-        │             │             │             │
-        ▼             ▼             ▼             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Utility Layer                           │
-│  ┌──────────────┐  ┌────────────┐  ┌───────────────────┐  │
-│  │ Ollama Mgr   │  │ MCP Client │  │ Vector Store Mgr  │  │
-│  └──────┬───────┘  └─────┬──────┘  └────────┬──────────┘  │
-└─────────┼─────────────────┼──────────────────┼──────────────┘
-          │                 │                  │
-          ▼                 ▼                  ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Infrastructure Layer                       │
-│  ┌──────────┐  ┌──────────────┐  ┌──────────────────────┐ │
-│  │  Ollama  │  │  MCP Servers │  │  Vector Stores       │ │
-│  │  Server  │  │  (FS, Web)   │  │  (Chroma, FAISS)     │ │
-│  └──────────┘  └──────────────┘  └──────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
+| Task | Model | Speed | Quality |
+|------|-------|-------|---------|
+| Fast | gemma3:4b | 🚀🚀🚀 | ⭐⭐⭐ |
+| Balanced | qwen3:8b | 🚀🚀 | ⭐⭐⭐⭐ |
+| Best | qwen3:70b | 🚀 | ⭐⭐⭐⭐⭐ |
+| Vision | qwen3-vl:8b | 🚀🚀 | ⭐⭐⭐⭐ |
 
-### Key Design Principles
-
-1. **Local-First**: All data stays on your machine
-2. **Composability**: Small, focused utilities that combine well
-3. **Observability**: LangSmith integration for debugging
-4. **Extensibility**: Easy to add new models, tools, and agents
-5. **Type Safety**: Full type hints for better IDE support
-
-### Data Flow
-
-```
-User Query
-    │
-    ▼
-Agent (LangGraph)
-    │
-    ├─→ LLM (Ollama) ─→ Response
-    │
-    ├─→ Tools (MCP) ─→ External Data
-    │
-    └─→ Memory (Vector Store) ─→ Context
-```
-
-### State Management
-
-```python
-# LangGraph uses TypedDict for state
-from typing import TypedDict, Annotated
-import operator
-
-class AgentState(TypedDict):
-    messages: Annotated[list[BaseMessage], operator.add]
-    context: dict[str, Any]
-    iteration: int
-```
-
-### Tool Integration Pattern
-
-```python
-# Register tools centrally
-from utils.tool_registry import get_registry
-
-registry = get_registry()
-registry.auto_discover_utilities()
-
-# Convert to LangChain format
-tools = registry.get_langchain_tools()
-
-# Use in agent
-agent = create_tool_calling_agent(llm, tools, prompt)
-```
-
----
-
-## Advanced Features
-
-### LangSmith Integration
-
-Enable observability for debugging agent workflows:
+### Quantization
 
 ```bash
-# Set environment variables
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_PROJECT="my-project"
-export LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-export LANGCHAIN_API_KEY="your-key"  # Optional for local
-```
+# Recommended (good balance)
+ollama pull qwen3:8b-q4_k_m
 
-```python
-# Tracing is now automatic
-from langchain_ollama import ChatOllama
+# Better quality
+ollama pull qwen3:8b-q5_k_m
 
-llm = ChatOllama(model="qwen3:8b")
-response = llm.invoke("Hello")  # Automatically traced
-```
-
-### Custom MCP Servers
-
-Create your own MCP server:
-
-```python
-# mcp-servers/custom/my-server/server.py
-from mcp import Server, Tool
-
-server = Server("my-server")
-
-@server.tool()
-def my_tool(input: str) -> str:
-    """Custom tool description"""
-    return f"Processed: {input}"
-
-if __name__ == "__main__":
-    server.run()
-```
-
-### Multi-Modal Workflows
-
-Process images with vision models:
-
-```python
-from langchain_ollama import ChatOllama
-
-llm = ChatOllama(model="qwen3-vl:8b")
-
-messages = [
-    {
-        "role": "user",
-        "content": [
-            {"type": "text", "text": "What's in this image?"},
-            {"type": "image_url", "image_url": {"url": "path/to/image.jpg"}}
-        ]
-    }
-]
-
-response = llm.invoke(messages)
-```
-
-### Fine-Tuning Local Models
-
-Customize models for your domain:
-
-```bash
-# Create dataset (JSONL format)
-echo '{"text": "Your training data..."}' > data.jsonl
-
-# Fine-tune with Ollama (coming soon)
-ollama create my-model -f Modelfile
+# Best quality (slower)
+ollama pull qwen3:8b-q8_0
 ```
 
 ---
 
-## Roadmap
+## 🤝 Contributing
 
-### Phase 1: Foundation (Complete ✅)
-- [x] Ollama integration
-- [x] Basic LangChain examples
-- [x] Project structure
-- [x] Core utilities implementation
+Contributions welcome! See [DEVELOPMENT.md](DEVELOPMENT.md).
 
-### Phase 2: MCP & Multi-Agent (In Progress 🔄)
-- [x] MCP server implementations
-- [ ] MCP integration examples
-- [ ] Multi-agent orchestration
-- [ ] State management patterns
+```bash
+# Fork and clone
+git clone https://github.com/YOUR_USERNAME/ai-lang-stuff.git
 
-### Phase 3: RAG Systems (Q1 2025)
-- [ ] Vector store integration
-- [ ] Document Q&A examples
-- [ ] Codebase search
-- [ ] Multi-modal RAG
+# Create branch
+git checkout -b feature/your-feature
 
-### Phase 4: Advanced Features (Q1 2025)
-- [ ] Mechanistic interpretability
-- [ ] Production patterns
-- [ ] Performance optimization
-- [ ] Fine-tuning pipelines
+# Make changes, test
+make test
 
-### Phase 5: Polish & Documentation (Q2 2025)
-- [ ] Comprehensive test coverage (80%+)
+# Commit and push
+git commit -m "feat: your feature"
+git push origin feature/your-feature
+```
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE)
+
+---
+
+## 🙏 Acknowledgments
+
+- **LangChain** - Orchestration framework
+- **Ollama** - Local LLM runtime
+- **TransformerLens** - Interpretability
+- **Community** - Contributors and users
+
+---
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/hackur/ai-lang-stuff/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/hackur/ai-lang-stuff/discussions)
+- **Docs**: [DEVELOPMENT.md](DEVELOPMENT.md)
+
+---
+
+## 🗺️ Roadmap
+
+**Current**: Alpha (0.1.0)
+- [x] Core utilities
+- [x] 30+ examples
+- [x] CLI tool
+- [x] Documentation
+- [ ] 80% test coverage
+- [ ] Community launch
+
+**Next**: Beta (0.2.0)
+- [ ] PyPI package
+- [ ] Homebrew formula
 - [ ] Video tutorials
-- [ ] Interactive examples
-- [ ] Community contributions
+- [ ] Example projects
+
+See [MASTER-PLAN-SEQUENTIAL.md](MASTER-PLAN-SEQUENTIAL.md) for full roadmap.
 
 ---
 
-## FAQ
+**Status**: 🚀 Active Development | **Version**: 0.1.0-alpha
 
-### Q: Do I need an API key?
-**A:** No! Everything runs locally with Ollama. Zero API keys required.
+Built with ❤️ for the local-first AI community.
 
-### Q: Can I use this with cloud models?
-**A:** Yes, but the focus is on local models. You can swap in OpenAI/Anthropic if needed.
-
-### Q: What hardware do I need?
-**A:**
-- **Minimum**: 8GB RAM, Apple M1/M2 or equivalent
-- **Recommended**: 16GB RAM, Apple M2/M3 or equivalent
-- **Optimal**: 32GB RAM, Apple M3 Pro/Max or equivalent
-
-### Q: How much disk space do I need?
-**A:**
-- Base install: ~2GB (Python + Node dependencies)
-- Single model: 3-8GB (depending on size)
-- Full setup: ~20GB (multiple models + vector stores)
-
-### Q: Can I deploy this to production?
-**A:** Yes! See `examples/06-production/` for production patterns including error handling, monitoring, and logging.
-
-### Q: Is this faster than cloud APIs?
-**A:**
-- **First token**: Yes (no network latency)
-- **Total throughput**: Depends on hardware vs cloud GPU
-- **Cost**: Always faster (zero cost after setup)
-
-### Q: Can I contribute?
-**A:** Absolutely! See the [Development](#development) section for guidelines.
-
----
-
-## Resources
-
-### Documentation
-- [Quick Start Guide](QUICKSTART.md) - Get running in 5 minutes
-- [Development Plan](docs/DEVELOPMENT-PLAN-PHASE-2.md) - Roadmap and tasks
-- [Claude Instructions](CLAUDE.md) - For Claude Code users
-- [Project Vision](plans/0-readme.md) - 25+ sequential thoughts on project goals
-
-### External Links
-- [LangChain Documentation](https://python.langchain.com/)
-- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
-- [Ollama Documentation](https://ollama.ai/docs)
-- [Model Context Protocol](https://github.com/modelcontextprotocol)
-- [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens)
-
-### Community
-- [LangChain Discord](https://discord.gg/langchain) - Framework questions
-- [Ollama Discord](https://discord.gg/ollama) - Local model help
-- [GitHub Issues](https://github.com/yourusername/ai-lang-stuff/issues) - Bug reports and features
-
----
-
-## License and Credits
-
-### License
-
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
-
-```
-MIT License
-
-Copyright (c) 2024 AI Lang Stuff Contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
-### Credits
-
-Built with love by the local-first AI community.
-
-**Core Technologies:**
-- [Ollama](https://ollama.ai/) - Local LLM runtime
-- [LangChain](https://python.langchain.com/) - LLM orchestration framework
-- [LangGraph](https://langchain-ai.github.io/langgraph/) - Multi-agent workflows
-- [ChromaDB](https://www.trychroma.com/) - Vector store
-- [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens) - Interpretability
-
-**Special Thanks:**
-- Alibaba Cloud for Qwen models
-- Google for Gemma models
-- Meta for Llama models
-- Anthropic for Claude (used to build this project via Claude Code)
-
----
-
-## Support
-
-### Getting Help
-
-1. **Check Documentation**: Start with [QUICKSTART.md](QUICKSTART.md)
-2. **Search Issues**: Check existing [GitHub Issues](https://github.com/yourusername/ai-lang-stuff/issues)
-3. **Ask the Community**: Join LangChain or Ollama Discord
-4. **Open an Issue**: Create a new issue with details
-
-### Reporting Bugs
-
-Please include:
-- OS and version (macOS 14.0+)
-- Python version (`python --version`)
-- Ollama version (`ollama --version`)
-- Steps to reproduce
-- Error messages and logs
-
-### Requesting Features
-
-Open a GitHub Issue with:
-- Clear description of feature
-- Use case and rationale
-- Example code or API design
-- Alternatives considered
-
----
-
-## Changelog
-
-### v0.1.0 (2024-10-26)
-- Initial release
-- Core utilities implemented (ollama_manager, mcp_client, vector_store, state_manager, tool_registry)
-- Foundation examples working (simple_chat, streaming_chat, compare_models)
-- MCP servers built (filesystem, web-search)
-- Comprehensive documentation
-
----
-
-**Built for developers who value privacy, control, and local-first AI.**
-
-**Get started now**: [Quick Start](#quick-start) | [Examples](#examples) | [Documentation](QUICKSTART.md)
-
----
-
-<div align="center">
-  <strong>Star ⭐ this repo if you find it useful!</strong>
-</div>
+**Zero API keys. Zero cloud. 100% local. Complete privacy.**
