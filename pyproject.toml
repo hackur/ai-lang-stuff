@@ -3,7 +3,7 @@ name = "ai-lang-stuff"
 version = "0.1.0"
 description = "Local-first AI experimentation toolkit with LangChain, LangGraph, Ollama, and mechanistic interpretability tools"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     # Core LangChain
     "langchain>=1.0.2",
@@ -19,8 +19,8 @@ dependencies = [
     "langchain-chroma>=0.1.0",
     "chromadb>=0.5.0",
     "faiss-cpu>=1.9.0",
-    # Mechanistic interpretability
-    "transformer-lens>=3.0.0",
+    # Mechanistic interpretability (optional - requires Python <3.13)
+    "transformer-lens>=2.0.0; python_version < '3.13'",
     "torch>=2.0.0",
     # Utilities
     "python-dotenv>=1.0.0",
