@@ -13,3 +13,6 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "slow: marks tests that take a long time to run"
     )
+    config.addinivalue_line(
+        "markers", "benchmark: marks performance benchmark tests"
+    )
