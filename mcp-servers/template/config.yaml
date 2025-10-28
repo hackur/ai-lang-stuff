@@ -1,0 +1,162 @@
+# MCP Server Configuration Template
+#
+# This file defines the server configuration including:
+# - Server metadata (name, version, description)
+# - Tool definitions
+# - Server settings
+#
+# Copy and customize for your MCP server.
+
+# ============================================================================
+# Server Metadata
+# ============================================================================
+
+name: "example-mcp-server"
+version: "1.0.0"
+description: "Example MCP server demonstrating tool registration and configuration"
+
+# ============================================================================
+# Tool Definitions
+# ============================================================================
+
+tools:
+  # Example 1: Simple greeting tool
+  - name: "greet"
+    description: "Generate a greeting message for a person"
+    enabled: true
+    parameters:
+      - name: "name"
+        type: "string"
+        description: "Name of person to greet"
+        required: true
+
+      - name: "greeting"
+        type: "string"
+        description: "Greeting to use (e.g., Hello, Hi, Hey)"
+        required: false
+        default: "Hello"
+
+      - name: "formal"
+        type: "boolean"
+        description: "Whether to use formal greeting style"
+        required: false
+        default: false
+
+  # Example 2: Text analysis tool
+  - name: "analyze_text"
+    description: "Analyze text and return statistics (word count, sentence count, etc.)"
+    enabled: true
+    parameters:
+      - name: "text"
+        type: "string"
+        description: "Text to analyze"
+        required: true
+
+      - name: "include_words"
+        type: "boolean"
+        description: "Include word frequency analysis"
+        required: false
+        default: true
+
+      - name: "include_sentences"
+        type: "boolean"
+        description: "Include sentence analysis"
+        required: false
+        default: true
+
+  # Example 3: Data fetching tool
+  - name: "fetch_data"
+    description: "Fetch data from a URL"
+    enabled: true
+    parameters:
+      - name: "url"
+        type: "string"
+        description: "URL to fetch data from (must start with http:// or https://)"
+        required: true
+
+      - name: "timeout"
+        type: "integer"
+        description: "Request timeout in seconds (1-300)"
+        required: false
+        default: 30
+
+  # Example 4: Disabled tool (for demonstration)
+  - name: "experimental_feature"
+    description: "Experimental feature - currently disabled"
+    enabled: false
+    parameters:
+      - name: "input"
+        type: "string"
+        description: "Input data"
+        required: true
+
+# ============================================================================
+# Server Settings
+# ============================================================================
+
+settings:
+  # Logging configuration
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: null  # Set to path for file logging, null for console only
+
+  # Rate limiting (requests per minute)
+  rate_limit:
+    enabled: false
+    requests_per_minute: 60
+
+  # Timeout settings (seconds)
+  timeouts:
+    default: 30
+    maximum: 300
+
+  # Security settings
+  security:
+    require_auth: false
+    api_key: null  # Set if require_auth is true
+    allowed_origins:
+      - "http://localhost"
+      - "http://127.0.0.1"
+
+  # Feature flags
+  features:
+    enable_caching: false
+    enable_metrics: false
+    enable_tracing: false
+
+  # Custom settings (add your own)
+  custom:
+    max_text_length: 10000
+    default_language: "en"
+    enable_debug_mode: false
+
+# ============================================================================
+# Environment-Specific Overrides
+# ============================================================================
+
+# Development settings
+development:
+  logging:
+    level: "DEBUG"
+  features:
+    enable_debug_mode: true
+
+# Production settings
+production:
+  logging:
+    level: "WARNING"
+    file: "/var/log/mcp-server.log"
+  security:
+    require_auth: true
+  rate_limit:
+    enabled: true
+    requests_per_minute: 100
+
+# Testing settings
+testing:
+  logging:
+    level: "DEBUG"
+  timeouts:
+    default: 5
+    maximum: 10

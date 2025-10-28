@@ -1,0 +1,126 @@
+# Docker Compose Configuration for MCP Server Template
+#
+# This file provides a complete Docker Compose setup for running
+# the MCP server in different environments.
+#
+# Usage:
+#   docker-compose up -d                    # Start in production mode
+#   docker-compose -f docker-compose.yml up dev  # Start in dev mode
+#   docker-compose logs -f                  # View logs
+#   docker-compose down                     # Stop and remove containers
+
+version: '3.8'
+
+# ============================================================================
+# Services
+# ============================================================================
+
+services:
+  # Production MCP Server
+  mcp-server:
+    build:
+      context: .
+      target: production
+      dockerfile: Dockerfile
+    container_name: mcp-server
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount configuration (read-only)
+      - ./config.yaml:/app/config.yaml:ro
+      # Mount data directory (read-write)
+      - mcp-data:/app/data
+    environment:
+      - SERVER_NAME=mcp-server
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "print('healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mcp-network
+
+  # Development MCP Server
+  dev:
+    build:
+      context: .
+      target: development
+      dockerfile: Dockerfile
+    container_name: mcp-server-dev
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount entire directory for live editing
+      - .:/app
+    environment:
+      - SERVER_NAME=mcp-server-dev
+      - LOG_LEVEL=DEBUG
+      - PYTHONUNBUFFERED=1
+    networks:
+      - mcp-network
+    profiles:
+      - dev
+
+  # Testing container
+  test:
+    build:
+      context: .
+      target: testing
+      dockerfile: Dockerfile
+    container_name: mcp-server-test
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - mcp-network
+    profiles:
+      - test
+
+# ============================================================================
+# Volumes
+# ============================================================================
+
+volumes:
+  mcp-data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+
+networks:
+  mcp-network:
+    driver: bridge
+
+# ============================================================================
+# Usage Examples
+# ============================================================================
+
+# Start production server:
+#   docker-compose up -d
+#
+# Start development server:
+#   docker-compose --profile dev up -d
+#
+# Run tests:
+#   docker-compose --profile test up test
+#
+# View logs:
+#   docker-compose logs -f mcp-server
+#
+# Stop all services:
+#   docker-compose down
+#
+# Rebuild and start:
+#   docker-compose up -d --build
+#
+# Execute command in running container:
+#   docker-compose exec mcp-server python -c "from server import MCPServer; print(MCPServer.__doc__)"
+#
+# Access container shell:
+#   docker-compose exec mcp-server /bin/bash

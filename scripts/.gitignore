@@ -1,0 +1,9 @@
+# Ignore logs
+*.log
+
+# Ignore benchmark results
+benchmarks/
+
+# Ignore temporary files
+*.tmp
+*.temp

@@ -1,0 +1,82 @@
+# MCP Server Requirements Template
+#
+# Core dependencies for MCP server implementation.
+# Customize based on your server's specific needs.
+
+# ============================================================================
+# Core Dependencies
+# ============================================================================
+
+# Data validation and parsing
+pydantic>=2.0.0
+
+# YAML configuration
+pyyaml>=6.0.0
+
+# ============================================================================
+# Optional Dependencies (uncomment as needed)
+# ============================================================================
+
+# HTTP client (for tools that make HTTP requests)
+# httpx>=0.25.0
+# requests>=2.31.0
+
+# Database support
+# sqlalchemy>=2.0.0
+# psycopg2-binary>=2.9.0  # PostgreSQL
+# pymongo>=4.0.0          # MongoDB
+
+# Caching
+# redis>=5.0.0
+# diskcache>=5.6.0
+
+# Async support
+# asyncio>=3.4.3
+# aiohttp>=3.9.0
+
+# Rate limiting
+# slowapi>=0.1.9
+
+# Authentication/Security
+# pyjwt>=2.8.0
+# cryptography>=41.0.0
+
+# Metrics and monitoring
+# prometheus-client>=0.19.0
+# opentelemetry-api>=1.20.0
+
+# Document processing
+# pypdf>=3.17.0
+# python-docx>=1.0.0
+# openpyxl>=3.1.0
+
+# Data processing
+# numpy>=1.24.0
+# pandas>=2.0.0
+
+# Natural language processing
+# nltk>=3.8.0
+# spacy>=3.7.0
+
+# Web scraping
+# beautifulsoup4>=4.12.0
+# selenium>=4.15.0
+
+# ============================================================================
+# Development Dependencies (install separately)
+# ============================================================================
+
+# Testing
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+# pytest-cov>=4.1.0
+# pytest-mock>=3.12.0
+
+# Code quality
+# black>=23.0.0
+# ruff>=0.1.0
+# mypy>=1.5.0
+
+# Documentation
+# sphinx>=7.0.0
+# sphinx-rtd-theme>=1.3.0
