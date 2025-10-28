@@ -39,10 +39,11 @@ jobs:
         source .venv/bin/activate
         ruff format --check src/ examples/ tests/
 
-    - name: Run Black formatter check
-      run: |
-        source .venv/bin/activate
-        black --check src/ examples/ tests/
+    # Black disabled - using ruff-format as the primary formatter
+    # - name: Run Black formatter check
+    #   run: |
+    #     source .venv/bin/activate
+    #     black --check src/ examples/ tests/
 
     - name: Run mypy type checking
       run: |
