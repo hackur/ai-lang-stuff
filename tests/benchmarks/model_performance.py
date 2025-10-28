@@ -87,11 +87,7 @@ Provide a detailed but concise explanation.""",
         return len(text) // 4
 
     def benchmark_model(
-        self,
-        model_name: str,
-        prompt: str,
-        prompt_type: str,
-        num_runs: int = 3
+        self, model_name: str, prompt: str, prompt_type: str, num_runs: int = 3
     ) -> List[ModelBenchmarkResult]:
         """
         Benchmark a single model with a specific prompt.
@@ -128,7 +124,7 @@ Provide a detailed but concise explanation.""",
 
                 # Calculate metrics
                 latency_ms = (end_time - start_time) * 1000
-                response_text = response.content if hasattr(response, 'content') else str(response)
+                response_text = response.content if hasattr(response, "content") else str(response)
                 tokens_generated = self._count_tokens_estimate(response_text)
                 tokens_per_second = tokens_generated / (latency_ms / 1000) if latency_ms > 0 else 0
                 memory_mb = mem_after - mem_before
@@ -204,18 +200,24 @@ Provide a detailed but concise explanation.""",
             if model_results:
                 summary["by_model"][model] = {
                     "avg_latency_ms": statistics.mean(r.latency_ms for r in model_results),
-                    "avg_tokens_per_second": statistics.mean(r.tokens_per_second for r in model_results),
+                    "avg_tokens_per_second": statistics.mean(
+                        r.tokens_per_second for r in model_results
+                    ),
                     "avg_memory_mb": statistics.mean(r.memory_mb for r in model_results),
                     "runs": len(model_results),
                 }
 
         # Group by prompt type
         for prompt_type in self.PROMPTS.keys():
-            type_results = [r for r in self.results if r.prompt_type == prompt_type and r.error is None]
+            type_results = [
+                r for r in self.results if r.prompt_type == prompt_type and r.error is None
+            ]
             if type_results:
                 summary["by_prompt_type"][prompt_type] = {
                     "avg_latency_ms": statistics.mean(r.latency_ms for r in type_results),
-                    "avg_tokens_per_second": statistics.mean(r.tokens_per_second for r in type_results),
+                    "avg_tokens_per_second": statistics.mean(
+                        r.tokens_per_second for r in type_results
+                    ),
                     "runs": len(type_results),
                 }
 
@@ -262,7 +264,9 @@ Provide a detailed but concise explanation.""",
 def test_model_latency(model: str):
     """Test that model latency is within acceptable range."""
     benchmark = ModelBenchmark()
-    results = benchmark.benchmark_model(model, ModelBenchmark.PROMPTS["simple"], "simple", num_runs=1)
+    results = benchmark.benchmark_model(
+        model, ModelBenchmark.PROMPTS["simple"], "simple", num_runs=1
+    )
 
     assert len(results) == 1
     result = results[0]

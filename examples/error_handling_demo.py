@@ -178,11 +178,11 @@ def example_4_circuit_breaker():
     for i in range(10):
         try:
             result = breaker.call(unreliable_service)
-            print(f"Call {i+1}: {result} (state: {breaker.state.value})")
+            print(f"Call {i + 1}: {result} (state: {breaker.state.value})")
         except ConnectionError as e:
-            print(f"Call {i+1}: Failed - {e} (state: {breaker.state.value})")
+            print(f"Call {i + 1}: Failed - {e} (state: {breaker.state.value})")
         except RuntimeError as e:
-            print(f"Call {i+1}: Circuit open - {e}")
+            print(f"Call {i + 1}: Circuit open - {e}")
 
         time.sleep(0.5)
 
@@ -365,9 +365,9 @@ def example_8_decorators():
     for i in range(5):
         try:
             result = call_api()
-            print(f"Call {i+1}: {result}")
+            print(f"Call {i + 1}: {result}")
         except (ConnectionError, RuntimeError) as e:
-            print(f"Call {i+1}: {e}")
+            print(f"Call {i + 1}: {e}")
         time.sleep(0.5)
 
 
@@ -495,7 +495,7 @@ def example_11_resource_management_pattern():
         results = []
         for i in range(0, len(items), batch_size):
             batch = items[i : i + batch_size]
-            print(f"Processing batch {i//batch_size + 1} ({len(batch)} items)")
+            print(f"Processing batch {i // batch_size + 1} ({len(batch)} items)")
             results.extend([f"processed_{item}" for item in batch])
 
         return results

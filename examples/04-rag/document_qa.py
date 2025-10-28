@@ -69,8 +69,9 @@ def load_pdf_documents(pdf_path: str) -> List[Document]:
     return documents
 
 
-def chunk_documents(documents: List[Document], chunk_size: int = 1000,
-                    chunk_overlap: int = 200) -> List[Document]:
+def chunk_documents(
+    documents: List[Document], chunk_size: int = 1000, chunk_overlap: int = 200
+) -> List[Document]:
     """Split documents into smaller chunks for better retrieval.
 
     Args:
@@ -85,7 +86,7 @@ def chunk_documents(documents: List[Document], chunk_size: int = 1000,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         length_function=len,
-        separators=["\n\n", "\n", " ", ""]
+        separators=["\n\n", "\n", " ", ""],
     )
 
     chunks = text_splitter.split_documents(documents)
@@ -108,7 +109,7 @@ def create_qa_chain(vectorstore, llm_model: str = "qwen3:8b"):
     llm = ChatOllama(
         model=llm_model,
         temperature=0.3,  # Lower temperature for factual answers
-        base_url="http://localhost:11434"
+        base_url="http://localhost:11434",
     )
 
     # Custom prompt template for Q&A
@@ -123,10 +124,7 @@ Question: {question}
 
 Helpful Answer:"""
 
-    PROMPT = PromptTemplate(
-        template=prompt_template,
-        input_variables=["context", "question"]
-    )
+    PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
     # Create RetrievalQA chain
     qa_chain = RetrievalQA.from_chain_type(
@@ -134,7 +132,7 @@ Helpful Answer:"""
         chain_type="stuff",
         retriever=vectorstore.as_retriever(search_kwargs={"k": 4}),
         return_source_documents=True,
-        chain_type_kwargs={"prompt": PROMPT}
+        chain_type_kwargs={"prompt": PROMPT},
     )
 
     return qa_chain
@@ -205,34 +203,27 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="PDF Question Answering with RAG")
-    parser.add_argument(
-        "pdf_path",
-        help="Path to PDF file or directory containing PDFs"
-    )
+    parser.add_argument("pdf_path", help="Path to PDF file or directory containing PDFs")
     parser.add_argument(
         "--collection",
         default="pdf_qa",
-        help="Name for the vector store collection (default: pdf_qa)"
+        help="Name for the vector store collection (default: pdf_qa)",
     )
     parser.add_argument(
         "--persist-dir",
         default="./data/vector_stores",
-        help="Directory to store vector database (default: ./data/vector_stores)"
+        help="Directory to store vector database (default: ./data/vector_stores)",
     )
     parser.add_argument(
-        "--llm-model",
-        default="qwen3:8b",
-        help="Ollama LLM model to use (default: qwen3:8b)"
+        "--llm-model", default="qwen3:8b", help="Ollama LLM model to use (default: qwen3:8b)"
     )
     parser.add_argument(
         "--embedding-model",
         default="qwen3-embedding",
-        help="Ollama embedding model to use (default: qwen3-embedding)"
+        help="Ollama embedding model to use (default: qwen3-embedding)",
     )
     parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Force rebuild of vector store even if it exists"
+        "--rebuild", action="store_true", help="Force rebuild of vector store even if it exists"
     )
 
     args = parser.parse_args()
@@ -275,8 +266,7 @@ def main():
     if collection_exists and not args.rebuild:
         print(f"\n4. Loading existing collection '{args.collection}'...")
         vectorstore = vector_mgr.load_existing(
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            collection_name=args.collection, persist_dir=args.persist_dir
         )
         print(f"   -> Loaded from {persist_path / 'chroma' / args.collection}")
 
@@ -301,9 +291,7 @@ def main():
         # Create vector store
         print("\n   Creating vector store (this may take a while)...")
         vectorstore = vector_mgr.create_from_documents(
-            documents=chunks,
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            documents=chunks, collection_name=args.collection, persist_dir=args.persist_dir
         )
         print(f"   -> Saved to {persist_path / 'chroma' / args.collection}")
 

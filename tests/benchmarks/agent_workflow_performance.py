@@ -140,8 +140,8 @@ class AgentWorkflowBenchmark:
         # Link sequentially
         workflow.set_entry_point("agent_0")
         for i in range(num_agents - 1):
-            workflow.add_edge(f"agent_{i}", f"agent_{i+1}")
-        workflow.add_edge(f"agent_{num_agents-1}", END)
+            workflow.add_edge(f"agent_{i}", f"agent_{i + 1}")
+        workflow.add_edge(f"agent_{num_agents - 1}", END)
 
         return workflow
 

@@ -205,15 +205,15 @@ def comparison_node(state: ParallelComparisonState) -> ParallelComparisonState:
         )
 
         # Build comparison prompt
-        comparison_prompt = f"""Compare these responses from different LLM models to the prompt: "{state['prompt']}"
+        comparison_prompt = f"""Compare these responses from different LLM models to the prompt: "{state["prompt"]}"
 
 """
 
         for i, resp in enumerate(responses, 1):
             comparison_prompt += f"""
-Model {i}: {resp['model_name']}
-Response: {resp['response']}
-Stats: {resp['tokens']} tokens, {resp['duration_ms']:.0f}ms
+Model {i}: {resp["model_name"]}
+Response: {resp["response"]}
+Stats: {resp["tokens"]} tokens, {resp["duration_ms"]:.0f}ms
 ---
 """
 

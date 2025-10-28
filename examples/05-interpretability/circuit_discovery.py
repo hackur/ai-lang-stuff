@@ -188,7 +188,7 @@ class CircuitDiscovery:
 
         # Check all attention heads
         for layer in range(self.model.cfg.n_layers):
-            print(f"  Layer {layer}/{self.model.cfg.n_layers-1}", end="\r")
+            print(f"  Layer {layer}/{self.model.cfg.n_layers - 1}", end="\r")
             for head in range(self.model.cfg.n_heads):
                 component = Component(layer, "attn_head", head)
                 effect = self.compute_direct_effect(tokens, component)
@@ -204,7 +204,7 @@ class CircuitDiscovery:
             if effect >= threshold:
                 important.append((component, effect))
 
-        print(f"  Layer {self.model.cfg.n_layers-1}/{self.model.cfg.n_layers-1} ✓")
+        print(f"  Layer {self.model.cfg.n_layers - 1}/{self.model.cfg.n_layers - 1} ✓")
 
         # Sort by effect magnitude
         important.sort(key=lambda x: x[1], reverse=True)
@@ -233,7 +233,7 @@ class CircuitDiscovery:
 
         n_components = len(important_components)
         for i, source in enumerate(important_components):
-            print(f"  Component {i+1}/{n_components}", end="\r")
+            print(f"  Component {i + 1}/{n_components}", end="\r")
 
             for target in important_components:
                 # Only check forward connections
@@ -527,7 +527,9 @@ def main():
     device = (
         "cuda"
         if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
     )
 
     print(f"Loading model on {device}...")

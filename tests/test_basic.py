@@ -70,9 +70,7 @@ def test_env_file_exists():
     env_path = Path(__file__).parent.parent / ".env"
     env_example_path = Path(__file__).parent.parent / "config" / ".env.example"
 
-    assert env_path.exists() or env_example_path.exists(), (
-        ".env or .env.example should exist"
-    )
+    assert env_path.exists() or env_example_path.exists(), ".env or .env.example should exist"
 
 
 def test_directory_structure():

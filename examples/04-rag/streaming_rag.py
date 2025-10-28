@@ -320,7 +320,7 @@ def display_streaming_response(stream: Iterator[dict]):
                     if source_path != "unknown":
                         source_path = Path(source_path).name
 
-                    print(f"\n[Source {i}] - Relevance: {(1-score):.2%}")
+                    print(f"\n[Source {i}] - Relevance: {(1 - score):.2%}")
                     print(f"  File: {source_path}")
                     print(f"  Preview: {doc.page_content[:150]}...")
 

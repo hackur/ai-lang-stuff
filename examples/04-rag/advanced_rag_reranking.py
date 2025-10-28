@@ -94,7 +94,7 @@ class QualityScorer:
         score += 0.2 * density_score
 
         # 4. Structural quality (0.15 weight)
-        has_structure = any(marker in content for marker in ['\n\n', '. ', ', '])
+        has_structure = any(marker in content for marker in ["\n\n", ". ", ", "])
         structure_score = 1.0 if has_structure else 0.5
         score += 0.15 * structure_score
 
@@ -133,7 +133,7 @@ class ContextCompressor:
 
         for doc in documents:
             # Split into sentences
-            sentences = [s.strip() for s in doc.page_content.split('.') if s.strip()]
+            sentences = [s.strip() for s in doc.page_content.split(".") if s.strip()]
 
             # Score each sentence
             scored_sentences = []
@@ -160,8 +160,8 @@ class ContextCompressor:
 
             if compressed_content:
                 compressed_doc = Document(
-                    page_content='. '.join(compressed_content) + '.',
-                    metadata={**doc.metadata, 'compressed': True}
+                    page_content=". ".join(compressed_content) + ".",
+                    metadata={**doc.metadata, "compressed": True},
                 )
                 compressed.append(compressed_doc)
 
@@ -178,7 +178,7 @@ class AdvancedRAGRetriever:
         quality_scorer: QualityScorer,
         context_compressor: ContextCompressor,
         k: int = 10,
-        final_k: int = 4
+        final_k: int = 4,
     ):
         """
         Initialize advanced RAG retriever.
@@ -204,7 +204,7 @@ class AdvancedRAGRetriever:
         # Create ensemble retriever (hybrid)
         self.ensemble_retriever = EnsembleRetriever(
             retrievers=[self.bm25_retriever, vectorstore.as_retriever(search_kwargs={"k": k})],
-            weights=[0.4, 0.6]  # BM25: 40%, Semantic: 60%
+            weights=[0.4, 0.6],  # BM25: 40%, Semantic: 60%
         )
 
     def retrieve_and_rerank(self, query: str) -> Tuple[List[Document], dict]:
@@ -246,7 +246,7 @@ class AdvancedRAGRetriever:
         scored_docs.sort(reverse=True, key=lambda x: x[0])
 
         # Take top final_k
-        top_docs = [doc for score, doc in scored_docs[:self.final_k]]
+        top_docs = [doc for score, doc in scored_docs[: self.final_k]]
         logger.info(f"  -> Selected top {len(top_docs)} documents")
 
         # Stage 4: Context compression
@@ -256,12 +256,14 @@ class AdvancedRAGRetriever:
 
         # Calculate stats
         stats = {
-            'initial_count': len(initial_docs),
-            'unique_count': len(unique_docs),
-            'final_count': len(compressed_docs),
-            'avg_quality_score': sum(s for s, _ in scored_docs[:self.final_k]) / self.final_k,
-            'compression_ratio': sum(len(d.page_content) for d in compressed_docs) /
-                               sum(len(d.page_content) for d in top_docs) if top_docs else 0.0
+            "initial_count": len(initial_docs),
+            "unique_count": len(unique_docs),
+            "final_count": len(compressed_docs),
+            "avg_quality_score": sum(s for s, _ in scored_docs[: self.final_k]) / self.final_k,
+            "compression_ratio": sum(len(d.page_content) for d in compressed_docs)
+            / sum(len(d.page_content) for d in top_docs)
+            if top_docs
+            else 0.0,
         }
 
         return compressed_docs, stats
@@ -286,11 +288,7 @@ def load_documents(data_path: str) -> List[Document]:
 
     elif data_path_obj.is_dir():
         logger.info(f"Loading directory: {data_path}")
-        loader = DirectoryLoader(
-            str(data_path_obj),
-            glob="**/*.txt",
-            loader_cls=TextLoader
-        )
+        loader = DirectoryLoader(str(data_path_obj), glob="**/*.txt", loader_cls=TextLoader)
         return loader.load()
 
     else:
@@ -298,9 +296,7 @@ def load_documents(data_path: str) -> List[Document]:
 
 
 def chunk_documents(
-    documents: List[Document],
-    chunk_size: int = 800,
-    chunk_overlap: int = 150
+    documents: List[Document], chunk_size: int = 800, chunk_overlap: int = 150
 ) -> List[Document]:
     """
     Split documents into chunks for retrieval.
@@ -317,7 +313,7 @@ def chunk_documents(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         length_function=len,
-        separators=["\n\n", "\n", ". ", " ", ""]
+        separators=["\n\n", "\n", ". ", " ", ""],
     )
 
     chunks = text_splitter.split_documents(documents)
@@ -337,22 +333,23 @@ def create_advanced_qa_chain(retriever: AdvancedRAGRetriever, llm_model: str = "
         Callable QA function.
     """
     # Initialize LLM
-    llm = ChatOllama(
-        model=llm_model,
-        temperature=0.2,
-        base_url="http://localhost:11434"
-    )
+    llm = ChatOllama(model=llm_model, temperature=0.2, base_url="http://localhost:11434")
 
     # Create prompt template
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are a helpful AI assistant that answers questions based on provided context.
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """You are a helpful AI assistant that answers questions based on provided context.
 Use the following context to answer the question. If the answer is not in the context, say so clearly.
 Always ground your answer in the provided context and cite specific details when possible.
 
 Context:
-{context}"""),
-        ("human", "{question}")
-    ])
+{context}""",
+            ),
+            ("human", "{question}"),
+        ]
+    )
 
     def qa_function(query: str) -> dict:
         """
@@ -369,26 +366,21 @@ Context:
 
         if not docs:
             return {
-                'answer': "I couldn't find relevant information to answer your question.",
-                'sources': [],
-                'stats': stats
+                "answer": "I couldn't find relevant information to answer your question.",
+                "sources": [],
+                "stats": stats,
             }
 
         # Format context
-        context = "\n\n".join([
-            f"[Document {i+1}]\n{doc.page_content}"
-            for i, doc in enumerate(docs)
-        ])
+        context = "\n\n".join(
+            [f"[Document {i + 1}]\n{doc.page_content}" for i, doc in enumerate(docs)]
+        )
 
         # Generate answer
         chain = prompt | llm
         response = chain.invoke({"context": context, "question": query})
 
-        return {
-            'answer': response.content,
-            'sources': docs,
-            'stats': stats
-        }
+        return {"answer": response.content, "sources": docs, "stats": stats}
 
     return qa_function
 
@@ -422,7 +414,7 @@ def interactive_qa_loop(qa_function):
             if question.lower() == "stats" and last_result:
                 print("\nRetrieval Statistics:")
                 print("-" * 60)
-                stats = last_result['stats']
+                stats = last_result["stats"]
                 print(f"Initial retrieval: {stats['initial_count']} documents")
                 print(f"After deduplication: {stats['unique_count']} documents")
                 print(f"Final selection: {stats['final_count']} documents")
@@ -439,11 +431,11 @@ def interactive_qa_loop(qa_function):
             # Display answer
             print("\nAnswer:")
             print("-" * 60)
-            print(result['answer'])
+            print(result["answer"])
             print("-" * 60)
 
             # Show sources
-            if result['sources']:
+            if result["sources"]:
                 print(f"\nBased on {len(result['sources'])} sources")
                 print("(Type 'stats' to see retrieval statistics)")
 
@@ -462,35 +454,26 @@ def main():
     parser = argparse.ArgumentParser(
         description="Advanced RAG with multi-stage retrieval and re-ranking"
     )
-    parser.add_argument(
-        "data_path",
-        help="Path to text file or directory containing documents"
-    )
+    parser.add_argument("data_path", help="Path to text file or directory containing documents")
     parser.add_argument(
         "--collection",
         default="advanced_rag",
-        help="Vector store collection name (default: advanced_rag)"
+        help="Vector store collection name (default: advanced_rag)",
     )
     parser.add_argument(
         "--persist-dir",
         default="./data/vector_stores",
-        help="Vector store directory (default: ./data/vector_stores)"
+        help="Vector store directory (default: ./data/vector_stores)",
     )
     parser.add_argument(
-        "--llm-model",
-        default="qwen3:8b",
-        help="Ollama LLM model (default: qwen3:8b)"
+        "--llm-model", default="qwen3:8b", help="Ollama LLM model (default: qwen3:8b)"
     )
     parser.add_argument(
         "--embedding-model",
         default="qwen3-embedding",
-        help="Ollama embedding model (default: qwen3-embedding)"
+        help="Ollama embedding model (default: qwen3-embedding)",
     )
-    parser.add_argument(
-        "--rebuild",
-        action="store_true",
-        help="Rebuild vector store"
-    )
+    parser.add_argument("--rebuild", action="store_true", help="Rebuild vector store")
 
     args = parser.parse_args()
 
@@ -532,15 +515,12 @@ def main():
     if collection_exists and not args.rebuild:
         print(f"   Loading existing collection '{args.collection}'...")
         vectorstore = vector_mgr.load_existing(
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            collection_name=args.collection, persist_dir=args.persist_dir
         )
     else:
         print(f"   Creating vector store '{args.collection}'...")
         vectorstore = vector_mgr.create_from_documents(
-            documents=chunks,
-            collection_name=args.collection,
-            persist_dir=args.persist_dir
+            documents=chunks, collection_name=args.collection, persist_dir=args.persist_dir
         )
 
     # Step 6: Initialize advanced components
@@ -554,7 +534,7 @@ def main():
         quality_scorer=quality_scorer,
         context_compressor=context_compressor,
         k=10,
-        final_k=4
+        final_k=4,
     )
 
     # Step 7: Create QA chain

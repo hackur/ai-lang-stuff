@@ -115,9 +115,7 @@ class MCPClient(ABC):
         try:
             response = await self._health_check()
             if response.status_code != 200:
-                raise MCPConnectionError(
-                    f"Health check failed with status {response.status_code}"
-                )
+                raise MCPConnectionError(f"Health check failed with status {response.status_code}")
             self._connected = True
             logger.info(f"Connected to MCP server at {self.config.base_url}")
         except httpx.RequestError as e:

@@ -107,7 +107,7 @@ def researcher_node(state: ResearchPipelineState) -> ResearchPipelineState:
         user_prompt = HumanMessage(
             content=f"""Research this question and provide detailed findings:
 
-Question: {state['question']}
+Question: {state["question"]}
 
 Provide 3-4 key findings with supporting details."""
         )
@@ -175,10 +175,10 @@ def analyzer_node(state: ResearchPipelineState) -> ResearchPipelineState:
         user_prompt = HumanMessage(
             content=f"""Analyze these research findings and provide structured insights:
 
-Original Question: {state['question']}
+Original Question: {state["question"]}
 
 Research Findings:
-{state['research_findings']}
+{state["research_findings"]}
 
 Provide your analysis with:
 1. Key themes identified
@@ -250,13 +250,13 @@ def summarizer_node(state: ResearchPipelineState) -> ResearchPipelineState:
         user_prompt = HumanMessage(
             content=f"""Create a concise summary based on this research pipeline:
 
-Original Question: {state['question']}
+Original Question: {state["question"]}
 
 Research Findings:
-{state['research_findings']}
+{state["research_findings"]}
 
 Analysis:
-{state['analysis']}
+{state["analysis"]}
 
 Provide a clear, actionable summary (3-4 paragraphs) that:
 1. Directly answers the original question

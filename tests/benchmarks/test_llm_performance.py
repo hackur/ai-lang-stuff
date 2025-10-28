@@ -17,6 +17,7 @@ def llm():
 
 def test_simple_completion(benchmark, llm):
     """Benchmark simple completion performance."""
+
     def run_completion():
         return llm.invoke("What is 2+2?")
 
@@ -37,6 +38,7 @@ def test_batch_completion(benchmark, llm):
 
 def test_streaming_completion(benchmark, llm):
     """Benchmark streaming completion performance."""
+
     def run_streaming():
         chunks = []
         for chunk in llm.stream("Count from 1 to 10"):
@@ -50,6 +52,7 @@ def test_streaming_completion(benchmark, llm):
 @pytest.mark.asyncio
 async def test_async_completion(benchmark, llm):
     """Benchmark async completion performance."""
+
     async def run_async():
         return await llm.ainvoke("What is 2+2?")
 

@@ -242,8 +242,7 @@ class StateManager:
         """
         if not confirm:
             raise ValueError(
-                "Must set confirm=True to delete checkpoints. "
-                "This prevents accidental data loss."
+                "Must set confirm=True to delete checkpoints. This prevents accidental data loss."
             )
 
         try:

@@ -45,7 +45,9 @@ def setup_model(model_name: str = "gpt2-small") -> HookedTransformer:
     device = (
         "cuda"
         if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
     )
 
     print(f"Loading {model_name} on {device}...")
@@ -193,7 +195,7 @@ def run_patching_experiment(
     attn_patching_results = np.zeros((n_layers, n_heads))
 
     for layer in range(n_layers):
-        print(f"   Layer {layer}/{n_layers-1}", end="\r")
+        print(f"   Layer {layer}/{n_layers - 1}", end="\r")
         for head in range(n_heads):
             # Patch this head
             patched_logits = patch_activation(
@@ -217,14 +219,14 @@ def run_patching_experiment(
 
             attn_patching_results[layer, head] = recovery
 
-    print(f"   Layer {n_layers-1}/{n_layers-1} ✓")
+    print(f"   Layer {n_layers - 1}/{n_layers - 1} ✓")
 
     # Patch MLP layers
     print("\n3. Patching MLP layers...")
     mlp_patching_results = np.zeros(n_layers)
 
     for layer in range(n_layers):
-        print(f"   Layer {layer}/{n_layers-1}", end="\r")
+        print(f"   Layer {layer}/{n_layers - 1}", end="\r")
 
         patched_logits = patch_activation(
             model,
@@ -244,7 +246,7 @@ def run_patching_experiment(
 
         mlp_patching_results[layer] = recovery
 
-    print(f"   Layer {n_layers-1}/{n_layers-1} ✓")
+    print(f"   Layer {n_layers - 1}/{n_layers - 1} ✓")
 
     print("\n" + "=" * 70)
 

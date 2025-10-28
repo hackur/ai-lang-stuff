@@ -552,15 +552,15 @@ async def main():
         ]
 
         results = await asyncio.gather(
-            *[agent.process_request(req, f"demo_00{i+1}") for i, req in enumerate(requests)],
+            *[agent.process_request(req, f"demo_00{i + 1}") for i, req in enumerate(requests)],
             return_exceptions=True,
         )
 
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                print(f"Request {i+1} failed: {result}")
+                print(f"Request {i + 1} failed: {result}")
             else:
-                print(f"Request {i+1} completed in {result.duration_ms:.2f}ms")
+                print(f"Request {i + 1} completed in {result.duration_ms:.2f}ms")
 
         print()
 

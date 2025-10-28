@@ -120,10 +120,10 @@ def syntax_checker_node(state: CodeReviewState) -> CodeReviewState:
         )
 
         user_prompt = HumanMessage(
-            content=f"""Analyze this {state['language']} code for syntax and logical errors:
+            content=f"""Analyze this {state["language"]} code for syntax and logical errors:
 
-```{state['language']}
-{state['code']}
+```{state["language"]}
+{state["code"]}
 ```
 
 For each issue found, provide:
@@ -206,10 +206,10 @@ def security_scanner_node(state: CodeReviewState) -> CodeReviewState:
         )
 
         user_prompt = HumanMessage(
-            content=f"""Perform security analysis on this {state['language']} code:
+            content=f"""Perform security analysis on this {state["language"]} code:
 
-```{state['language']}
-{state['code']}
+```{state["language"]}
+{state["code"]}
 ```
 
 Provide:
@@ -303,10 +303,10 @@ def style_reviewer_node(state: CodeReviewState) -> CodeReviewState:
         )
 
         user_prompt = HumanMessage(
-            content=f"""Review the style of this {state['language']} code:
+            content=f"""Review the style of this {state["language"]} code:
 
-```{state['language']}
-{state['code']}
+```{state["language"]}
+{state["code"]}
 ```
 
 Provide:
@@ -459,11 +459,11 @@ def code_fixer_node(state: CodeReviewState) -> CodeReviewState:
         )
 
         user_prompt = HumanMessage(
-            content=f"""Fix the following {state['language']} code:
+            content=f"""Fix the following {state["language"]} code:
 
 Original code:
-```{state['language']}
-{state['code']}
+```{state["language"]}
+{state["code"]}
 ```
 
 Issues to fix:

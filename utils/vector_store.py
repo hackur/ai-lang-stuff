@@ -71,7 +71,7 @@ class VectorStoreManager:
         self.embedding_model = embedding_model
         self.base_url = base_url
         logger.info(
-            f"Initialized VectorStoreManager with model={embedding_model}, " f"base_url={base_url}"
+            f"Initialized VectorStoreManager with model={embedding_model}, base_url={base_url}"
         )
 
     def _get_embeddings(self) -> Embeddings:
@@ -177,8 +177,7 @@ class VectorStoreManager:
                 logger.info(f"Created FAISS index at {persist_path}")
 
             logger.info(
-                f"Successfully created {store_type} vector store with "
-                f"{len(documents)} documents"
+                f"Successfully created {store_type} vector store with {len(documents)} documents"
             )
             return vectorstore
 

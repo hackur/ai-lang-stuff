@@ -195,9 +195,7 @@ class OllamaManager:
             return True
 
         except ConnectionError:
-            logger.error(
-                f"Cannot connect to Ollama server at {self.base_url}. " "Is Ollama running?"
-            )
+            logger.error(f"Cannot connect to Ollama server at {self.base_url}. Is Ollama running?")
             return False
         except Timeout:
             logger.error(f"Timeout while pulling model '{model}'")
@@ -296,7 +294,7 @@ class OllamaManager:
             }
 
             logger.info(
-                f"Benchmark complete: latency={latency:.2f}s, " f"tokens/sec={tokens_per_sec:.1f}"
+                f"Benchmark complete: latency={latency:.2f}s, tokens/sec={tokens_per_sec:.1f}"
             )
 
             return results
