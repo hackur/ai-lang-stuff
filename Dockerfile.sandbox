@@ -1,0 +1,36 @@
+# Dockerfile for sandboxed execution of ai-lang-stuff examples
+# Build: docker build -t ai-lang-stuff-sandbox -f Dockerfile.sandbox .
+# Run:   docker run --rm -v $(pwd)/examples:/workspace/examples:ro ai-lang-stuff-sandbox python examples/error_handling_demo.py
+
+FROM python:3.12-slim
+
+# Set working directory
+WORKDIR /workspace
+
+# Install uv for fast package management
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.local/bin/uv /usr/local/bin/
+
+# Copy only necessary files
+COPY pyproject.toml .
+COPY utils/ ./utils/
+COPY workflows/ ./workflows/
+COPY src/ ./src/
+
+# Install dependencies
+RUN uv venv && \
+    . .venv/bin/activate && \
+    uv sync --no-dev
+
+# Create non-root user for security
+RUN useradd -m -u 1000 sandbox && \
+    chown -R sandbox:sandbox /workspace
+
+USER sandbox
+
+# Activate venv in shell
+ENV PATH="/workspace/.venv/bin:$PATH"
+ENV PYTHONPATH="/workspace:$PYTHONPATH"
+
+# Default command shows help
+CMD ["python", "-c", "print('Sandbox ready. Mount examples/ and run with: docker run --rm -v $(pwd)/examples:/workspace/examples:ro ai-lang-stuff-sandbox python examples/error_handling_demo.py')"]
