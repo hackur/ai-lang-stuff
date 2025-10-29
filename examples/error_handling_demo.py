@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
-"""Error Recovery Patterns Demo.
+"""
+Example: Comprehensive Error Handling Patterns for Agent Systems
 
-This example demonstrates comprehensive error recovery utilities including:
-- Retry strategies with exponential backoff
-- Error classification and analysis
-- Graceful degradation with model fallbacks
-- Health checks for system components
-- Circuit breaker pattern
-- Recovery orchestration
+Purpose:
+    Demonstrates production-grade error handling patterns including retry logic with exponential
+    backoff, circuit breakers, graceful degradation, error classification, health checks, and
+    recovery orchestration for robust agent workflows.
 
 Prerequisites:
-    - Ollama running (ollama serve)
-    - At least one model available (qwen3:8b or gemma3:4b)
+    - Ollama running with at least one model (qwen3:8b or gemma3:4b)
+    - Python packages: tenacity, psutil
+    - Estimated 3-5 minutes runtime
 
 Expected Output:
-    - Demonstrations of various error recovery patterns
-    - Health check results
-    - Retry behavior with backoff
-    - Fallback mechanisms
-    - System resource monitoring
+    Shows error handling in action with simulated failures, retry attempts with exponential backoff,
+    circuit breaker patterns opening and closing, fallback mechanisms, error classification, health
+    checks, and comprehensive error logging. Demonstrates 12 different error handling patterns for
+    production systems.
+
+Usage:
+    uv run python examples/error_handling_demo.py
 """
 
 import logging

@@ -32,7 +32,7 @@ Example:
 import logging
 import shutil
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import Literal, TypeAlias
 
 from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
@@ -44,7 +44,7 @@ from langchain_ollama import OllamaEmbeddings
 logger = logging.getLogger(__name__)
 
 # Type aliases
-VectorStoreType = Literal["chroma", "faiss"]
+VectorStoreType: TypeAlias = Literal["chroma", "faiss"]
 
 
 class VectorStoreManager:
@@ -98,12 +98,12 @@ class VectorStoreManager:
 
     def create_from_documents(
         self,
-        documents: List[Document],
+        documents: list[Document],
         collection_name: str,
         persist_dir: str,
         store_type: VectorStoreType = "chroma",
-        chunk_size: Optional[int] = None,
-        chunk_overlap: Optional[int] = None,
+        chunk_size: int | None = None,
+        chunk_overlap: int | None = None,
     ) -> VectorStore:
         """Create a new vector store from documents.
 
@@ -249,7 +249,7 @@ class VectorStoreManager:
             raise
 
     def add_documents(
-        self, vectorstore: VectorStore, documents: List[Document], persist_dir: Optional[str] = None
+        self, vectorstore: VectorStore, documents: list[Document], persist_dir: str | None = None
     ) -> None:
         """Add new documents to an existing vector store.
 
@@ -327,8 +327,8 @@ class VectorStoreManager:
             raise
 
     def list_collections(
-        self, persist_dir: str, store_type: Optional[VectorStoreType] = None
-    ) -> dict[str, List[str]]:
+        self, persist_dir: str, store_type: VectorStoreType | None = None
+    ) -> dict[str, list[str]]:
         """List all available vector store collections.
 
         Args:
@@ -370,8 +370,8 @@ class VectorStoreManager:
         return collections
 
     def similarity_search(
-        self, vectorstore: VectorStore, query: str, k: int = 4, filter: Optional[dict] = None
-    ) -> List[Document]:
+        self, vectorstore: VectorStore, query: str, k: int = 4, filter: dict | None = None
+    ) -> list[Document]:
         """Perform similarity search with optional metadata filtering.
 
         Args:
@@ -416,8 +416,8 @@ class VectorStoreManager:
             raise
 
     def similarity_search_with_score(
-        self, vectorstore: VectorStore, query: str, k: int = 4, filter: Optional[dict] = None
-    ) -> List[tuple[Document, float]]:
+        self, vectorstore: VectorStore, query: str, k: int = 4, filter: dict | None = None
+    ) -> list[tuple[Document, float]]:
         """Perform similarity search with relevance scores.
 
         Args:
@@ -462,7 +462,7 @@ class VectorStoreManager:
 
 
 def create_chroma_store(
-    documents: List[Document],
+    documents: list[Document],
     collection_name: str,
     persist_dir: str = "./data/vector_stores",
     embedding_model: str = "qwen3-embedding",
@@ -488,7 +488,7 @@ def create_chroma_store(
 
 
 def create_faiss_store(
-    documents: List[Document],
+    documents: list[Document],
     collection_name: str,
     persist_dir: str = "./data/vector_stores",
     embedding_model: str = "qwen3-embedding",

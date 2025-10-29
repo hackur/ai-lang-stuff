@@ -9,12 +9,16 @@ import operator
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Optional, Type, TypedDict
+from typing import Annotated, Any, TypeAlias, TypedDict
 
 from langchain_core.messages import BaseMessage
 from langgraph.checkpoint.sqlite import SqliteSaver
 
 logger = logging.getLogger(__name__)
+
+# Type aliases
+CheckpointData: TypeAlias = dict[str, Any]
+CheckpointMetadata: TypeAlias = dict[str, str | int | float]
 
 
 class StateManager:
@@ -59,8 +63,8 @@ class StateManager:
 
     @staticmethod
     def create_state_schema(
-        fields: Dict[str, type], class_name: str = "AgentState"
-    ) -> Type[TypedDict]:
+        fields: dict[str, type], class_name: str = "AgentState"
+    ) -> type[TypedDict]:
         """Create a TypedDict state schema for LangGraph workflows.
 
         Args:
@@ -107,9 +111,7 @@ class StateManager:
             raise
 
     @staticmethod
-    def load_checkpoint(
-        thread_id: str, db_path: str = "./checkpoints.db"
-    ) -> Optional[Dict[str, Any]]:
+    def load_checkpoint(thread_id: str, db_path: str = "./checkpoints.db") -> CheckpointData | None:
         """Load a specific checkpoint by thread ID.
 
         Args:
@@ -150,7 +152,7 @@ class StateManager:
                 connection.close()
 
     @staticmethod
-    def list_checkpoints(db_path: str = "./checkpoints.db") -> List[Dict[str, Any]]:
+    def list_checkpoints(db_path: str = "./checkpoints.db") -> list[CheckpointMetadata]:
         """List all checkpoint thread IDs with metadata.
 
         Args:
@@ -211,7 +213,7 @@ class StateManager:
     @staticmethod
     def clear_checkpoints(
         db_path: str = "./checkpoints.db",
-        thread_id: Optional[str] = None,
+        thread_id: str | None = None,
         confirm: bool = False,
     ) -> int:
         """Clear checkpoint data from database.
@@ -280,7 +282,7 @@ class StateManager:
 # ============================================================================
 
 
-def basic_agent_state() -> Type[TypedDict]:
+def basic_agent_state() -> type[TypedDict]:
     """Create basic agent state with message history.
 
     Returns:
@@ -294,12 +296,12 @@ def basic_agent_state() -> Type[TypedDict]:
         ...     return {"messages": [response]}
     """
     return StateManager.create_state_schema(
-        {"messages": Annotated[List[BaseMessage], operator.add]},
+        {"messages": Annotated[list[BaseMessage], operator.add]},
         class_name="BasicAgentState",
     )
 
 
-def research_state() -> Type[TypedDict]:
+def research_state() -> type[TypedDict]:
     """Create research agent state with question, context, and sources.
 
     Returns:
@@ -319,15 +321,15 @@ def research_state() -> Type[TypedDict]:
     return StateManager.create_state_schema(
         {
             "question": str,
-            "context": Annotated[List[str], operator.add],
+            "context": Annotated[list[str], operator.add],
             "answer": str,
-            "sources": Annotated[List[str], operator.add],
+            "sources": Annotated[list[str], operator.add],
         },
         class_name="ResearchState",
     )
 
 
-def code_review_state() -> Type[TypedDict]:
+def code_review_state() -> type[TypedDict]:
     """Create code review state with code, issues, and approval status.
 
     Returns:
@@ -347,8 +349,8 @@ def code_review_state() -> Type[TypedDict]:
     return StateManager.create_state_schema(
         {
             "code": str,
-            "issues": Annotated[List[str], operator.add],
-            "suggestions": Annotated[List[str], operator.add],
+            "issues": Annotated[list[str], operator.add],
+            "suggestions": Annotated[list[str], operator.add],
             "approved": bool,
         },
         class_name="CodeReviewState",
@@ -379,7 +381,7 @@ def create_thread_id(prefix: str = "thread") -> str:
     return thread_id
 
 
-def get_checkpoint_size(db_path: str = "./checkpoints.db") -> Dict[str, Any]:
+def get_checkpoint_size(db_path: str = "./checkpoints.db") -> dict[str, float | int | str]:
     """Get checkpoint database statistics.
 
     Args:

@@ -1,17 +1,23 @@
 """
-Compare different local models on the same task.
+Example: Systematic Model Comparison and Benchmarking
 
-This helps you understand the speed/quality tradeoffs between models.
+Purpose:
+    Compares multiple local LLMs on standardized tasks to help select the optimal model
+    for specific use cases, measuring response quality, speed, and consistency across
+    different model sizes and architectures.
 
 Prerequisites:
-- Ollama server running: `ollama serve`
-- Models downloaded:
-  - ollama pull qwen3:8b
-  - ollama pull qwen3:30b-a3b
-  - ollama pull gemma3:4b
+    - Ollama running with models: qwen3:8b, qwen3:30b-a3b, gemma3:4b
+    - Python packages: langchain-ollama
+    - Estimated 3-5 minutes runtime (depends on models)
 
-Expected output:
-Response from each model with timing information.
+Expected Output:
+    Performance comparison showing response time, response length, and quality preview
+    for each model on a coding task. Summary includes fastest model and most detailed
+    responses to inform model selection decisions.
+
+Usage:
+    uv run python examples/01-foundation/compare_models.py
 """
 
 import time

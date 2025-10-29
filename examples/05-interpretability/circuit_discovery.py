@@ -1,31 +1,25 @@
 """
-Circuit Discovery with TransformerLens
+Example: Neural Circuit Discovery with TransformerLens
 
-This example demonstrates how to discover and analyze computational circuits
-in transformer models - the specific pathways of computation that implement
-particular algorithms or behaviors.
-
-A circuit is a subgraph of the model's computation that is:
-1. Necessary for a specific behavior
-2. Sufficient to reproduce that behavior
-3. Interpretable in terms of what each component does
-
-This involves:
-- Identifying important components via activation patching
-- Tracing information flow between components
-- Analyzing what each component computes
-- Visualizing the discovered circuit
+Purpose:
+    Demonstrates mechanistic interpretability techniques to discover computational circuits
+    in language models, revealing how specific behaviors like induction and factual recall
+    emerge from combinations of attention heads and MLP layers through causal analysis.
 
 Prerequisites:
-    uv add transformer-lens torch numpy matplotlib networkx
+    - Python packages: transformer-lens, torch, numpy, matplotlib, networkx
+    - GPU optional but recommended for performance
+    - GPT-2 model downloads automatically via TransformerLens
+    - Estimated 10-15 minutes runtime
+
+Expected Output:
+    Visualization of discovered circuits showing attention patterns, component importance,
+    and information flow between layers. Identifies which specific attention heads and MLPs
+    are causally responsible for induction (pattern completion) and factual recall behaviors.
+    Generates circuit diagrams saved as PNG files.
 
 Usage:
-    python circuit_discovery.py
-
-References:
-    - Anthropic's "A Mathematical Framework for Transformer Circuits"
-    - "In-context Learning and Induction Heads" (Anthropic)
-    - TransformerLens documentation
+    uv run python examples/05-interpretability/circuit_discovery.py
 """
 
 from dataclasses import dataclass
@@ -528,9 +522,7 @@ def main():
     device = (
         "cuda"
         if torch.cuda.is_available()
-        else "mps"
-        if torch.backends.mps.is_available()
-        else "cpu"
+        else "mps" if torch.backends.mps.is_available() else "cpu"
     )
 
     print(f"Loading model on {device}...")

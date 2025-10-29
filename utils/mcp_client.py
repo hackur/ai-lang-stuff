@@ -8,9 +8,10 @@ connection pooling, retry logic, and LangChain tool integration.
 
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager, contextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, TypeAlias
 
 import httpx
 from langchain_core.tools import Tool
@@ -23,6 +24,11 @@ from tenacity import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Type aliases
+ToolArgs: TypeAlias = dict[str, Any]
+ToolResult: TypeAlias = dict[str, Any]
+FileEntry: TypeAlias = dict[str, Any]
 
 
 class MCPError(Exception):
@@ -82,9 +88,9 @@ class MCPClient(ABC):
 
     def __init__(
         self,
-        config: Optional[MCPConfig] = None,
-        client: Optional[httpx.AsyncClient] = None,
-    ):
+        config: MCPConfig | None = None,
+        client: httpx.AsyncClient | None = None,
+    ) -> None:
         """Initialize MCP client with configuration."""
         self.config = config or MCPConfig()
         self._client = client
@@ -145,7 +151,7 @@ class MCPClient(ABC):
         wait=wait_exponential(multiplier=1, min=1, max=10),
         reraise=True,
     )
-    async def call_tool(self, name: str, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def call_tool(self, name: str, args: ToolArgs) -> ToolResult:
         """
         Call a tool on the MCP server.
 
@@ -183,26 +189,26 @@ class MCPClient(ABC):
             raise MCPToolError(f"Tool call request failed: {e}") from e
 
     @asynccontextmanager
-    async def __aenter__(self):
+    async def __aenter__(self) -> AsyncIterator["MCPClient"]:
         """Async context manager entry."""
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         await self.disconnect()
 
     @contextmanager
-    def __enter__(self):
+    def __enter__(self) -> None:
         """Sync context manager entry (not recommended, use async)."""
         raise NotImplementedError("Use async context manager (async with) instead")
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Sync context manager exit."""
         pass
 
     @abstractmethod
-    def to_langchain_tools(self) -> List[Tool]:
+    def to_langchain_tools(self) -> list[Tool]:
         """
         Convert MCP client methods to LangChain tools.
 
@@ -232,10 +238,10 @@ class FilesystemMCP(MCPClient):
 
     def __init__(
         self,
-        config: Optional[MCPConfig] = None,
-        client: Optional[httpx.AsyncClient] = None,
-        base_path: Optional[Union[str, Path]] = None,
-    ):
+        config: MCPConfig | None = None,
+        client: httpx.AsyncClient | None = None,
+        base_path: str | Path | None = None,
+    ) -> None:
         """
         Initialize filesystem MCP client.
 
@@ -247,7 +253,7 @@ class FilesystemMCP(MCPClient):
         super().__init__(config, client)
         self.base_path = Path(base_path) if base_path else None
 
-    def _validate_path(self, path: Union[str, Path]) -> Path:
+    def _validate_path(self, path: str | Path) -> Path:
         """
         Validate and resolve path to prevent path traversal attacks.
 
@@ -267,7 +273,7 @@ class FilesystemMCP(MCPClient):
                 raise ValueError(f"Path {path} is outside allowed base path {self.base_path}")
         return resolved
 
-    async def read_file(self, path: Union[str, Path]) -> str:
+    async def read_file(self, path: str | Path) -> str:
         """
         Read contents of a file.
 
@@ -284,7 +290,7 @@ class FilesystemMCP(MCPClient):
         result = await self.call_tool("read_file", {"path": str(validated_path)})
         return result.get("content", "")
 
-    async def write_file(self, path: Union[str, Path], content: str) -> bool:
+    async def write_file(self, path: str | Path, content: str) -> bool:
         """
         Write content to a file.
 
@@ -305,7 +311,7 @@ class FilesystemMCP(MCPClient):
         )
         return result.get("success", False)
 
-    async def list_directory(self, path: Union[str, Path]) -> List[Dict[str, Any]]:
+    async def list_directory(self, path: str | Path) -> list[FileEntry]:
         """
         List contents of a directory.
 
@@ -325,8 +331,8 @@ class FilesystemMCP(MCPClient):
     async def search_files(
         self,
         pattern: str,
-        path: Optional[Union[str, Path]] = None,
-    ) -> List[str]:
+        path: str | Path | None = None,
+    ) -> list[str]:
         """
         Search for files matching a pattern.
 
@@ -348,7 +354,7 @@ class FilesystemMCP(MCPClient):
         )
         return result.get("files", [])
 
-    def to_langchain_tools(self) -> List[Tool]:
+    def to_langchain_tools(self) -> list[Tool]:
         """
         Convert filesystem operations to LangChain tools.
 
@@ -407,7 +413,7 @@ class SearchResult(BaseModel):
     title: str = Field(description="Search result title")
     url: str = Field(description="Result URL")
     snippet: str = Field(description="Text snippet from result")
-    score: Optional[float] = Field(default=None, description="Relevance score")
+    score: float | None = Field(default=None, description="Relevance score")
 
 
 class WebSearchMCP(MCPClient):
@@ -426,7 +432,7 @@ class WebSearchMCP(MCPClient):
         ```
     """
 
-    async def search(self, query: str, num_results: int = 5) -> List[SearchResult]:
+    async def search(self, query: str, num_results: int = 5) -> list[SearchResult]:
         """
         Perform web search.
 
@@ -472,7 +478,7 @@ class WebSearchMCP(MCPClient):
         result = await self.call_tool("fetch_url", {"url": url})
         return result.get("content", "")
 
-    def to_langchain_tools(self) -> List[Tool]:
+    def to_langchain_tools(self) -> list[Tool]:
         """
         Convert web search operations to LangChain tools.
 
@@ -518,7 +524,7 @@ class WebSearchMCP(MCPClient):
 def create_filesystem_client(
     host: str = "localhost",
     port: int = 8001,
-    base_path: Optional[Union[str, Path]] = None,
+    base_path: str | Path | None = None,
 ) -> FilesystemMCP:
     """
     Create a filesystem MCP client with default configuration.

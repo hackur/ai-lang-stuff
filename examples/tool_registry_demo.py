@@ -1,21 +1,23 @@
 """
-Demonstration of ToolRegistry usage.
+Example: Tool Registry System for Centralized Tool Management
 
-This example shows how to use the centralized ToolRegistry to:
-1. Register custom tools
-2. List and filter tools by category
-3. Export registry to JSON
-4. Convert tools to LangChain format (when dependencies available)
+Purpose:
+    Demonstrates how to use the Tool Registry utility to organize, discover, and manage tools
+    across agent systems with category-based organization and LangChain integration.
 
 Prerequisites:
-- Python 3.11+
-- No dependencies required for basic usage
-- langchain-core required for LangChain tool conversion
+    - Python 3.10+ installed
+    - No external dependencies required (self-contained example)
+    - langchain-core optional for LangChain tool conversion
+    - Estimated 30 seconds runtime
 
-Expected output:
-- Tool registration confirmations
-- Tool listings by category
-- JSON export of registry
+Expected Output:
+    Shows tool registration, category organization, tool retrieval by category, JSON export
+    functionality, and optional LangChain tool conversion. Displays registered tools with
+    descriptions and demonstrates how agents can discover and use tools dynamically.
+
+Usage:
+    uv run python examples/tool_registry_demo.py
 """
 
 import json

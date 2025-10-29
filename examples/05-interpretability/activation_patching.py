@@ -1,27 +1,25 @@
 """
-Activation Patching with TransformerLens
+Example: Activation Patching for Causal Analysis
 
-This example demonstrates activation patching (also called causal interventions)
-to understand which model components are causally responsible for specific behaviors.
-
-Activation patching involves:
-1. Running model on a "clean" prompt
-2. Running model on a "corrupted" prompt
-3. Patching activations from clean run into corrupted run
-4. Measuring how much behavior is restored
-
-This helps identify which components (layers, heads, neurons) are critical
-for specific model behaviors.
+Purpose:
+    Demonstrates activation patching techniques to identify causal relationships in model behavior,
+    determining which specific attention heads and neurons are necessary for particular outputs
+    by systematically replacing activations and measuring behavior recovery.
 
 Prerequisites:
-    uv add transformer-lens torch numpy
+    - Python packages: transformer-lens, torch, numpy, matplotlib
+    - GPU optional but recommended for performance
+    - GPT-2 model downloads automatically via TransformerLens
+    - Estimated 10-15 minutes runtime
+
+Expected Output:
+    Heatmaps showing which attention heads and MLP layers are causally responsible for
+    specific behaviors like indirect object identification and factual recall. Identifies
+    top causal components with recovery scores showing how much fixing each component
+    restores correct behavior. Generates visualization PNGs.
 
 Usage:
-    python activation_patching.py
-
-References:
-    - https://transformerlensorg.github.io/TransformerLens/
-    - Anthropic's "Interpretability in the Wild" paper
+    uv run python examples/05-interpretability/activation_patching.py
 """
 
 from typing import Dict
@@ -46,9 +44,7 @@ def setup_model(model_name: str = "gpt2-small") -> HookedTransformer:
     device = (
         "cuda"
         if torch.cuda.is_available()
-        else "mps"
-        if torch.backends.mps.is_available()
-        else "cpu"
+        else "mps" if torch.backends.mps.is_available() else "cpu"
     )
 
     print(f"Loading {model_name} on {device}...")

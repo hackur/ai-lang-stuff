@@ -1,14 +1,23 @@
 """
-Simple chat example using Ollama and LangChain.
+Example: Basic Chat Interaction with Local LLM
 
-This demonstrates the most basic usage of a local LLM.
+Purpose:
+    Demonstrates the simplest possible interaction with a local LLM using Ollama,
+    serving as the foundation for understanding local model communication and
+    LangChain message formatting.
 
 Prerequisites:
-- Ollama server running: `ollama serve`
-- Model downloaded: `ollama pull qwen3:8b`
+    - Ollama running with qwen3:8b model
+    - Python packages: langchain-ollama
+    - Estimated 30 seconds runtime
 
-Expected output:
-Clear explanation of list comprehensions with examples.
+Expected Output:
+    A clear explanation of Python list comprehensions with examples, demonstrating
+    successful Ollama connection and basic inference with system and user message
+    formatting.
+
+Usage:
+    uv run python examples/01-foundation/simple_chat.py
 """
 
 from langchain_core.messages import HumanMessage, SystemMessage

@@ -9,13 +9,18 @@ and conversion to LangChain Tool objects.
 import inspect
 import json
 import logging
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 if TYPE_CHECKING:
     pass
 
 logger = logging.getLogger(__name__)
+
+# Type aliases
+ToolFunction: TypeAlias = Callable[..., Any]
+ToolMetadataDict: TypeAlias = dict[str, str | int]
 
 
 class ToolMetadata:
@@ -24,11 +29,11 @@ class ToolMetadata:
     def __init__(
         self,
         name: str,
-        tool: Callable,
+        tool: ToolFunction,
         description: str,
         category: str,
-        args_schema: Optional[type] = None,
-    ):
+        args_schema: type | None = None,
+    ) -> None:
         """
         Initialize tool metadata.
 
@@ -45,7 +50,7 @@ class ToolMetadata:
         self.category = category
         self.args_schema = args_schema
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> ToolMetadataDict:
         """
         Convert metadata to dictionary format.
 
@@ -68,7 +73,7 @@ class ToolRegistry:
     to LangChain Tool objects for use in agents.
     """
 
-    _instance: Optional["ToolRegistry"] = None
+    _instance: "ToolRegistry | None" = None
     _initialized: bool = False
 
     def __new__(cls) -> "ToolRegistry":
@@ -77,10 +82,10 @@ class ToolRegistry:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the registry if not already initialized."""
         if not self._initialized:
-            self._tools: Dict[str, ToolMetadata] = {}
+            self._tools: dict[str, ToolMetadata] = {}
             self._initialized = True
             logger.info("ToolRegistry initialized")
 
@@ -97,10 +102,10 @@ class ToolRegistry:
     def register_tool(
         self,
         name: str,
-        tool: Callable,
+        tool: ToolFunction,
         description: str,
         category: str,
-        args_schema: Optional[type] = None,
+        args_schema: type | None = None,
     ) -> None:
         """
         Register a tool with metadata.
@@ -136,7 +141,7 @@ class ToolRegistry:
         self._tools[name] = metadata
         logger.info(f"Registered tool: {name} (category: {category})")
 
-    def get_tool(self, name: str) -> Callable:
+    def get_tool(self, name: str) -> ToolFunction:
         """
         Retrieve a tool by name.
 
@@ -155,7 +160,7 @@ class ToolRegistry:
 
         return self._tools[name].tool
 
-    def list_tools(self, category: Optional[str] = None) -> List[Dict[str, Any]]:
+    def list_tools(self, category: str | None = None) -> list[ToolMetadataDict]:
         """
         List all tools or filter by category.
 
@@ -173,7 +178,7 @@ class ToolRegistry:
 
         return [t.to_dict() for t in tools]
 
-    def get_langchain_tools(self, categories: Optional[List[str]] = None) -> List[Any]:
+    def get_langchain_tools(self, categories: list[str] | None = None) -> list[Any]:
         """
         Convert registered tools to LangChain Tool objects.
 
@@ -218,7 +223,7 @@ class ToolRegistry:
         logger.info(f"Generated {len(langchain_tools)} LangChain tools")
         return langchain_tools
 
-    def auto_discover_utilities(self, utils_dir: Optional[Path] = None) -> int:
+    def auto_discover_utilities(self, utils_dir: Path | None = None) -> int:
         """
         Scan utils/ directory and auto-register common utility functions.
 
@@ -319,7 +324,7 @@ class ToolRegistry:
 
         return "other"
 
-    def to_json(self, filepath: Optional[Path] = None) -> str:
+    def to_json(self, filepath: Path | None = None) -> str:
         """
         Export registry to JSON format.
 
@@ -344,14 +349,14 @@ class ToolRegistry:
 
         return json_str
 
-    def _get_category_summary(self) -> Dict[str, int]:
+    def _get_category_summary(self) -> dict[str, int]:
         """
         Get summary of tools by category.
 
         Returns:
             Dictionary mapping category names to tool counts
         """
-        summary: Dict[str, int] = {}
+        summary: dict[str, int] = {}
         for metadata in self._tools.values():
             summary[metadata.category] = summary.get(metadata.category, 0) + 1
         return summary

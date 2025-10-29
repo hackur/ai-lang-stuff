@@ -14,10 +14,11 @@ import asyncio
 import logging
 import random
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
+from typing import Any, TypeAlias, TypeVar
 
 import psutil
 import requests
@@ -27,6 +28,11 @@ from requests.exceptions import ConnectionError, Timeout
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
+
+# Type aliases
+ContextDict: TypeAlias = dict[str, Any]
+ErrorPatterns: TypeAlias = dict[str, int]
+HealthDetails: TypeAlias = dict[str, Any]
 
 
 # ============================================================================
@@ -63,7 +69,7 @@ class ErrorInfo:
     severity: ErrorSeverity
     retryable: bool
     suggested_action: str
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: ContextDict = field(default_factory=dict)
     timestamp: float = field(default_factory=time.time)
 
 
@@ -78,17 +84,17 @@ class ErrorClassifier:
         max_history: Maximum number of errors to track
     """
 
-    def __init__(self, max_history: int = 100):
+    def __init__(self, max_history: int = 100) -> None:
         """Initialize the ErrorClassifier.
 
         Args:
             max_history: Maximum number of errors to track in history
         """
-        self.error_history: List[ErrorInfo] = []
+        self.error_history: list[ErrorInfo] = []
         self.max_history = max_history
         logger.info("Initialized ErrorClassifier")
 
-    def classify(self, error: Exception, context: Optional[Dict[str, Any]] = None) -> ErrorInfo:
+    def classify(self, error: Exception, context: ContextDict | None = None) -> ErrorInfo:
         """Classify an error and determine recovery strategy.
 
         Args:
@@ -203,7 +209,7 @@ class ErrorClassifier:
         if len(self.error_history) > self.max_history:
             self.error_history.pop(0)
 
-    def get_error_patterns(self) -> Dict[str, int]:
+    def get_error_patterns(self) -> ErrorPatterns:
         """Analyze error history for patterns.
 
         Returns:
@@ -242,7 +248,7 @@ class RetryConfig:
     max_delay: float = 60.0
     backoff_factor: float = 2.0
     jitter: bool = True
-    jitter_range: Tuple[float, float] = (0.8, 1.2)
+    jitter_range: tuple[float, float] = (0.8, 1.2)
 
 
 class CircuitState(Enum):
@@ -270,7 +276,7 @@ class CircuitBreaker:
         failure_threshold: int = 5,
         recovery_timeout: float = 60.0,
         success_threshold: int = 2,
-    ):
+    ) -> None:
         """Initialize the CircuitBreaker.
 
         Args:
@@ -285,7 +291,7 @@ class CircuitBreaker:
         self.state = CircuitState.CLOSED
         self.failure_count = 0
         self.success_count = 0
-        self.last_failure_time: Optional[float] = None
+        self.last_failure_time: float | None = None
 
         logger.info(
             f"Initialized CircuitBreaker: threshold={failure_threshold}, "
@@ -390,7 +396,7 @@ class RetryStrategy:
         backoff_factor: float = 2.0,
         jitter: bool = True,
         use_circuit_breaker: bool = True,
-    ):
+    ) -> None:
         """Initialize the RetryStrategy.
 
         Args:
@@ -409,7 +415,9 @@ class RetryStrategy:
             jitter=jitter,
         )
 
-        self.circuit_breaker = CircuitBreaker() if use_circuit_breaker else None
+        self.circuit_breaker: CircuitBreaker | None = (
+            CircuitBreaker() if use_circuit_breaker else None
+        )
 
         logger.info(
             f"Initialized RetryStrategy: max_retries={max_retries}, "
@@ -443,7 +451,7 @@ class RetryStrategy:
         self,
         func: Callable[..., T],
         *args: Any,
-        fallback: Optional[Callable[..., T]] = None,
+        fallback: Callable[..., T] | None = None,
         **kwargs: Any,
     ) -> T:
         """Execute function with retry logic.
@@ -464,7 +472,7 @@ class RetryStrategy:
             >>> retry = RetryStrategy(max_retries=3)
             >>> result = retry.execute(api_call, param1, fallback=cache_lookup)
         """
-        last_exception: Optional[Exception] = None
+        last_exception: Exception | None = None
 
         for attempt in range(self.config.max_retries + 1):
             try:
@@ -515,7 +523,7 @@ class RetryStrategy:
         self,
         func: Callable[..., Any],
         *args: Any,
-        fallback: Optional[Callable[..., Any]] = None,
+        fallback: Callable[..., Any] | None = None,
         **kwargs: Any,
     ) -> Any:
         """Execute async function with retry logic.
@@ -535,7 +543,7 @@ class RetryStrategy:
         """
 
         async def _execute() -> Any:
-            last_exception: Optional[Exception] = None
+            last_exception: Exception | None = None
 
             for attempt in range(self.config.max_retries + 1):
                 try:
@@ -581,7 +589,7 @@ class ModelFallback:
     """Configuration for model fallback strategy."""
 
     primary_model: str
-    fallback_models: List[str]
+    fallback_models: list[str]
     cache_enabled: bool = True
     simplified_workflow: bool = False
 
@@ -597,7 +605,7 @@ class GracefulDegradation:
         cache: Simple in-memory cache for responses
     """
 
-    def __init__(self, fallback_models: Optional[List[str]] = None):
+    def __init__(self, fallback_models: list[str] | None = None) -> None:
         """Initialize GracefulDegradation.
 
         Args:
@@ -607,10 +615,10 @@ class GracefulDegradation:
             "qwen3:8b",  # Primary balanced model
             "gemma3:4b",  # Smaller, faster fallback
         ]
-        self.cache: Dict[str, Any] = {}
+        self.cache: dict[str, Any] = {}
         logger.info(f"Initialized GracefulDegradation with fallbacks: {self.fallback_chain}")
 
-    def get_fallback_model(self, failed_model: str) -> Optional[str]:
+    def get_fallback_model(self, failed_model: str) -> str | None:
         """Get next fallback model after failure.
 
         Args:
@@ -650,7 +658,7 @@ class GracefulDegradation:
         self.cache[key] = {"value": value, "timestamp": time.time()}
         logger.debug(f"Cached response for key: {key}")
 
-    def get_cached_response(self, key: str, max_age: float = 3600.0) -> Optional[Any]:
+    def get_cached_response(self, key: str, max_age: float = 3600.0) -> Any | None:
         """Get cached response if available and not expired.
 
         Args:
@@ -684,7 +692,7 @@ class GracefulDegradation:
         self.cache.clear()
         logger.info("Cleared response cache")
 
-    def simplify_workflow(self, workflow: Dict[str, Any]) -> Dict[str, Any]:
+    def simplify_workflow(self, workflow: dict[str, Any]) -> dict[str, Any]:
         """Simplify workflow for degraded mode.
 
         Args:
@@ -728,7 +736,7 @@ class HealthStatus:
     component: str
     healthy: bool
     message: str
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: HealthDetails = field(default_factory=dict)
     timestamp: float = field(default_factory=time.time)
 
 
@@ -743,7 +751,7 @@ class HealthCheck:
         timeout: Request timeout in seconds
     """
 
-    def __init__(self, ollama_base_url: str = "http://localhost:11434", timeout: int = 5):
+    def __init__(self, ollama_base_url: str = "http://localhost:11434", timeout: int = 5) -> None:
         """Initialize HealthCheck.
 
         Args:
@@ -899,7 +907,7 @@ class HealthCheck:
                 details={"error": str(e)},
             )
 
-    def check_all(self, models: Optional[List[str]] = None) -> Dict[str, HealthStatus]:
+    def check_all(self, models: list[str] | None = None) -> dict[str, HealthStatus]:
         """Perform all health checks.
 
         Args:
@@ -956,9 +964,9 @@ class RecoveryManager:
 
     def __init__(
         self,
-        retry_strategy: Optional[RetryStrategy] = None,
-        fallback_models: Optional[List[str]] = None,
-    ):
+        retry_strategy: RetryStrategy | None = None,
+        fallback_models: list[str] | None = None,
+    ) -> None:
         """Initialize RecoveryManager.
 
         Args:
@@ -970,7 +978,7 @@ class RecoveryManager:
         self.degradation = GracefulDegradation(fallback_models)
         self.health_check = HealthCheck()
 
-        self.checkpoints: Dict[str, Any] = {}
+        self.checkpoints: dict[str, Any] = {}
 
         logger.info("Initialized RecoveryManager")
 
@@ -978,8 +986,8 @@ class RecoveryManager:
         self,
         func: Callable[..., T],
         *args: Any,
-        fallback: Optional[Callable[..., T]] = None,
-        checkpoint_key: Optional[str] = None,
+        fallback: Callable[..., T] | None = None,
+        checkpoint_key: str | None = None,
         **kwargs: Any,
     ) -> T:
         """Execute function with comprehensive recovery strategies.
@@ -1047,7 +1055,7 @@ class RecoveryManager:
         self.checkpoints[key] = {"state": state, "timestamp": time.time()}
         logger.debug(f"Saved checkpoint: {key}")
 
-    def restore_checkpoint(self, key: str) -> Optional[Any]:
+    def restore_checkpoint(self, key: str) -> Any | None:
         """Restore a saved checkpoint.
 
         Args:
@@ -1069,7 +1077,7 @@ class RecoveryManager:
         self.checkpoints.clear()
         logger.info("Cleared all checkpoints")
 
-    def get_system_health(self, models: Optional[List[str]] = None) -> Dict[str, HealthStatus]:
+    def get_system_health(self, models: list[str] | None = None) -> dict[str, HealthStatus]:
         """Get comprehensive system health status.
 
         Args:
@@ -1117,8 +1125,8 @@ class RecoveryManager:
 def with_retry(
     max_retries: int = 3,
     backoff_factor: float = 2.0,
-    fallback: Optional[Callable] = None,
-) -> Callable:
+    fallback: Callable[..., Any] | None = None,
+) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """Decorator to add retry logic to a function.
 
     Args:
@@ -1143,7 +1151,9 @@ def with_retry(
     return decorator
 
 
-def with_circuit_breaker(failure_threshold: int = 5, recovery_timeout: float = 60.0) -> Callable:
+def with_circuit_breaker(
+    failure_threshold: int = 5, recovery_timeout: float = 60.0
+) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """Decorator to add circuit breaker to a function.
 
     Args:
