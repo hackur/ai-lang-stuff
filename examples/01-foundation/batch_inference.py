@@ -78,17 +78,17 @@ async def demo_batch_generation():
     print(f"Average time per prompt: {batch_duration / len(prompts):.2f} seconds")
 
     successful = sum(1 for r in responses if r.get("success", False))
-    print(f"Success rate: {successful}/{len(prompts)} ({successful/len(prompts)*100:.1f}%)")
+    print(f"Success rate: {successful}/{len(prompts)} ({successful / len(prompts) * 100:.1f}%)")
 
     print("\n" + "-" * 80)
     print("Sample Responses (first 3):")
     print("-" * 80)
     for i, resp in enumerate(responses[:3]):
         if resp["success"]:
-            print(f"\n[{i+1}] Prompt: {resp['prompt']}")
+            print(f"\n[{i + 1}] Prompt: {resp['prompt']}")
             print(f"Response: {resp['response'][:200]}...")
         else:
-            print(f"\n[{i+1}] Prompt: {resp['prompt']}")
+            print(f"\n[{i + 1}] Prompt: {resp['prompt']}")
             print(f"Error: {resp.get('error', 'Unknown error')}")
 
     return batch_duration, len(prompts)
