@@ -9,12 +9,12 @@ repos:
       # Run the formatter
       - id: ruff-format
 
-  # Black - Python code formatter (backup)
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
-    hooks:
-      - id: black
-        language_version: python3.12
+  # Black - Python code formatter (disabled - conflicts with ruff-format)
+  # - repo: https://github.com/psf/black
+  #   rev: 24.10.0
+  #   hooks:
+  #     - id: black
+  #       language_version: python3.12
 
   # Type checking with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy

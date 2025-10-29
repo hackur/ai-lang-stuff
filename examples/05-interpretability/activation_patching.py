@@ -44,7 +44,9 @@ def setup_model(model_name: str = "gpt2-small") -> HookedTransformer:
     device = (
         "cuda"
         if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
     )
 
     print(f"Loading {model_name} on {device}...")
